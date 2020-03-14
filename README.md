@@ -1,11 +1,11 @@
 # vgl
 Vector Graphic Library for Python
 
-Why?
+# Why?
 I wanted a simple and light raster & vector graphic plot library.
 It was hard to find a package which provides saving Windows metafile.
 
-Purpose
+# Purpose
 Simple xy plot
 Simple math or physics simulation
 Save screen to image files or WMF(Windows Metafile)
@@ -16,7 +16,7 @@ PIL
 Note
 This library is not full-fledged.
 
-Terminology
+# Terminology
 Frame:
 A frame is individual plot window.
 Users can create multiple frames.
@@ -59,7 +59,7 @@ If symbol size 0.001 and a frame height is 3 inch, the logical symbol size will 
 In DeviceWindowsMetafile, 0.003 is converted to twip.
 0.003 x 1270 = 3.81
 
-Usage
+# Usage
 Import necessary modules
 from frame import Frame, FrameManager
 from data import Data
