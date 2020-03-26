@@ -94,6 +94,9 @@ class DeviceWindowsMetafile(DeviceVector):
 		y2 = self.get_y(ey)
 		self.dev.Line(x1, y1, x2, y2, lcol, lthk)
 
+	def stroke(self):
+		return
+		
 	def moveto(self, x, y):
 		self.dev.MoveTo(self.get_x(x),self.get_y(y))
 		
@@ -260,6 +263,9 @@ class DevicePygame(DeviceRaster):
 		pygame.draw.line(self.screen, self.pen.color, 
 			(self.get_x(sx), self.get_y(sy)),
 			(self.get_x(ex), self.get_y(ey)), math.ceil(self.pen.thk))
+		
+	def stroke(self):
+		return
 		
 	def moveto(self, x, y):
 		self.pos.set(x,y)
@@ -514,9 +520,10 @@ class DeviceCairo(DeviceRaster):
 		self.data  = np.ndarray(shape=(self.ghgt, self.gwid), dtype=np.uint32)
 		self.surf  = cairo.ImageSurface.create_for_data(self.data, 
 		             cairo.FORMAT_ARGB32, self.gwid, self.ghgt)
-		self.cnxt  = cairo.Context(self.surf)
+		self.cntx  = cairo.Context(self.surf)
 		self.lcol  = color.rgb()
 		self.fcol  = color.rgb()
+		self.nlineto = 0
 		
 	def set_device(self, frm):
 		self.frm = frm
@@ -535,12 +542,12 @@ class DeviceCairo(DeviceRaster):
 		self.pen.thk = self.get_xl(lthk)
 		self.pen.color = lcol
 		self.lcol.conv(lcol)
-		self.cnxt.set_source_rgb(self.lcol.r,self.lcol.g,self.lcol.b)
-		self.cnxt.set_line_width(self.pen.thk)
+		self.cntx.set_source_rgb(self.lcol.r,self.lcol.g,self.lcol.b)
+		self.cntx.set_line_width(self.pen.thk)
 		
 	def make_brush(self, fcol):
 		self.fcol.conv(fcol)
-		self.cnxt.set_source_rgb(self.fcol.r,self.fcol.g,self.fcol.b)
+		self.cntx.set_source_rgb(self.fcol.r,self.fcol.g,self.fcol.b)
 		
 	def delete_pen(self):
 		return
@@ -548,45 +555,49 @@ class DeviceCairo(DeviceRaster):
 	def line(self, sx, sy, ex, ey, lcol=0, lthk=0):
 		if lcol!=0:
 			self.make_pen(lcol, lthk)
-		self.cnxt.move_to(self.get_x(sx),self.get_y(sy))
-		self.cnxt.line_to(self.get_x(ex),self.get_y(ey))
-		self.cnxt.stroke()
+		self.cntx.move_to(self.get_x(sx),self.get_y(sy))
+		self.cntx.line_to(self.get_x(ex),self.get_y(ey))
+		self.cntx.stroke()
 		
 	def moveto(self, x, y):
-		self.cnxt.move_to(self.get_x(x),self.get_y(y))
+		#if self.nlineto > 0: 
+		#	self.cntx.stroke()
+		#	self.nlineto = 0
+		self.cntx.move_to(self.get_x(x),self.get_y(y))
 		
 	def lineto(self, x, y):
-		self.cnxt.line_to(self.get_x(x),self.get_y(y))
+		self.cntx.line_to(self.get_x(x),self.get_y(y))
+		self.nlineto += 1
 
 	def stroke(self):
-		self.cnxt.stroke()
+		self.cntx.stroke()
 		
 	def create_pnt_list(self, x, y, convx, convy):
 		self.npnt = len(x)
-		self.cnxt.move_to(convx(x[0]), convy(y[0]))
+		self.cntx.move_to(convx(x[0]), convy(y[0]))
 		for i in range(1,self.npnt):
-			self.cnxt.line_to(convx(x[i]), convy(y[i]))
+			self.cntx.line_to(convx(x[i]), convy(y[i]))
 	
 	def polygon(self, x, y, lcol, fcol, lthk):
 		self.create_pnt_list(x,y,self.get_x,self.get_y)
-		self.cnxt.close_path()
+		self.cntx.close_path()
 		self.make_brush(fcol)
 		
 		if lcol != fcol: 
-			self.cnxt.fill_preserve()
+			self.cntx.fill_preserve()
 			self.make_pen(lcol, lthk)
-			self.cnxt.stroke()
+			self.cntx.stroke()
 		else:
-			self.cnxt.fill()
+			self.cntx.fill()
 		
 	def polyline(self, x, y, lcol=0, lthk=0, closed=False):
 		self.create_pnt_list(x,y,self.get_x,self.get_y)
 		if closed: 
-			self.cnxt.close_path()
+			self.cntx.close_path()
 
 		if lcol !=0: 
 			self.make_pen(lcol, lthk)	
-		self.cnxt.stroke()
+		self.cntx.stroke()
 		
 	def begin(self,lcol,lthk,fcol): return
 	def end(self): return
@@ -601,67 +612,71 @@ class DeviceCairo(DeviceRaster):
 		cx = self.get_x(x)
 		cy = self.get_y(y)
 		rr = self.get_v(rad)
-		self.cnxt.arc(cx,cy,rr,0,two_pi)
+		self.cntx.arc(cx,cy,rr,0,two_pi)
 		if lcol!=0: self.make_pen(lcol,lthk)
 		if fcol!=0: 
 			self.make_brush(fcol)
-			if lcol==0: self.cnxt.fill()
+			if lcol==0: self.cntx.fill()
 			else      : 
-				self.cnxt.fill_preserve()
+				self.cntx.fill_preserve()
 				self.make_pen(lcol,lthk)
-		self.cnxt.stroke()
+		self.cntx.stroke()
 		
 	def symbol(self, x,y, sym, draw=False):
 		px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
 		self.create_pnt_list(px,py,self.get_xl, self.get_yl)
-		self.cnxt.close_path()
+		self.cntx.close_path()
 		self.make_brush(sym.fcol)
-		self.cnxt.fill_preserve()
-		self.make_pen(color.get_rgb(sym.lcol), sym.lthk)
-		self.cnxt.stroke()
+		self.cntx.fill_preserve()
+		#self.make_pen(color.get_rgb(sym.lcol), sym.lthk)
+		self.cntx.stroke()
 		
 	def lline(self, sx, sy, ex, ey, color=0, lthk=0):		
 		if color != 0: self.make_pen(color,lthk)
-		self.cnxt.move_to(self.get_xl(sx),self.get_yl(sy))
-		self.cnxt.line_to(self.get_xl(ex),self.get_yl(ey))
-		self.cnxt.stroke()
+		self.cntx.move_to(self.get_xl(sx),self.get_yl(sy))
+		self.cntx.line_to(self.get_xl(ex),self.get_yl(ey))
+		self.cntx.stroke()
 		
 	def lmoveto(self, x, y):
-		self.cnxt.move_to(self.get_xl(x),self.get_yl(y))
+		self.cntx.move_to(self.get_xl(x),self.get_yl(y))
 		
 	def llineto(self, x,y):
-		self.cnxt.line_to(self.get_xl(x),self.get_yl(y))
+		self.cntx.line_to(self.get_xl(x),self.get_yl(y))
 	
 	def lpolygon(self, x, y, lcol=0, fcol=0, lthk=0):
 		self.create_pnt_list(x,y,self.get_xl,self.get_yl)
-		self.cnxt.close_path()
+		self.cntx.close_path()
 		
 		self.make_brush(fcol)
 		if lcol != fcol:
-			self.cnxt.fill_preserve()
+			self.cntx.fill_preserve()
 			self.make_pen(lcol, lthk)
-			self.cnxt.stroke()
+			self.cntx.stroke()
 		else:
-			self.cnxt.fill()
+			self.cntx.fill()
 
 	def lpolyline(self, x, y, lcol=0, lthk=0, closed=False):
 		self.create_pnt_list(x,y,self.get_xl,self.get_yl)
 		if closed: 
-			self.cnxt.close_path()
+			self.cntx.close_path()
 		
 		if lcol !=0: 
 			self.make_pen(lcol, lthk)	
-		self.cnxt.stroke()
+		self.cntx.stroke()
 	
 	def create_clip(self, x1, y1, x2, y2):
-		self.cnxt.save()
-		self.cnxt.rectangle(self.get_xl(x1),
-							self.get_yl(y1),
-							self.get_xl(x2-x1),
-							self.get_yl(y2-y1))
+		self.cntx.save()
+		sx=self.get_xl(x1)
+		sy=self.get_yl(y1)
+		ex=self.get_xl(x2)
+		ey=self.get_yl(y2)
+		#print("%3.2f %3.2f %3.2f %3.2f"%(sx,sy,ex,ey))
+		self.cntx.rectangle(sx,sy,ex-sx,ey-sy)
+		self.cntx.clip()
+		#print(self.cntx.clip_extents())
 		
 	def delete_clip(self):
-		self.cnxt.restore()
+		self.cntx.restore()
 		
 	def clip(self):	return
 		
@@ -672,7 +687,7 @@ class DeviceCairo(DeviceRaster):
 		elif ext == 'jpg':
 			self.surf.write_to_jpg(self.fname)
 		self.pnt  = None
-		self.cnxt = None
+		self.cntx = None
 		self.surf = None
 		self.data = None
 

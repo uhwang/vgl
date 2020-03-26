@@ -39,7 +39,7 @@ def draw_tick_2d(dev):
 	
 	# draw first minor ticks
 	dev.make_pen(min_tick.lcol, min_tick.lthk*hgt)
-	yy = frm.pdom.get_ey()
+	yy = frm.bbox.sy+frm.pdom.get_ey() #frm.pdom.get_ey()
 		
 	fnt = xaxis.first_nminor_tick
 	if fnt != 0:
@@ -93,7 +93,7 @@ def draw_tick_2d(dev):
 	mispc = yaxis.spacing/(yaxis.nminor_tick+1)
 	
 	dev.make_pen(min_tick.lcol, min_tick.lthk*hgt)
-	xx = frm.pdom.get_sx()
+	xx = frm.bbox.sx+frm.pdom.get_sx()#frm.pdom.get_sx()
 	fnt = yaxis.first_nminor_tick
 	maj_tx0, maj_tx1 = tick_pos_dir(maj_tick, mjtlen)
 	min_tx0, min_tx1 = tick_pos_dir(min_tick, mitlen)

@@ -9,10 +9,16 @@ def draw_axis(dev):
 	
 	# draw x-axis
 	dev.make_pen(xaxis.lcol, xaxis.lthk*frm.hgt())
-	dev.lline(frm.pdom.get_sx(), frm.pdom.get_ey(), frm.pdom.get_ex(), frm.pdom.get_ey())
+	sx = frm.bbox.sx+frm.pdom.sx
+	yy = frm.bbox.sy+frm.pdom.get_ey()
+	ex = frm.bbox.sx+frm.pdom.get_ex()
+	dev.lline(sx, yy, ex, yy)
 	dev.delete_pen()
 	
 	# draw y-axis
 	dev.make_pen(yaxis.lcol, yaxis.lthk*frm.hgt())
-	dev.lline(frm.pdom.get_sx(), frm.pdom.get_ey(), frm.pdom.get_sx(), frm.pdom.get_sy())
+	xx = frm.bbox.sx+frm.pdom.sx
+	sy = frm.bbox.sy+frm.pdom.sy
+	ey = frm.bbox.sy+frm.pdom.get_ey()
+	dev.lline(xx, sy, xx, ey)
 	dev.delete_pen()

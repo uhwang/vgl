@@ -46,9 +46,9 @@ IS_BOTTOM    = lambda a: (a)&TEXT_ALIGN_BOTTOM
 IS_VCENTER   = lambda a: (a)&TEXT_ALIGN_VCENTER
 
 class Font():
-	def __init__(self, fn='RomanSimplex', fid=fontid.FONT_ROMANSIMPLEX, size=0.05,\
+	def __init__(self, fid=fontid.FONT_ROMANDUPLEX, size=0.05,\
 	                   lcol = color.BLACK, lthk=0.001, align = TEXT_ALIGN_BOTTOM):
-		self.font_name = fn
+		self.font_name = fontm.font_manager.get_font_name(fid)
 		self.font_id   = fid
 		self.size      = size
 		self.lcol      = lcol
@@ -257,16 +257,16 @@ def write_text(dev, t):
 def test(dev):
 	tx = 1.5
 	ty = 1.5
-	txt = Text(tx,ty,"! = 3", dev.lpolyline, dev.lpolygon)
+	txt = Text(tx,ty,"!=3", dev.lpolyline, dev.lpolygon)
 	txt.lcol = color.BLUE
 	txt.size *= 2
-	txt.lthk = 0.005
+	txt.lthk = 0.001
 	txt.rotation = 0
 	txt.show_box = True
 	txt.fill_box = False
 	txt.box_fcol = color.YELLOW
 	txt.box_lcol = color.BLACK
-	txt.box_lthk = 0.004
+	#txt.box_lthk = 0.004
 	write_text(dev, txt)
 	#txt.str = "es"
 	#txt.es()

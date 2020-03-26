@@ -11,7 +11,10 @@
 class BBox():
 	def __init__(self,sx,sy,ex,ey):
 		self.set_bbox(sx,sy,ex,ey)
-	
+		
+	def __repr__(self): 
+		return 'sx:2.2f, sy:2.2f, wid: 2.2f, hgt: 2.2f'%(self.sx,self.sy,self.ex,self.ey)
+		
 	def wid(self): return self.ex-self.sx
 	def hgt(self): return self.ey-self.sy
 	def get_xs(self): return [self.sx,self.sx,self.ex,self.ex]
@@ -49,6 +52,9 @@ class Rect():
 		self.sy = sy
 		self.wid = wid
 		self.hgt = hgt
+		
+	def __repr__(self): 
+		return 'sx:2.2f, sy:2.2f, wid: 2.2f, hgt: 2.2f'%(self.sx,self.sy,self.wid,self.hgt)
 		
 	def get_wid(self): return self.wid
 	def get_hgt(self): return self.hgt

@@ -29,6 +29,9 @@ class Symbol(vertex.Vertex):
 		#self.pat      = SVC_SOLID;
 		#self.len      = 0.0
 
+	#def __repr__(self):
+	#	return "x: "+self.get_xs()+"\n"+"y: "+self.get_ys()
+		
 	def set_lcolor(self, col): self.lcol = col
 	def set_fcolor(self, col): self.fcol = col
 	def update_xy(self, x,y):

@@ -23,12 +23,12 @@ def draw_label_2d(dev):
 	
 	wxx = xaxis.first_major_tick_pos
 	vi = 1
-	yy = frm.pdom.get_ey()
+	yy = frm.bbox.sy+frm.pdom.get_ey()
 	
 	dev.make_pen(xlabel.lcol, xlabel.lthk*hgt)
 	#xlabel.size = 0.02
 	#xlabel.lcol = color.BLUE
-	xlabel.lthk = 0.002
+	#xlabel.lthk = 0.002
 	while wxx <= xaxis.max:
 		wxxl = dev.wtol_x(wxx)
 		#dev.lline(wxxl, yy+maj_ty0, wxxl, yy+maj_ty1)
@@ -49,12 +49,12 @@ def draw_label_2d(dev):
 	maj_tick = yaxis.get_major_tick()
 	wyy = yaxis.first_major_tick_pos
 	vi = 1
-	xx = frm.pdom.get_sx()
+	xx = frm.bbox.sx+frm.pdom.get_sx()
 	ylabel.wv()
 	#dev.make_pen(xlabel.lcol, xlabel.lthk*hgt)
 	#ylabel.size = 0.02
 	#ylabel.lcol = color.BLUE
-	ylabel.lthk = 0.002
+	#ylabel.lthk = 0.002
 	ylabel.pos  = 0.03
 	while wyy <= yaxis.max:
 		#print(wyy, yaxis.max)

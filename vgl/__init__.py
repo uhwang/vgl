@@ -12,6 +12,7 @@ from . symbol import Circle, Gradient, RightTriangle, LeftTriangle, Diamond, Squ
 from . text   import Text, write_text
 from . geom   import Square, EquiTriangle, Polygon
 from . drawtick import draw_tick_2d
+from . patline import get_pattern_line
 
 __all__=[
 	"frame", 
@@ -28,7 +29,8 @@ __all__=[
 	"drawaxis",
 	"drawgrid",
 	"drawlabel",
-	"drawtick"
+	"drawtick",
+	"patline"
 	]
 
 
