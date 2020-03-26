@@ -35,9 +35,8 @@ sine_plot_xratio = float(sine_plot_range)/float(max_sine_points)
 sine_track_list = [[0]]
 circle_point = []
 final_wave=[]
-#tt = text.Text(3.5, 2.5)
 tt = text.Text(3.5, 4.7)
-tt.lthk = 0.005
+tt.lthk = 0.002
 tt.lcol = color.BLUE
 tt.hn()
 
@@ -60,7 +59,8 @@ def draw_grid(dev):
 def square_wave(t):
 	global dev, theta, sine_track_list, final_wave, duration
 	thk=0.003*dev.frm.hgt()
-	thk1=thk*4
+	thk1=thk*2
+	thk2=thk*2
 	dev.fill_white()
 	draw_grid(dev)
 	
@@ -79,7 +79,10 @@ def square_wave(t):
 		amp = coef/n
 		x1 = amp*np.cos(theta*n)
 		y1 = amp*np.sin(theta*n)
-		dev.line(tx,ty,tx+x1,ty+y1,color_list[i%len(color_list)], thk1-i*thk1*0.1)
+		#dev.line(tx,ty,tx+x1,ty+y1,color_list[i%len(color_list)], thk1-i*thk1*0.1)
+		dev.line(tx,ty,tx+x1,ty+y1,color.GRAY20, thk2)
+		if i > 0: 
+			dev.circle(tx,ty, amp, lcol=color_list[i%len(color_list)], lthk=thk1)
 		sine_track_list[i] = [y1]+sine_track_list[i][:max_sine_points]
 		yy += y1
 		tx += x1
@@ -97,18 +100,6 @@ def square_wave(t):
 	if npnts > 1:
 		x3 = [j*sine_plot_xratio+sint_trail_xpos for j in range(npnts)]
 		dev.polyline(x3, final_wave, lcol=color.GRAY50, lthk=thk)
-		
-	# plot points
-	#for i, pnts in enumerate(sine_track_list):
-	#	for j, p in enumerate(pnts):
-	#		x3 = sint_trail_xpos+j*sine_plot_xratio
-	#		#dev.circle(x3,p,r4,fcol=color.BLACK)
-	#		dev.circle(x3,p,r4,fcol=color_list[i%len(color_list)])
-	#
-	#for i,p in enumerate(final_wave):
-	#	x3 = sint_trail_xpos+i*sine_plot_xratio
-	#	deg = int(i/max_sine_points*350.0)
-	#	dev.circle(x3,p,r3,fcol=color.hsv(deg,1,1))
 
 	tt.polyline = dev.lpolyline
 	tt.polygon = dev.lpolygon
@@ -140,8 +131,6 @@ def save_wmf(fname, frm, gbbox):
 def save_movie(fname):
 	global dev, duration, nn
 	dur = 30
-	nnn = nn[:]
-	nn = [1]
 	old_dev = dev
 	dev_img = device.DeviceCairo("", gbox, 90)
 	dev_img.set_plot(frm)
@@ -150,7 +139,6 @@ def save_movie(fname):
 	dev_mov = device.DeviceCairoAnimation(fname, dev_img, square_wave, dur)
 	dev_mov.save_video()
 	#dev_mov.save_gif("square01.gif")
-	nn = nnn[:]
 	dev = old_dev
 	
 running = True

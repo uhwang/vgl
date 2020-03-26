@@ -2,7 +2,7 @@
 import numpy as np
 
 from vgl import color, geom, BBox, Frame, FrameManager, Data
-from vgl import DeviceWindowsMetafile, DevicePygame, DeviceAggdraw, DeviceCairo
+from vgl import DeviceWindowsMetafile, DeviceAggdraw, DeviceCairo
 from vgl import drawfrm, symbol, drawtick, drawaxis, drawlabel
 
 
