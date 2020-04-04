@@ -219,6 +219,8 @@ class DeviceRaster():
 	def get_y (self, y): return self.ref_y-(y-self.frm.data.ymin)*self.scal
 	def get_v (self, v): return v*self.scal
 	def size  (self   ): return (self.gwid, self.ghgt)
+	def get_xp(self, x): return int(self.sx_ltop + x)
+	def get_yp(self, y): return int(self.sy_ltop + y)
 		
 class DevicePygame(DeviceRaster):
 	def __init__(self, gbox, dpi, fps=30):
@@ -529,6 +531,12 @@ class DeviceCairo(DeviceRaster):
 		self.frm = frm
 		self.set_plot(frm)
 		
+	def set_surface_pixel(self, x, y, col):
+		self.data[y][x] = int("0xFF%02X%02X%02X"%(col[0],col[1],col[2]),16)
+		
+	def set_pixel(self, x, y, col):
+		self.set_surface_pixel(self.get_xp(x), self.get_yp(y), col)
+		
 	def fill_black(self):
 		self.data[::]=0xff000000
 
@@ -628,7 +636,7 @@ class DeviceCairo(DeviceRaster):
 		self.cntx.close_path()
 		self.make_brush(sym.fcol)
 		self.cntx.fill_preserve()
-		#self.make_pen(color.get_rgb(sym.lcol), sym.lthk)
+		self.make_pen(sym.lcol, sym.lthk)
 		self.cntx.stroke()
 		
 	def lline(self, sx, sy, ex, ey, color=0, lthk=0):		

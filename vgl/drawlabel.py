@@ -24,7 +24,6 @@ def draw_label_2d(dev):
 	wxx = xaxis.first_major_tick_pos
 	vi = 1
 	yy = frm.bbox.sy+frm.pdom.get_ey()
-	
 	dev.make_pen(xlabel.lcol, xlabel.lthk*hgt)
 	#xlabel.size = 0.02
 	#xlabel.lcol = color.BLUE
@@ -35,13 +34,13 @@ def draw_label_2d(dev):
 		ypos = yy + xlabel.pos * hgt
 		xlabel.x = wxxl
 		xlabel.y = ypos
-		xlabel.str = "%1.0f"%wxx
+		xlabel.str = "%1.2f"%wxx
 		xlabel.polyline = dev.lpolyline
 		xlabel.polygon  = dev.lpolygon
 		text.write_text(dev, xlabel)
 		wxx = xaxis.first_major_tick_pos+xaxis.spacing*vi
 		vi+=1
-		if wxx >= xaxis.max: break
+		#if wxx >= xaxis.max: break
 	#dev.delete_pen()
 	
 	yaxis = frm.get_yaxis()
@@ -50,12 +49,12 @@ def draw_label_2d(dev):
 	wyy = yaxis.first_major_tick_pos
 	vi = 1
 	xx = frm.bbox.sx+frm.pdom.get_sx()
-	ylabel.wv()
+	ylabel.ev()
 	#dev.make_pen(xlabel.lcol, xlabel.lthk*hgt)
 	#ylabel.size = 0.02
 	#ylabel.lcol = color.BLUE
 	#ylabel.lthk = 0.002
-	ylabel.pos  = 0.03
+	ylabel.pos  = 0.01
 	while wyy <= yaxis.max:
 		#print(wyy, yaxis.max)
 		wyyl = dev.wtol_y(wyy)
@@ -63,7 +62,7 @@ def draw_label_2d(dev):
 		xpos = xx - ylabel.pos * hgt
 		ylabel.x = xpos
 		ylabel.y = wyyl
-		ylabel.str = "%1.0f"%wyy
+		ylabel.str = "%1.2f"%wyy
 		ylabel.polyline = dev.lpolyline
 		ylabel.polygon  = dev.lpolygon
 		text.write_text(dev, ylabel)

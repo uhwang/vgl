@@ -30,6 +30,9 @@ agg_color = lambda x: (0,x[2],x[1],x[0])
 
 def get_rgb(c): return c[0]/255., c[1]/255., c[2]/255.
 
+#def get_cairo_rgb(c): 
+#	return 
+
 class rgb():
 	def __init__(self,col=WHITE):
 		self.conv(col)

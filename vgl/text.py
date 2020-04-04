@@ -46,7 +46,7 @@ IS_BOTTOM    = lambda a: (a)&TEXT_ALIGN_BOTTOM
 IS_VCENTER   = lambda a: (a)&TEXT_ALIGN_VCENTER
 
 class Font():
-	def __init__(self, fid=fontid.FONT_ROMANDUPLEX, size=0.05,\
+	def __init__(self, fid=fontid.FONT_ROMANSIMPLEX, size=0.05,\
 	                   lcol = color.BLACK, lthk=0.001, align = TEXT_ALIGN_BOTTOM):
 		self.font_name = fontm.font_manager.get_font_name(fid)
 		self.font_id   = fid

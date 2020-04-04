@@ -80,6 +80,8 @@ class Frame():
 	def get_property(self): return self.fmpt
 	def get_xaxis   (self): return self.xaxis
 	def get_yaxis   (self): return self.yaxis
+	def get_pdom_wid(self): return self.pdom.wid
+	def get_pdom_hgt(self): return self.pdom.hgt
 	def update_pdom (self, xm=default_plot_domain_xmargin, 
 		                  ym=default_plot_domain_ymargin):
 		wid = self.bbox.wid()
