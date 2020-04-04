@@ -11,12 +11,15 @@ fmm = FrameManager()
 frm_x2 = fmm.create(0,0,4,4, data)
 clips = []
 
-def fixed_tree(dev, order, length, angle):
+def rand_tree(dev, order, length, angle):
 	global posx, posy, ctbl, dlength, prv_posx, prv_posy, dev_ani, movie
 	
 	dx = length*sin(angle);
 	dy = length*cos(angle);
 	scale = random.random()
+	turnl = random.random()
+	turnr = random.random()
+	
 	prv_posx = posx
 	prv_posy = posy
 	
@@ -39,16 +42,16 @@ def fixed_tree(dev, order, length, angle):
 		clips.append(ImageClip(dev_ani.get_image()).set_duration(0.1))
 	
 	if order > 0:
-		fixed_tree(dev, order - 1, length*0.8, angle + 0.5)
-		fixed_tree(dev, order - 1, length*0.8, angle - 0.5)
+		rand_tree(dev, order - 1, length*0.8, angle + turnl)
+		rand_tree(dev, order - 1, length*0.8, angle - turnr)
 		
 	posx += dx;
 	posy -= dy;
 
-def run_fixed_tree(dev):
+def run_rand_tree(dev):
 	global posx, posy, order, length, ctbl, dlength, prv_posx, prv_posy
 	
-	order = 10
+	order = 9
 	length = 60
 	dlength = 1./(length-1)*0.5;
 
@@ -59,7 +62,7 @@ def run_fixed_tree(dev):
 
 	prv_posx = posx
 	prv_posy = posy
-	fixed_tree(dev, order, length, 0);
+	rand_tree(dev, order, length, 0);
 	dev.stroke()
 
 def save_wmf(fname, gbbox):
@@ -67,7 +70,7 @@ def save_wmf(fname, gbbox):
 	movie = False
 	dev_wmf = DeviceWindowsMetafile(fname, gbbox)
 	dev_wmf.set_device(frm_x2)
-	run_fixed_tree(dev_wmf)
+	run_rand_tree(dev_wmf)
 	dev_wmf.close()
 	
 def save_cairo(fname, gbox, dpi):
@@ -76,14 +79,14 @@ def save_cairo(fname, gbox, dpi):
 	dev_img = DeviceCairo(fname, gbox, dpi)
 	dev_img.fill_black()
 	dev_img.set_plot(frm_x2)
-	run_fixed_tree(dev_img)
+	run_rand_tree(dev_img)
 	if movie:
 		print(len(clips))
-		dev_ani = DeviceCairoAnimation("ftree01.mp4", dev_img, 0,0)
+		dev_ani = DeviceCairoAnimation("ftree2.mp4", dev_img, 0,0)
 		video = concatenate_videoclips(clips, method='compose')
 		#video.write_videofile("ftree01.mp4", fps=30)
-		video.write_gif("ftree01.gif", fps=30)
+		video.write_gif("ftree2.gif", fps=30)
 	dev_img.close()
 	
-save_wmf("ftree1.wmf", fmm.get_gbbox())
-save_cairo("ftree1.png", fmm.get_gbbox(), 300)
+save_wmf("ftree2.wmf", fmm.get_gbbox())
+save_cairo("ftree2.png", fmm.get_gbbox(), 100)
