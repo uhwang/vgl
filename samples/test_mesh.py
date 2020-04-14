@@ -60,8 +60,8 @@ def create_cylinder(r, jpan, ipan, zmin, zmax):
 	
 	return geom
 	
-jpan = 7
-ipan = 7
+jpan = 10
+ipan = 10
 zmin = -0.4
 zmax = 0.4
 
@@ -110,6 +110,13 @@ def plot_geom(dev):
 	drawlabel.draw_label_2d(dev)
 	plot.plot_mesh(dev, mesh, v3d)
 	
+def save_cairo(fname, frm, gbox, dpi):
+	dev_img = DeviceCairo(fname, gbox, dpi)
+	dev_img.fill_white()
+	dev_img.set_plot(frm)
+	plot_geom(dev_img)
+	dev_img.close()
+	
 def save_wmf(fname, frm, gbbox):
 	dev_wmf = DeviceWindowsMetafile(fname, gbbox)
 	dev_wmf.set_device(frm)
@@ -134,6 +141,10 @@ while running:
 			if event.key == K_s:
 				prv_choice = choice
 				choice='s'
+			if event.key == K_i:
+				prv_choice = choice
+				choice='i'
+				
 			elif event.key == K_w:
 				mesh.mode = mesh3d.MESH_WIREFRAME
 			elif event.key == K_h:
@@ -185,6 +196,10 @@ while running:
 	if choice == 's':
 		print('... 3dgeom wmf')
 		save_wmf('3dgeom.wmf', frm, gbbox)
+		choice = prv_choice		
+	elif choice == 'i':
+		print('... 3dgeom png')
+		save_cairo('3dgeom.png', frm, gbbox, 150)
 		choice = prv_choice		
 		
 pygame.quit()
