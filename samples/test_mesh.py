@@ -44,32 +44,62 @@ def create_cylinder(r, jpan, ipan, zmin, zmax):
 	geom = np.zeros((jpnt,ipnt,3),dtype=np.float32)
 	dz = (zmax-zmin)/jpan
 
-	for i in range(ipnt):
-		the = i * dthe
-		x = r*np.cos(the)
-		y = r*np.sin(the)
-		geom[0][i][0] = x
-		geom[0][i][1] = y
-		geom[0][i][2] = zmin
-	
 	for j in range(jpnt):
-		z = j * dz
-		geom[j,:,0] = geom[0,:,0]
-		geom[j,:,1] = geom[0,:,1]
-		geom[j,:,2] = z
+		z = zmin + j*dz
+		for i in range(ipnt):
+			the = i * dthe
+			x = r*np.cos(the)
+			y = r*np.sin(the)
+			geom[j][i][0] = x
+			geom[j][i][1] = y
+			geom[j][i][2] = z
+			
+	#for i in range(ipnt):
+	#	the = i * dthe
+	#	x = r*np.cos(the)
+	#	y = r*np.sin(the)
+	#	geom[0][i][0] = x
+	#	geom[0][i][1] = y
+	#	geom[0][i][2] = zmin
+	#
+	#for j in range(1,jpnt):
+	#	z = zmin+j * dz
+	#	geom[j,:,0:1] = geom[0,:,0:1]
+	#	#geom[j,:,1] = geom[0,:,1]
+	#	geom[j,:,2] = z
 	
 	return geom
-	
+
 jpan = 10
 ipan = 10
 zmin = -0.4
 zmax = 0.4
 
-#wgeom = naca45.create_3d_wing("4412", jpan, ipan, 0, -0.5, 0.5)
+#geom = naca45.create_3d_wing("4412", jpan, ipan, 0, -0.5, 0.5)
 #geom = create_sphere(1, jpan, ipan)
 geom = create_cylinder(0.5, jpan, ipan, zmin, zmax)
 shape = geom.shape
+
 print(shape)
+
+#=====================================
+
+def compare_matplot():
+	import matplotlib.pyplot as plt
+	from matplotlib import cm
+	from matplotlib.ticker import LinearLocator, FormatStrFormatter
+	
+	X = geom[:,:,0]
+	Y = geom[:,:,1]
+	Z = geom[:,:,2]
+	
+	fig = plt.figure()
+	ax = fig.gca(projection='3d')
+	surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+	fig.colorbar(surf, shrink=0.5, aspect=5)
+	plt.show()
+
+#=====================================
 
 xmin = np.min(geom[:,:,0])
 xmax = np.max(geom[:,:,0])
@@ -144,11 +174,18 @@ while running:
 			if event.key == K_i:
 				prv_choice = choice
 				choice='i'
+			if event.key == K_m:
+				prv_choice = choice
+				choice='m'
 				
 			elif event.key == K_w:
 				mesh.mode = mesh3d.MESH_WIREFRAME
 			elif event.key == K_h:
 				mesh.mode = mesh3d.MESH_HIDDENLINE
+				mesh.create_tansform_node(v3d)
+				plot_geom(dev_rst)
+				dev_rst.show()
+			mesh.compute_ave_z()
 				
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			prv_mode = mesh.mode
@@ -201,6 +238,9 @@ while running:
 		print('... 3dgeom png')
 		save_cairo('3dgeom.png', frm, gbbox, 150)
 		choice = prv_choice		
+	elif choice == 'm':
+		compare_matplot()
+		choice = prv_choice
 		
 pygame.quit()
 
