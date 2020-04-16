@@ -71,7 +71,7 @@ def compute_tick_spacing(vmin, vmax):
 			tickSpacing = vv
 	else:
 		if maxExp < 0 and minExp < 0:
-			maxExp = maxExp if fabs(vmax) > fabs(vmin) else minExp
+			maxExp = maxExp if math.fabs(vmax) > math.fabs(vmin) else minExp
 			vv = math.pow(10.0, maxExp)*0.5
 			v1 = int((vmax-vmin)/vv)
 			if   v1 < 4 : vv *= 0.5
@@ -116,6 +116,7 @@ def compute_tick_position(vmin, vmax, mjspace, nMiTick):
 	c=0.
 	d=0
 	b=mjspace/float(nMiTick+1)
+	#b=mjspace/nMiTick
 	vmax = float(vmax)
 	vmin = float(vmin)
 	
@@ -155,7 +156,7 @@ class Label(text.Text):
 	def __init__(self, pos=0.02):
 		super().__init__()
 		self.pos = pos
-		self.size = 0.02
+		self.size = 0.015
 
 class Grid(LineLevelC):
 	def __init__(self, show, lcol=color.BLACK, lthk=0.001, lpat=0, patlen=0):

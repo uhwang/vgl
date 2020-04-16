@@ -11,8 +11,9 @@
 import numpy as np
 
 class Vertex():
-	def __init__(self, nvert):
-		self.vertex = np.empty(nvert*2, dtype='float32')
+	def __init__(self, nvert, dim=2):
+		self.dim = dim
+		self.vertex = np.empty(nvert*dim, dtype='float32')
 		
 	def get_vertices(self): return self.vertex
 	def get_vertex(self, index): return [self.vertex[index*2], self.vertex[index*2+1]]
@@ -23,5 +24,8 @@ class Vertex():
 		self.vertex[i*2]=x
 		self.vertex[i*2+1]=y
 		
-
+#class Vertex3d(Vertex):
+#	def __init__(self, nvert):
+#		super.__init__(nvert, dim=3)
+		
 

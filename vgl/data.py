@@ -17,6 +17,29 @@ class Data():
 		self.zmin=zmin 
 		self.zmax=zmax
 		
+		self.xmin_org=xmin
+		self.xmax_org=xmax 
+		self.ymin_org=ymin 
+		self.ymax_org=ymax 
+		self.zmin_org=zmin 
+		self.zmax_org=zmax
+		
+	def reset(self):
+		self.xmin=self.xmin_org
+		self.xmax=self.xmax_org 
+		self.ymin=self.ymin_org 
+		self.ymax=self.ymax_org 
+		self.zmin=self.zmin_org 
+		self.zmax=self.zmax_org
+	
+	def trans(self, dx, dy, dz):
+		self.xmin+=dx
+		self.xmax+=dx 
+		self.ymin+=dy 
+		self.ymax+=dy 
+		self.zmin+=dz 
+		self.zmax+=dz
+		
 	def get_xrange(self): return self.xmax-self.xmin
 	def get_yrange(self): return self.ymax-self.ymin
 	def get_zrange(self): return self.zmax-self.zmin

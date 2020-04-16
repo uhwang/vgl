@@ -34,6 +34,7 @@ class View3d:
 		
 		self.cx = xvp_center-fx*x_center
 		self.cy = yvp_center-fy*y_center
+		self.vp_center = (self.cx, self.cy)
 		
 	#def prepare_3d(self):
 		#self.vmat = np.identity(4)
@@ -72,7 +73,11 @@ class View3d:
 		self.qq = self.qx*self.qy
 		#return self.qq.rotate(v)
 		p = self.qq.rotate(v)
-		return np.matmul(self.tmat, [p[0], p[1], p[2], 1])
+		return np.matmul(self.tmat[0:3,0:3], p)
+	
+	def vp_translate(self, dx, dy):
+		self.cx += dx
+		self.cy += dy
 	
 	def projection(self, v):
 		p = np.matmul(self.tmat, [v[0],v[1],v[2],1])

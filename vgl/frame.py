@@ -105,6 +105,10 @@ class Frame():
 	def show_border   (self): self.fmpt.border_show = True
 	def hide_header   (self): self.fmpt.header_show = False
 	def hide_border   (self): self.fmpt.border_show = False
+	def translate_xy  (self, dx, dy):
+		self.data.trans(dx,dy,0)
+		self.xaxis.update_tick(self.data.xmin, self.data.xmax)
+		self.yaxis.update_tick(self.data.ymin, self.data.ymax)
 		
 class FrameId():
 	def __init__(self):

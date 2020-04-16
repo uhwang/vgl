@@ -42,36 +42,68 @@ def draw_tick_2d(dev):
 	yy = frm.bbox.sy+frm.pdom.get_ey() #frm.pdom.get_ey()
 		
 	fnt = xaxis.first_nminor_tick
+	#print(fnt)
 	if fnt != 0:
-		vi = 0;
 		for i in range(fnt):
-			wxx = xaxis.first_minor_tick_pos+mispc*vi
+			wxx = xaxis.first_minor_tick_pos+mispc*i
 			wxxl= dev.wtol_x(wxx)
 			dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)
-			vi+=1
-		wxx += mispc
+		wxx += mispc*2
 	else: 
 		wxx = xaxis.first_minor_tick_pos
-		
-	# draw minor ticks
+		#print(wxx)
 	j=0
 	vi = 1
 	owxx = wxx
-	wxx = xaxis.first_minor_tick_pos
+	#wxx = xaxis.first_minor_tick_pos
+
 	while wxx <= xaxis.max:
-		wxxl= dev.wtol_x(wxx)	
-		dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)
-	
+		wxxl = dev.wtol_x(wxx)
+		dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)	
 		if j == xaxis.nminor_tick:
-			vi+=1
+			vi += 1
 			wxx = owxx+mispc*vi
-			vi+=1
+			vi += 1
 			j = 0
 		else:
 			wxx = owxx+mispc*vi
-			vi+=1
-		j+=1
-	dev.delete_pen()
+			vi += 1
+		j += 1
+	dev.delete_pen()	
+	
+
+	
+	#print(fnt)
+	#if fnt > 0:
+	#	vi = 0;
+	#	for i in range(fnt):
+	#		wxx = xaxis.first_minor_tick_pos+mispc*vi
+	#		wxxl= dev.wtol_x(wxx)
+	#		dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)
+	#		vi+=1
+	#	wxx += mispc
+	#else: 
+	#	wxx = xaxis.first_minor_tick_pos
+	#	
+	## draw minor ticks
+	#j=1
+	#vi = 0
+	#owxx = wxx
+    #
+	#while wxx <= xaxis.max:
+	#	wxxl= dev.wtol_x(wxx)	
+	#	dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)
+	#
+	#	if j == xaxis.nminor_tick:
+	#		vi+=2
+	#		wxx = owxx+mispc*vi
+	#		#vi+=1
+	#		j = 1
+	#	else:
+	#		vi+=1
+	#		wxx = owxx+mispc*vi
+	#		j+=1
+	#dev.delete_pen()
 	
 	wxx = xaxis.first_major_tick_pos
 	dev.make_pen(maj_tick.lcol, maj_tick.lthk*hgt)
