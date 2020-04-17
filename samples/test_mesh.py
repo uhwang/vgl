@@ -121,13 +121,12 @@ def save_wmf(fname, frm, gbbox):
 choice = 1
 dev_rst.fill_white()
 mesh.create_tansform_node(v3d)
-mesh.compute_ave_z()
+mesh.compute_avg_z()
 plot_geom(dev_rst)
 dev_rst.show()
 
 while running:
 	dev_rst.fill_white()
-	loopRate = 50
 	
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -200,7 +199,7 @@ while running:
 			#trans = False
 			mesh.mode = prv_mode
 			if mesh.mode is mesh3d.MESH_HIDDENLINE:
-				mesh.compute_ave_z()
+				mesh.compute_avg_z()
 				plot_geom(dev_rst)
 				dev_rst.show()
 			

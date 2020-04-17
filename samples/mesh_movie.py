@@ -63,4 +63,4 @@ dev.create_clip(clip[0],clip[1],clip[2],clip[3])
 
 dev1 = DeviceCairoAnimation('3dgeom.mp4', dev, plot_geom, duration=dura, fps=frmp)
 dev1.save_video()
-
+#dev1.save_gif('3dgeom.gif')
