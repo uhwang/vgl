@@ -2,8 +2,9 @@
 Vector Graphic Library for Python
 
 # Why?
-I wanted a simple and light raster & vector graphic plot library.
-It was hard to find a package which provides saving Windows metafile.
+More than 20 years ago, I used Tecplot with image and vector graphic(PS, EPS, WMF) file export. 
+However, I can't use it because it is a expensive software. I wanted a simple and light raster & vector graphic plot library.
+It was hard to find a package which provides saving Windows metafile. 
 
 # Purpose
 Simple xy plot
