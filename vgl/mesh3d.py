@@ -59,7 +59,7 @@ class SquareMesh3d(LineLevelA):
 			self.tnode.x[i] = p[0]
 			self.tnode.y[i] = p[1]
 
-	def compute_ave_z(self):
+	def compute_avg_z(self):
 		for i, face in enumerate(self.face):
 			n = self.zvalue
 			z = (n[face.index[0]] + n[face.index[1]] +
