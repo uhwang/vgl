@@ -61,31 +61,3 @@ In DeviceWindowsMetafile, 0.003 is converted to twip.
 0.003 x 1270 = 3.81
 
 # Usage
-Import necessary modules
-from frame import Frame, FrameManager
-from data import Data
-from device import DeviceWindowsMetafile, DeviceAggdraw
-import color
-import symbol
-
-Create a frame manager or a frame.
-fmm = FrameManager()
-
-Define limits of world coordinate system with Data
-data = Data(-3,3,-1,10)
-
-Create a frame
-frm = fmm.create(0.0,0.0,2,4, data)
-
-Define a symbol
-sym = symbol.Circle(0.02, dev.frm.hgt(), 0.005)
-0.02 : symbol size
-hgt : frame height
-0.005: symbol line thickness
-
-Create a device such as DevicePygame, DeviceAggdraw, DeviceWindowsMetafile
-dev_wmf = DeviceWindowsMetafile(fname, gbbox)
-user_function(dev_wmf)
-
-Close DeviceAggdraw or DeviceWindowsMetafile.
-dev_wmf.close()
