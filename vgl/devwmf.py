@@ -54,7 +54,7 @@ class PlaceableMetaHeader():
 		self.Top        = _to_twip(bbox.sy)
 		self.Right      = _to_twip(bbox.ex) 
 		self.Bottom     = _to_twip(bbox.ey)
-		self.Inch       = 1270
+		self.Inch       = wc.TWIP_PER_INCH # 1270
 		self.Reserved   = 0; 
 		self.CheckSum   = 0;
 		self.CheckSum  ^= (wc.META_MAGICNUMBER & wc.META_KEYLOW);
@@ -104,26 +104,14 @@ class MetaRecord():
 	def set_param(self, param):
 		self.Field.append(param)
 	
-	def get_ubytes(self):
+	def get_bytes(self, format='=h'):
 		len = 4+2+2*self.nParam
 		bytes = bytearray(len)
 		bytes[0:4] = struct.pack('=L', self.Size)
 		bytes[4:6] = struct.pack('=h', self.Function)
 		x=6
 		for i in range(self.nParam):
-			bytes[x:x+2] = struct.pack('=H', self.Field[i])
-			x += 2
-		return bytes
-	
-	def get_bytes(self):
-		len = 4+2+2*self.nParam
-		bytes = bytearray(len)
-		bytes[0:4] = struct.pack('=L', self.Size)
-		bytes[4:6] = struct.pack('=h', self.Function)
-		x=6
-		for i in range(self.nParam):
-			#bytes[x:x+2] = struct.pack('=H', self.Field[i])
-			bytes[x:x+2] = struct.pack('=h', self.Field[i])
+			bytes[x:x+2] = struct.pack(format, self.Field[i])
 			x += 2
 		return bytes
 		
@@ -282,7 +270,7 @@ class WindowsMetaFile():
 		self.rec.set_param(hatch)
 		self.UpdateHeaderInfo()
 		#self.WriteMetaRecord()
-		self.fp.write(self.rec.get_ubytes())
+		self.fp.write(self.rec.get_bytes(format='=H'))
 		self.rec.release()
 		self.nTh_GDI_Object += 1
 		self.std_head.NumOfObjects += 1
