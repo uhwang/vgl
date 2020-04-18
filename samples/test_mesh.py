@@ -4,42 +4,15 @@ from pygame.locals import *
 import numpy as np
 from vgl import color, geom, BBox, Frame, FrameManager, Data
 from vgl import DeviceWindowsMetafile, DeviceCairo, DevicePygame
-from vgl import drawfrm, drawtick, drawaxis, drawlabel
 from vgl import view3d, mesh3d, plot
 import math
 import cylinder
 
-def create_sphere(r, jpan, ipan):
-	jpnt = jpan+1
-	ipnt = ipan+1
-	twopi= 2*np.pi
-	pi_2 = np.pi*0.5
-	dphi = twopi/(jpan)
-	dthe = twopi/(ipan)
-	geom = np.zeros((jpnt,ipnt,3),dtype=np.float32)
-	ang = 0
-	for j in range(jpnt):
-		#start = pi_2 if math.fabs(ang-twopi) < 0.001 else 0
-		#phi = start+j * dphi
-		#ang = phi
-		phi = j*dphi
-		for i in range(ipnt):
-			the = i*dthe
-			x = r*np.cos(phi)*np.cos(the)
-			y = r*np.cos(phi)*np.sin(the)
-			z = r*np.sin(phi)
-			geom[j][i][0] = x
-			geom[j][i][1] = y
-			geom[j][i][2] = z
-	return geom
-	
 jpan = 15
 ipan = 10
 zmin = -0.4
 zmax = 0.4
 
-#geom = naca45.create_3d_wing("4412", jpan, ipan, 0, -0.5, 0.5)
-#geom = create_sphere(1, jpan, ipan)
 geom = cylinder.create_cylinder(0.5, jpan, ipan, zmin, zmax)
 
 #=====================================
@@ -66,9 +39,6 @@ xmax = np.max(geom[:,:,0])
 ymin = np.min(geom[:,:,1])
 ymax = np.max(geom[:,:,1])
 
-# adjust ymin, ymax for wing geom
-#ymin =-0.5
-#ymax = 0.5
 data = Data(xmin, xmax, ymin, ymax, zmin, zmax)
 fmm = FrameManager()
 frm = fmm.create(0,0,5,5,data)
@@ -94,8 +64,8 @@ move = False
 prv_mode = mesh3d.MESH_WIREFRAME
 win_size = dev_rst.size()
 trans = False
-trans_dx = data.get_xrange()*0.05
-trans_dy = data.get_yrange()*0.05
+trans_dx = data.get_xrange()*0.03
+trans_dy = data.get_yrange()*0.03
 scale = 1.0
 dev_rst.set_plot(frm)
 v3d.scaling(0.5)
@@ -103,7 +73,7 @@ v3d.scaling(0.5)
 def plot_geom(dev):
 	clip = dev.frm.get_clip()
 	dev.create_clip(clip[0],clip[1],clip[2],clip[3])
-	plot.plot_mesh(dev, mesh, v3d)
+	plot.plot_mesh(dev, v3d, mesh)
 	
 def save_cairo(fname, frm, gbox, dpi):
 	dev_img = DeviceCairo(fname, gbox, dpi)
@@ -164,8 +134,6 @@ while running:
 			move = True
 			if buttons[0]:
 				mesh.mode = mesh3d.MESH_WIREFRAME
-				#m_yRotate -= old_pos[0]-new_pos[0]
-				#m_xRotate += old_pos[1]-new_pos[1]
 				dx = new_pos[0]-old_pos[0]
 				dy = new_pos[1]-old_pos[1]
 				if trans:
