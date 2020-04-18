@@ -12,7 +12,7 @@ from vgl import color, mesh3d
 import numpy as np
 from operator import itemgetter
 
-def plot_mesh(dev, mesh, v3d):
+def plot_mesh(dev, v3d, mesh):
 	
 	if mesh.mode is mesh3d.MESH_WIREFRAME:
 		mx = mesh.tnode.x
