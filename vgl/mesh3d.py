@@ -48,6 +48,7 @@ class SquareMesh3d(LineLevelA):
 		self.face   = []#[Face3d()]*nface
 		self.edge   = []#[Edge3d()]*nface
 		
+	def hiddenline(self): self.mode = MESH_HIDDENLINE
 	def create_tansform_node(self, v3d):
 		nnode = self.jpnt*self.ipnt
 		for i in range(nnode):
