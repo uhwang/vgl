@@ -103,8 +103,8 @@ class MetaRecord():
 				
 	def set_param(self, param):
 		self.Field.append(param)
-				
-	def get_bytes(self):
+	
+	def get_ubytes(self):
 		len = 4+2+2*self.nParam
 		bytes = bytearray(len)
 		bytes[0:4] = struct.pack('=L', self.Size)
@@ -112,6 +112,18 @@ class MetaRecord():
 		x=6
 		for i in range(self.nParam):
 			bytes[x:x+2] = struct.pack('=H', self.Field[i])
+			x += 2
+		return bytes
+	
+	def get_bytes(self):
+		len = 4+2+2*self.nParam
+		bytes = bytearray(len)
+		bytes[0:4] = struct.pack('=L', self.Size)
+		bytes[4:6] = struct.pack('=h', self.Function)
+		x=6
+		for i in range(self.nParam):
+			#bytes[x:x+2] = struct.pack('=H', self.Field[i])
+			bytes[x:x+2] = struct.pack('=h', self.Field[i])
 			x += 2
 		return bytes
 		
@@ -269,7 +281,8 @@ class WindowsMetaFile():
 		self.rec.set_param(b)
 		self.rec.set_param(hatch)
 		self.UpdateHeaderInfo()
-		self.WriteMetaRecord()
+		#self.WriteMetaRecord()
+		self.fp.write(self.rec.get_ubytes())
 		self.rec.release()
 		self.nTh_GDI_Object += 1
 		self.std_head.NumOfObjects += 1
@@ -328,9 +341,6 @@ class WindowsMetaFile():
 			self.rec.set_param(_to_twip(x[i]))
 			self.rec.set_param(_to_twip(y[i]))
 
-		#if lcol != fcol: 
-		#	self.Polyline(x,y,True)
-			
 		self.UpdateHeaderInfo()
 		self.WriteMetaRecord()
 		self.DeleteObject(self.cur_brush)
