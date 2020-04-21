@@ -2,7 +2,6 @@
 import numpy as np
 import pyquaternion as pyqt
 
-		
 class View3d:
 	#def __init__(self, znear=0.1,zfar=10000.0,fov=90.):
 	def __init__(self, frm):

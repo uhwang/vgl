@@ -29,13 +29,18 @@ get_line_thk = lambda x : 1 if int(x) == 0 else x
 
 class Pen():
 	def __init__(self):
-		self.color = 0
-		self.thk = 0
+		self.lcol = 0
+		self.lthk = 0
 		
-	def set_pen(self, color, thk):
-		self.color = color
-		self.thk =thk
-
+	def set_pen(self, lcol, lthk):
+		self.lcol = lcol
+		self.lthk =lthk
+class Brush():
+	def __init__(self):
+		self.fcol=(0,0,0)
+	def set_brush(self, fcol):
+		self.fcol = fcol
+		
 class DeviceVector():
 	def __init__(self, gbox):
 		self.gbox =gbox
@@ -71,6 +76,7 @@ class DeviceWindowsMetafile(DeviceVector):
 		super().__init__(gbox)
 		self.dev = dw.WindowsMetaFile(fname, gbox)
 		self.pen = Pen()
+		self.brush = Brush()
 		
 	def set_device(self, frm):
 		self.frm = frm
@@ -80,14 +86,24 @@ class DeviceWindowsMetafile(DeviceVector):
 		return
 		
 	def make_pen(self, color, thk):
-		self.pen.color = color
-		self.pen.thk = thk
+		self.pen.lcol = color
+		self.pen.lthk = thk
 		self.dev.MakePen(color, thk)
-		
+	
 	def delete_pen(self):
 		self.dev.DeletePen()
+		self.pen.lcol = None
+		self.pen.lthk = None
 		
-	def line(self, sx, sy, ex, ey, lcol=0, lthk=0):
+	def make_brush(self, fcol):
+		self.dev.MakeBrush(fcol)
+		self.brush.fcol = fcol
+	
+	def delete_brush(self):
+		self.dev.DeleteBrush()
+		self.brush.fcol = None
+		
+	def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
 		x1 = self.get_x(sx)
 		y1 = self.get_y(sy)
 		x2 = self.get_x(ex)
@@ -103,10 +119,20 @@ class DeviceWindowsMetafile(DeviceVector):
 	def lineto(self, x, y):
 		self.dev.LineTo(self.get_x(x),self.get_y(y))
 		
-	def polygon(self, x, y, lcol, fcol, lthk):
+	def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
 		px=[self.get_x(x[i]) for i in range(len(x))]
 		py=[self.get_y(y[i]) for i in range(len(y))]
-		self.dev.Polygon(px,py,lcol,fcol,lthk)
+		
+		#if lcol: self.make_pen(lcol, lthk)
+		#if fcol: self.make_brush(fcol)
+
+		if not lcol and not fcol:
+			self.dev.Polygon(px,py,None, None, None)
+		else:
+			self.dev.Polygon(px,py,lcol,lthk,fcol)
+
+		#if lcol: self.delete_pen(lcol, lthk)
+		#if fcol: self.delete_brush(fcol)
 		
 	def begin_symbol(self, sym):
 		self.dev.MakePen(sym.lcol, sym.lthk)
@@ -124,31 +150,31 @@ class DeviceWindowsMetafile(DeviceVector):
 		self.dev.Symbol(px,py)
 		if draw: self.end_symbol()
 	
-	def circle(self, x,y, rad, lcol=0, lthk=0, fcol=0):
-		if lcol == 0: self.dev.MakePen(fcol, lthk)
-		else        : self.dev.MakePen(lcol, lthk)
-		if fcol != 0: self.dev.MakeBrush(fcol)
-		else        : self.dev.MakeNullBrush()
+	def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
+		if lcol : self.dev.MakePen(lcol, lthk)
+		else    : self.dev.MakePen(fcol, 0.01) # dummy line thickness 0.1
+		if fcol : self.dev.MakeBrush(fcol)
+		else    : self.dev.MakeNullBrush()
 		x1 = self.get_x(x-rad)
 		y1 = self.get_y(y-rad)
 		x2 = self.get_x(x+rad)
 		y2 = self.get_y(y+rad)
 		self.dev.Circle(x1,y1,x2,y2)
-		self.dev.DeletePen()
-		self.dev.DeleteBrush()
+		if lcol: self.dev.DeletePen()
+		if fcol: self.dev.DeleteBrush()
 		
-	def polyline(self, x, y, lcol=0, lthk=0,closed=False):
-		if lcol != 0: self.dev.MakePen(lcol, lthk)
+	def polyline(self, x, y, lcol=None, lthk=None, closed=False):
+		if lcol: self.dev.MakePen(lcol, lthk)
 		px=[self.get_x(x[i]) for i in range(len(x))]
 		py=[self.get_y(y[i]) for i in range(len(y))]
 		self.dev.Polyline(px,py,closed)
-		if lcol != 0: self.dev.DeletePen()
+		if lcol: self.dev.DeletePen()
 		
-	def lline(self, x1, y1, x2, y2, color=0, lthk=0):
-		if color != 0: self.dev.MakePen(color,lthk)
+	def lline(self, x1, y1, x2, y2, lcol=None, lthk=None):
+		if lcol: self.dev.MakePen(lcol,lthk)
 		self.dev.MoveTo(x1,y1)
 		self.dev.LineTo(x2,y2)
-		if color != 0: self.dev.DeletePen()
+		if lcol: self.dev.DeletePen()
 
 	def lmoveto(self, x, y):
 		self.dev.MoveTo(x,y)
@@ -156,16 +182,21 @@ class DeviceWindowsMetafile(DeviceVector):
 	def llineto(self, x, y):
 		self.dev.LineTo(x,y)
 		
-	def lpolygon(self, x, y, lcol, fcol, lthk=0):
-		self.dev.Polygon(x,y,lcol,fcol,lthk)
+	def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None):
+		self.dev.Polygon(x,y,lcol,lthk,fcol)
 		
-	def lpolyline(self, x, y, lcol=0, lthk=0, closed=False):
-		if lcol != 0: self.dev.MakePen(lcol, lthk)
+	def lpolyline(self, x, y, lcol=None, lthk=None, closed=False):
+		if lcol: 
+			self.dev.MakePen(lcol, lthk)
+			
 		self.dev.Polyline(x, y, closed)
-		if lcol != 0: self.dev.DeletePen()
+		
+		if lcol: 
+			self.dev.DeletePen()
 		
 	def create_clip(self, sx, sy, ex, ey):
 		self.dev.CreateClip(sx, sy, ex, ey)
+		
 	def delete_clip(self):
 		self.dev.DeleteClip(0)
 		
@@ -231,6 +262,7 @@ class DevicePygame(DeviceRaster):
 		self.clock = pygame.time.Clock()
 		self.fps = fps
 		self.pen = Pen()
+		self.brush = Brush()
 		self.pos = Position(0,0)
 		
 	def set_device(self, frm):
@@ -252,19 +284,29 @@ class DevicePygame(DeviceRaster):
 	def show(self):
 		pygame.display.update()
 
-	def make_pen(self, color, lthk):
-		self.pen.set_pen(color, self.get_xl(lthk))
+	def make_pen(self, lcol, lthk):
+		self.pen.set_pen(lcol, self.get_xl(lthk))
 		
-	def delete_pen(self):
+	def make_brush(self, fcol):
+		self.brush.set_brush(fcol)
 		return
 		
-	def line(self, sx, sy, ex, ey, lcol=0, lthk=0):
-		if lcol!=0:
+	def delete_pen(self):
+		self.pen.lcol = None
+		self.pen.lthk = None
+		return
+		
+	def delete_brush(self):
+		self.brush.fcol = None
+		return
+		
+	def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
+		if lcol:
 			self.make_pen(lcol, lthk)
 			self.moveto(sx,sy)
-		pygame.draw.line(self.screen, self.pen.color, 
+		pygame.draw.line(self.screen, self.pen.lcol, 
 			(self.get_x(sx), self.get_y(sy)),
-			(self.get_x(ex), self.get_y(ey)), math.ceil(self.pen.thk))
+			(self.get_x(ex), self.get_y(ey)), math.ceil(self.pen.lthk))
 		
 	def stroke(self):
 		return
@@ -273,88 +315,114 @@ class DevicePygame(DeviceRaster):
 		self.pos.set(x,y)
 		
 	def lineto(self, x, y):
-		pygame.draw.line(self.screen, self.pen.color, 
+		pygame.draw.line(self.screen, self.pen.lcol, 
 			(self.get_x(self.pos.x),
 			 self.get_y(self.pos.y)),
 			(self.get_x(x),
-			 self.get_y(y)), math.ceil(self.pen.thk))
+			 self.get_y(y)), math.ceil(self.pen.lthk))
 		self.pos.set(x,y)
 		
-	def polygon(self, x, y, lcol=0, fcol=0, lthk=0):
+	def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
 		pnt = [(self.get_x(x[i]),
 		        self.get_y(y[i])) for i in range(len(x))]
-		if lcol != 0:
-			self.make_pen(lcol, lthk)
-			
-		pygame.draw.polygon(self.screen, fcol, pnt)
-		if lcol!= fcol: 
-			pygame.draw.polygon(self.screen, self.pen.color, pnt, math.ceil(self.pen.thk))
-
-	def polyline(self, x, y, lcol=0, lthk=0, closed=False):
-		pnt = [(self.get_x(x[i]),
-		        self.get_y(y[i])) for i in range(len(x))]
-		if lcol!=0:
-			self.make_pen(lcol, lthk)
-		pygame.draw.lines(self.screen, self.pen.color, closed, pnt, math.ceil(self.pen.thk))
+				
+		if lcol or fcol:
+			if lcol: self.make_pen(lcol, lthk)
+			if fcol: self.make_brush(fcol)
 		
-	def begin(self,lcol,lthk,fcol): return
-	def end(self): return
+		if self.brush.fcol:
+			pygame.draw.polygon(self.screen, self.brush.fcol, pnt)
+			
+		if self.pen.lcol: 
+			pygame.draw.polygon(self.screen, self.pen.lcol, pnt, math.ceil(self.pen.lthk))
+
+	def polyline(self, x, y, lcol=None, lthk=None, closed=False):
+		pnt = [(self.get_x(x[i]),
+		        self.get_y(y[i])) for i in range(len(x))]
+		if lcol:
+			self.make_pen(lcol, lthk)
+		pygame.draw.lines(self.screen, self.pen.lcol, closed, pnt, math.ceil(self.pen.lthk))
+		
+	def begin(self,lcol,lthk,fcol): 
+		return
 	
-	def begin_symbol(self, sym): return
-	def end_symbol(self): return
+	def end(self): 
+		return
+	
+	def begin_symbol(self, sym): 
+		return
+	
+	def end_symbol(self): 
+		return
+	
 	def create_clip(self, x1, y1, x2, y2):
 		self.screen.set_clip(
 		pygame.Rect(self.get_xl(x1),
 		            self.get_yl(y1),
 					self.get_xl(x2-x1),
 					self.get_yl(y2-y1)))
+					
 	def delete_clip(self):
 		self.screen.set_clip(None)
 	
-	def circle(self, x,y, rad, lcol=0, lthk=0, fcol=0):
+	def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
 		xx = int(self.get_x(x))
 		yy = int(self.get_y(y))
 		rrad = int(rad*self.scal)
-		lthk = int(get_line_thk(lthk*self.lscl))
-		if fcol!=0: pygame.draw.circle(self.screen, fcol, (xx,yy), rrad)
-		if lcol!=0: pygame.draw.circle(self.screen, lcol, (xx,yy), rrad, lthk)
+		
+		if fcol: 
+			pygame.draw.circle(self.screen, fcol, (xx,yy), rrad)
+		if lcol: 
+			lthk = int(get_line_thk(lthk*self.lscl))
+			pygame.draw.circle(self.screen, lcol, (xx,yy), rrad, lthk)
 		
 	def symbol(self, x,y, sym, draw=False):
 		px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
+		
 		pnt = [(self.get_xl(px[i]),
 		        self.get_yl(py[i])) for i in range(len(px))]
+				
 		pygame.draw.polygon(self.screen, sym.fcol, pnt)
-		if sym.lcol!= sym.fcol: pygame.draw.polygon(self.screen, sym.lcol, pnt, 1)
+		
+		if sym.lcol != sym.fcol: 
+			pygame.draw.polygon(self.screen, sym.lcol, pnt, 1)
 
-	def lline(self, sx, sy, ex, ey, color=0, thk=0):
-		if color != 0: self.make_pen(color, thk)
-		pygame.draw.line(self.screen, self.pen.color, 
+	def lline(self, sx, sy, ex, ey, lcol=None, lthk=None):
+		if lcol: 
+			self.make_pen(lcol, lthk)
+			
+		pygame.draw.line(self.screen, self.pen.lcol, 
 			(self.get_xl(sx), self.get_yl(sy)),
-			(self.get_xl(ex), self.get_yl(ey)), math.ceil(self.pen.thk))
+			(self.get_xl(ex), self.get_yl(ey)), 
+			math.ceil(self.pen.lthk))
 
 	def lmoveto(self, x, y):
 		self.pos.set(x,y)
 		
 	def llineto(self, x,y):
-		pygame.draw.line(self.screen, self.pen.color, 
+		pygame.draw.line(self.screen, self.pen.lcol, 
 		    (self.get_xl(self.pos.x), self.get_yl(self.pos.y)),
 			(self.get_xl(x), self.get_yl(y)))
 		self.pos.set(x,y)
 	
-	def lpolygon(self, x, y, lcol=0, fcol=0, lthk=0):
+	def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None):
 		pnt = [(self.get_xl(x[i]),
 		        self.get_yl(y[i])) for i in range(len(x))]
-		pygame.draw.polygon(self.screen, fcol, pnt)
-		if lcol !=0 and lcol != fcol: 
-			self.make_pen(lcol, lthk)				
-			pygame.draw.polygon(self.screen, self.pen.lcol, pnt, math.ceil(self.pen.thk))
-
-	def lpolyline(self, x, y, lcol=0, lthk=0, closed=False):
-		pnt = [(self.get_xl(x[i]),
-		        self.get_yl(y[i])) for i in range(len(x))]
-		if lcol!=0:
+				
+		if fcol: 			
+			pygame.draw.polygon(self.screen, fcol, pnt)
+		
+		if lcol and (lcol != fcol):
 			self.make_pen(lcol, lthk)
-		pygame.draw.lines(self.screen, self.pen.color, closed, pnt, math.ceil(self.pen.thk))
+			pygame.draw.polygon(self.screen, self.pen.lcol, pnt, math.ceil(self.pen.lthk))
+			
+	def lpolyline(self, x, y, lcol=None, lthk=None, closed=False):
+		pnt = [(self.get_xl(x[i]),
+		        self.get_yl(y[i])) for i in range(len(x))]
+		if lcol:
+			self.make_pen(lcol, lthk)
+			
+		pygame.draw.lines(self.screen, self.pen.lcol, closed, pnt, math.ceil(self.pen.lthk))
 		
 	def show(self):
 		pygame.display.update()
@@ -374,6 +442,7 @@ class DeviceAggdraw(DeviceRaster):
 		super().__init__(gbox, dpi)
 		self.fname = fname
 		self.pen = Pen()
+		self.brush = Brush()
 		self.pos = Position(0,0)
 		self.img = Image.new('RGB', (self.gwid, self.ghgt), (255,255,255))
 		self.agg = aggdraw.Draw(self.img)
@@ -394,23 +463,32 @@ class DeviceAggdraw(DeviceRaster):
 		#self.screen.fill(color.CYAN)
 		return
 
-	def make_pen(self, color, lthk):
-		self.pen.thk = self.get_xl(lthk)
-		self.pen.color = color
-		self.agg_pen = aggdraw.Pen(color, self.pen.thk)
+	def make_pen(self, lcol, lthk):
+		self.pen.lthk = lthk #self.get_xl(lthk)
+		self.pen.lcol = lcol
+		self.agg_pen = aggdraw.Pen(color, self.get_xl(lthk))
 		
 	def make_brush(self, fcol):
+		self.brush.fcol = fcol
 		self.agg_brush = aggdraw.Brush(fcol)
 		
 	def delete_pen(self):
+		self.pen.lcol = None
+		self.pen.lthk = None
 		return
 		
-	def line(self, sx, sy, ex, ey, lcol=0, lthk=0):
-		if lcol!=0:
-			self.make_pen(lcol, lthk)
+	def delete_brush(self):
+		self.brush.fcol = None
+		
+	def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
+		if lcol           : self.make_pen(lcol, lthk)
+		elif self.pen.lcol: self.make_pen(self.pen.lcol, self.pen.lthk)
+		
 		self.agg.line((self.get_x(sx), self.get_y(sy),
 		              self.get_x(ex), self.get_y(ey)), self.agg_pen)
 		self.agg.flush()
+		
+		if lcol: self.delete_pen()
 		
 	def moveto(self, x, y):
 		#self.agg.moveto(x,y)
@@ -431,12 +509,24 @@ class DeviceAggdraw(DeviceRaster):
 			self.pnt[npnt*2]=self.pnt[0]
 			self.pnt[npnt*2+1]=self.pnt[1]
 		
-	def polygon(self, x, y, lcol, fcol, lthk):
+	def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
 		self.create_pnt_list(x,y,self.get_x, self.get_y,False)
-		self.make_pen(lcol, lthk)
-		self.make_brush(fcol)
-		self.agg.polygon(self.pnt, self.agg_pen, self.agg_brush)
+		
+		if lcol: self.make_pen(lcol, lthk)
+		else   : self.make_pen(self.pen.lcol, self.pen.lthk)
+
+		if fcol: self.make_brush(fcol)
+		else   : self.make_brush(self.brush.fcol)
+			
+		if (lcol and not fcol) or (self.pen.lcol and not self.brush.fcol): 
+			self.agg.polygon(self.pnt, self.agg_pen)
+		if (lcol and fcol) or (self.pen.lcol and self.brush.fcol): 
+			self.agg.polygon(self.pnt, self.agg_pen, self.agg_brush)
+			
 		self.agg.flush()
+		
+		if lcol: self.delete_pen()
+		if fcol: self.delete_brush()
 		
 	def polyline(self, x, y, lcol=0, lthk=0, closed=False):
 		self.create_pnt_list(x,y,self.get_x,self.get_y, closed)
@@ -453,19 +543,31 @@ class DeviceAggdraw(DeviceRaster):
 		
 	def end_symbol(self): return
 	
-	def circle(self, x,y, rad, lcol=0, lthk=0, fcol=0):
+	def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
 		x1 = self.get_x(x-rad)
 		y1 = self.get_y(y-rad)
 		x2 = self.get_x(x+rad)
 		y2 = self.get_y(y+rad)
 		xy = (x1,y1,x2,y2)
-		if fcol!=0: 
-			self.make_brush(fcol)
+		#if fcol!=0: 
+		#	self.make_brush(fcol)
+		#	self.agg.ellipse(xy,self.agg_brush)
+		#if lcol!=0:
+		#	self.make_pen(fcol,lthk)
+		#	self.agg.ellipse(xy,self.agg_pen)
+		if fcol or self.brush.fcol:
+			if fcol: self.make_brush(fcol)
+			elif self.brush.fcol: self.make_brush(self.brush.fcol)
 			self.agg.ellipse(xy,self.agg_brush)
-		if lcol!=0:
-			self.make_pen(fcol,lthk)
+		
+		if lcol or self.pen.lcol:
+			if lcol: self.make_pen(fcol,lthk)
+			elif self.pen.lcol: self.make_pen(self.pen.lcol, self.pen.lthk)
 			self.agg.ellipse(xy,self.agg_pen)
+		
 		self.agg.flush()
+		if lcol: self.delete_pen()
+		if fcol: self.delete_brush()
 		
 	def symbol(self, x,y, sym, draw=False):
 		px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
@@ -475,36 +577,49 @@ class DeviceAggdraw(DeviceRaster):
 		if draw: self.end_symbol()
 		self.agg.flush()
 		
-	def lline(self, sx, sy, ex, ey, color=0, lthk=0):
-		if color != 0: self.make_pen(color, lthk)
+	def lline(self, sx, sy, ex, ey, lcol=None, lthk=None):
+		if lcol: self.make_pen(color, lthk)
+		elif self.pen.lcol: self.make_pen(self.pen.lcol, self.pen.lthk)
 		xy = (self.get_xl(sx), self.get_yl(sy), self.get_xl(ex), self.get_yl(ey))
 		self.agg.line(xy, self.agg_pen)
 		self.agg.flush()
+		if lcol: self.delete_pen()
 		
 	def create_clip(self, x1, y1, x2, y2):
 		return
+		
 	def delete_clip(self):
 		return
+		
 	def lmoveto(self, x, y):
 		return
 		
 	def llineto(self, x,y):
 		return
 	
-	def lpolygon(self, x, y, lcol=0, fcol=0, lthk=0):
+	def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None):
 		self.create_pnt_list(x,y,self.get_xl,self.get_yl,False)
-		if lcol != 0: self.make_pen(lcol, lthk)
-		if fcol != 0: self.make_brush(fcol)
+		
+		if lcol:
+			self.make_pen(lcol, lthk)
+			
+		if fcol:
+			if not lcol: self.make_pen(fcol, 0.001) # dummy line thk
+			self.make_brush(fcol)
+			
 		self.agg.polygon(self.pnt, self.agg_pen, self.agg_brush)
 		self.agg.flush()
 
-	def lpolyline(self, x, y, lcol=0, lthk=0, closed=False):
+	def lpolyline(self, x, y, lcol=None, lthk=None, closed=False):
 		self.create_pnt_list(x,y,self.get_xl,self.get_yl,closed)
+		
 		if closed: 
 			npnt=len(x)
 			self.pnt[npnt*2]=self.pnt[0]
 			self.pnt[npnt*2+1]=self.pnt[1]
-		if lcol != 0: self.make_pen(lcol, lthk)
+			
+		if lcol: 
+			self.make_pen(lcol, lthk)
 		self.agg.line(self.pnt,self.agg_pen)
 		self.agg.flush()
 		
@@ -518,6 +633,8 @@ class DeviceCairo(DeviceRaster):
 		super().__init__(gbox, dpi)
 		self.fname = fname
 		self.pen   = Pen()
+		self.prv_pen = Pen()
+		self.brush = Brush()
 		self.pos   = Position(0,0)
 		self.data  = np.ndarray(shape=(self.ghgt, self.gwid), dtype=np.uint32)
 		self.surf  = cairo.ImageSurface.create_for_data(self.data, 
@@ -547,30 +664,33 @@ class DeviceCairo(DeviceRaster):
 		self.data[::]=0xff00ffff
 	
 	def make_pen(self, lcol, lthk):
-		self.pen.thk = self.get_xl(lthk)
-		self.pen.color = lcol
+		self.pen.lthk = lthk
+		self.pen.lcol = lcol
 		self.lcol.conv(lcol)
 		self.cntx.set_source_rgb(self.lcol.r,self.lcol.g,self.lcol.b)
-		self.cntx.set_line_width(self.pen.thk)
+		self.cntx.set_line_width(self.get_xl(lthk))
 		
 	def make_brush(self, fcol):
 		self.fcol.conv(fcol)
 		self.cntx.set_source_rgb(self.fcol.r,self.fcol.g,self.fcol.b)
+		self.brush.fcol = fcol
 		
 	def delete_pen(self):
-		return
+		self.pen.lcol = None
+		self.pen.lthk = None
 		
-	def line(self, sx, sy, ex, ey, lcol=0, lthk=0):
-		if lcol!=0:
+	def delete_brush(self):
+		self.brush.fcol = None
+		
+	def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
+		if lcol:
 			self.make_pen(lcol, lthk)
+			
 		self.cntx.move_to(self.get_x(sx),self.get_y(sy))
 		self.cntx.line_to(self.get_x(ex),self.get_y(ey))
 		self.cntx.stroke()
 		
 	def moveto(self, x, y):
-		#if self.nlineto > 0: 
-		#	self.cntx.stroke()
-		#	self.nlineto = 0
 		self.cntx.move_to(self.get_x(x),self.get_y(y))
 		
 	def lineto(self, x, y):
@@ -586,49 +706,59 @@ class DeviceCairo(DeviceRaster):
 		for i in range(1,self.npnt):
 			self.cntx.line_to(convx(x[i]), convy(y[i]))
 	
-	def polygon(self, x, y, lcol, fcol, lthk):
-		self.create_pnt_list(x,y,self.get_x,self.get_y)
-		self.cntx.close_path()
-		self.make_brush(fcol)
-		
-		if lcol != fcol: 
-			self.cntx.fill_preserve()
-			self.make_pen(lcol, lthk)
+	def draw_geometry(self, lcol, lthk, fcol):
+		if fcol or self.brush.fcol: 
+			if fcol: self.make_brush(fcol)
+			else   : self.make_brush(self.brush.fcol)
+			if lcol or self.pen.lcol:
+				self.cntx.fill_preserve()
+			else:
+				self.cntx.fill()
+			
+		if lcol or self.pen.lcol:
+			if lcol: self.make_pen(lcol, lthk)
+			else   : self.make_pen(self.pen.lcol, self.pen.lthk)
 			self.cntx.stroke()
-		else:
-			self.cntx.fill()
 		
-	def polyline(self, x, y, lcol=0, lthk=0, closed=False):
+		if lcol: self.delete_pen()
+		if fcol: self.delete_brush()
+		
+	def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
 		self.create_pnt_list(x,y,self.get_x,self.get_y)
+		self.cntx.close_path()		
+		self.draw_geometry(lcol, lthk, fcol)
+
+	def polyline(self, x, y, lcol=None, lthk=None, closed=False):
+		self.create_pnt_list(x,y,self.get_x,self.get_y)
+						
 		if closed: 
 			self.cntx.close_path()
 
-		if lcol !=0: 
-			self.make_pen(lcol, lthk)	
+		if lcol: self.make_pen(lcol, lthk)
+		else   : self.make_pen(self.pen.lcol, self.pen.lthk)
 		self.cntx.stroke()
 		
-	def begin(self,lcol,lthk,fcol): return
-	def end(self): return
+		if lcol: self.delete_pen()
+		
+	def begin(self,lcol,lthk,fcol): 
+		return
+		
+	def end(self): 
+		return
 	
 	def begin_symbol(self, sym): 
 		self.make_pen(sym.lcol, sym.lthk)
 		self.make_brush(sym.fcol)
 		
-	def end_symbol(self): return
+	def end_symbol(self): 
+		return
 	
-	def circle(self, x,y, rad, lcol=0, lthk=0, fcol=0):
+	def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
 		cx = self.get_x(x)
 		cy = self.get_y(y)
 		rr = self.get_v(rad)
 		self.cntx.arc(cx,cy,rr,0,two_pi)
-		if lcol!=0: self.make_pen(lcol,lthk)
-		if fcol!=0: 
-			self.make_brush(fcol)
-			if lcol==0: self.cntx.fill()
-			else      : 
-				self.cntx.fill_preserve()
-				self.make_pen(lcol,lthk)
-		self.cntx.stroke()
+		self.draw_geometry(lcol, lthk, fcol)
 		
 	def symbol(self, x,y, sym, draw=False):
 		px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
@@ -639,11 +769,14 @@ class DeviceCairo(DeviceRaster):
 		self.make_pen(sym.lcol, sym.lthk)
 		self.cntx.stroke()
 		
-	def lline(self, sx, sy, ex, ey, color=0, lthk=0):		
-		if color != 0: self.make_pen(color,lthk)
+	def lline(self, sx, sy, ex, ey, lcol=None, lthk=None):
+		if lcol: self.make_pen(lcol, lthk)
+		else   : self.make_pen(self.pen.lcol, self.pen.lthk)
 		self.cntx.move_to(self.get_xl(sx),self.get_yl(sy))
 		self.cntx.line_to(self.get_xl(ex),self.get_yl(ey))
 		self.cntx.stroke()
+		
+		if lcol: self.delete_pen()
 		
 	def lmoveto(self, x, y):
 		self.cntx.move_to(self.get_xl(x),self.get_yl(y))
@@ -651,25 +784,40 @@ class DeviceCairo(DeviceRaster):
 	def llineto(self, x,y):
 		self.cntx.line_to(self.get_xl(x),self.get_yl(y))
 	
-	def lpolygon(self, x, y, lcol=0, fcol=0, lthk=0):
+	def lpolygon(self, x, y, lcol=None, fcol=None, lthk=None):
 		self.create_pnt_list(x,y,self.get_xl,self.get_yl)
 		self.cntx.close_path()
 		
-		self.make_brush(fcol)
-		if lcol != fcol:
-			self.cntx.fill_preserve()
-			self.make_pen(lcol, lthk)
-			self.cntx.stroke()
-		else:
-			self.cntx.fill()
-
-	def lpolyline(self, x, y, lcol=0, lthk=0, closed=False):
+		#self.make_brush(fcol)
+		#if lcol and (lcol != fcol):
+		#	self.cntx.fill_preserve()
+		#	self.make_pen(lcol, lthk)
+		#	self.cntx.stroke()
+		#else:
+		#	self.cntx.fill()
+		
+		#if fcol or self.brush.fcol:
+		#	if fcol: self.make_brush(fcol)
+		#	else   : self.make_brush(self.brush.fcol)
+		#	self.cntx.fill_preserve()
+		#
+		#if lcol: self.make_pen(lcol, lthk)
+		#else   : self.make_pen(self.pen.lcol, self.pen.lthk)
+		#
+		#self.cntx.stroke()
+		#
+		#if lcol: self.delete_pen()
+		#if fcol: self.delete_brush()
+		
+		self.draw_geometry(lcol, lthk, fcol)
+		
+	def lpolyline(self, x, y, lcol=None, lthk=None, closed=False):
 		self.create_pnt_list(x,y,self.get_xl,self.get_yl)
 		if closed: 
 			self.cntx.close_path()
 		
-		if lcol !=0: 
-			self.make_pen(lcol, lthk)	
+		if lcol: self.make_pen(lcol, lthk)	
+		else   : self.make_pen(self.pen.lcol, self.pen.lthk)
 		self.cntx.stroke()
 	
 	def create_clip(self, x1, y1, x2, y2):
@@ -678,15 +826,14 @@ class DeviceCairo(DeviceRaster):
 		sy=self.get_yl(y1)
 		ex=self.get_xl(x2)
 		ey=self.get_yl(y2)
-		#print("%3.2f %3.2f %3.2f %3.2f"%(sx,sy,ex,ey))
 		self.cntx.rectangle(sx,sy,ex-sx,ey-sy)
 		self.cntx.clip()
-		#print(self.cntx.clip_extents())
 		
 	def delete_clip(self):
 		self.cntx.restore()
 		
-	def clip(self):	return
+	def clip(self):	
+		return
 		
 	def close(self, format='png'):
 		ext = format.lower()

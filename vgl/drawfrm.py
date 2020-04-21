@@ -41,7 +41,8 @@ def draw_frame(dev, frm):
 		ey = sy+frm.bbox.hgt()*fp.header_thk
 		xx = [sx,sx,ex,ex]
 		yy = [sy,ey,ey,sy]
-		dev.lpolygon(xx, yy, fp.header_col, fp.header_col)
+		#dev.lpolygon(xx, yy, lcol=fp.header_col, fcol=fp.header_col)
+		dev.lpolygon(xx, yy, fcol=fp.header_col)
 		
 	if fp.border_show:
 		dev.lpolyline(frm.get_frm_xs(), 
