@@ -68,6 +68,8 @@ trans_dx = data.get_xrange()*0.03
 trans_dy = data.get_yrange()*0.03
 scale = 1.0
 dev_rst.set_plot(frm)
+v3d.xrotation(30)
+v3d.yrotation(30)
 v3d.scaling(0.5)
 
 def plot_geom(dev):
@@ -121,6 +123,7 @@ while running:
 			elif event.key == K_h:
 				print("... Hiddenline mode")
 				mesh.mode = mesh3d.MESH_HIDDENLINE
+				mesh.render_show = True
 				plot_geom(dev_rst)
 				dev_rst.show()
 				
