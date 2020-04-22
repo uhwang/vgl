@@ -8,8 +8,8 @@ from vgl import view3d, mesh3d, plot
 import math
 import cylinder
 
-jpan = 15
-ipan = 10
+jpan = 1
+ipan = 3
 zmin = -0.4
 zmax = 0.4
 
@@ -34,6 +34,9 @@ def compare_matplot():
 
 #=====================================
 
+def get_center(a,b): return (a+b)*0.5
+def get_half  (min,max): return (max-min)*0.5
+
 xmin = np.min(geom[:,:,0])
 xmax = np.max(geom[:,:,0])
 ymin = np.min(geom[:,:,1])
@@ -46,6 +49,15 @@ frm = fmm.create(0,0,5,5,data)
 mesh = mesh3d.SquareMesh3d(geom.shape[0], geom.shape[1])
 mesh.create_node(geom)
 mesh.create_mesh()
+#mesh.create_axis((get_center(xmin,xmax),
+#                  get_center(ymin,ymax),
+#				  get_center(zmin,zmax)), 
+#				  get_half  (xmin,xmax),
+#				  get_half  (ymin,ymax),
+#				  get_half  (zmin,zmax))
+
+mesh.create_axis((0,0,0),get_half(xmin,xmax),get_half(ymin,ymax),get_half(zmin,zmax))
+mesh.set_show_axis(True)
 v3d = view3d.View3d(frm)
 
 running = True
@@ -71,6 +83,7 @@ dev_rst.set_plot(frm)
 v3d.xrotation(30)
 v3d.yrotation(30)
 v3d.scaling(0.5)
+render = False
 
 def plot_geom(dev):
 	clip = dev.frm.get_clip()
@@ -113,9 +126,16 @@ while running:
 			elif event.key == K_m:
 				prv_choice = choice
 				choice='m'
+			elif event.key == K_r:
+				render = ~render
+				mesh.set_render_show(render)
+				plot_geom(dev_rst)
+				dev_rst.show()
 			elif event.key == K_w:
 				print("... Wireframe mode")
 				mesh.mode = mesh3d.MESH_WIREFRAME
+				plot_geom(dev_rst)
+				dev_rst.show()
 			elif event.key == K_t:
 				print("... translation")
 				trans = ~trans
@@ -123,7 +143,6 @@ while running:
 			elif event.key == K_h:
 				print("... Hiddenline mode")
 				mesh.mode = mesh3d.MESH_HIDDENLINE
-				mesh.render_show = True
 				plot_geom(dev_rst)
 				dev_rst.show()
 				

@@ -42,7 +42,7 @@ def draw_shape(dev):
 	drawfrm.draw_axis(dev, dev.frm.data)
 	for i in range(len(plist)):
 		sh = plist[i]
-		dev.polygon(sh.get_xs(), sh.get_ys(), sh.lcol, sh.fcol, sh.lthk*dev.frm.hgt())
+		dev.polygon(sh.get_xs(), sh.get_ys(), sh.lcol, sh.lthk*dev.frm.hgt(), sh.fcol)
 
 def save_wmf(fname, frm, gbbox):
 	dev_wmf = DeviceWindowsMetafile(fname, gbbox)

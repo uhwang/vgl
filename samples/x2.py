@@ -11,7 +11,7 @@ y2 = x**2
 
 data = Data(-3,3,-1,10)
 fmm = FrameManager()
-frm_x2 = fmm.create(0.0,0.0,2,4, data)
+frm_x2 = fmm.create(0.0,0.0,2.3,4, data)
 
 def plot_x2(dev):
 	drawaxis.draw_axis(dev)

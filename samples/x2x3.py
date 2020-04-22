@@ -130,7 +130,7 @@ while running:
 		choice = prv_choice		
 	elif choice == 'i':
 		print('... save img')
-		save_img('x2x3.jpg',gbox, 150)
+		save_img('x2x3.png',gbox, 200)
 		choice = prv_choice		
 	dev_rst.show()
 
