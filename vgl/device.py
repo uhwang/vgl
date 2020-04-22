@@ -126,11 +126,13 @@ class DeviceWindowsMetafile(DeviceVector):
 		#if lcol: self.make_pen(lcol, lthk)
 		#if fcol: self.make_brush(fcol)
 
-		if not lcol and not fcol:
-			self.dev.Polygon(px,py,None, None, None)
-		else:
-			self.dev.Polygon(px,py,lcol,lthk,fcol)
-
+		#if lcol or fcol:
+		#	self.dev.Polygon(px,py,lcol,lthk,fcol)
+		#else:
+		#	#self.dev.Polygon(px,py,self.pen.lcol, self.pen.lthk, self.brush.fcol)
+		#	self.dev.Polygon(px,py,self.pen.lcol, self.pen.lthk, self.brush.fcol)
+		self.dev.Polygon(px,py,lcol,lthk,fcol)
+			
 		#if lcol: self.delete_pen(lcol, lthk)
 		#if fcol: self.delete_brush(fcol)
 		
@@ -395,6 +397,8 @@ class DevicePygame(DeviceRaster):
 			(self.get_xl(sx), self.get_yl(sy)),
 			(self.get_xl(ex), self.get_yl(ey)), 
 			math.ceil(self.pen.lthk))
+		if lcol:
+			self.delete_pen()
 
 	def lmoveto(self, x, y):
 		self.pos.set(x,y)

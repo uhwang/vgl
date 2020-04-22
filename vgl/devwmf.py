@@ -54,18 +54,18 @@ class PlaceableMetaHeader():
 		self.Top        = _to_twip(bbox.sy)
 		self.Right      = _to_twip(bbox.ex) 
 		self.Bottom     = _to_twip(bbox.ey)
-		self.Inch       = wc.TWIP_PER_INCH # 1270
-		self.Reserved   = 0; 
-		self.CheckSum   = 0;
-		self.CheckSum  ^= (wc.META_MAGICNUMBER & wc.META_KEYLOW);
+		self.Inch       = wc.TWIP_PER_INCH
+		self.Reserved   = 0
+		self.CheckSum   = 0
+		self.CheckSum  ^= (wc.META_MAGICNUMBER & wc.META_KEYLOW)
 		val             = wc.META_MAGICNUMBER & wc.META_KEYHIGH
 		self.CheckSum  ^= rshift_u32(val, wc.META_KEYSHIFT)
 		self.CheckSum  ^= self.Handle
-		self.CheckSum  ^= self.Left;
-		self.CheckSum  ^= self.Top;
-		self.CheckSum  ^= self.Right;
-		self.CheckSum  ^= self.Bottom;
-		self.CheckSum  ^= self.Inch;
+		self.CheckSum  ^= self.Left
+		self.CheckSum  ^= self.Top
+		self.CheckSum  ^= self.Right
+		self.CheckSum  ^= self.Bottom
+		self.CheckSum  ^= self.Inch
 		self.CheckSum  ^= (self.Reserved & wc.META_KEYLOW)
 		val             = self.Reserved & wc.META_KEYHIGH
 		self.CheckSum  ^= rshift_u32(val, wc.META_KEYSHIFT)
@@ -218,9 +218,9 @@ class WindowsMetaFile():
 		self.WriteMetaRecord()
 		self.rec.release()
 
-	def MakePen(self, color, thk):
-		thk = _to_twip(thk)
-		self.cur_pen = self.CreatePenIndirect(wc.PS_SOLID, thk, 0, color)
+	def MakePen(self, lcol, lthk):
+		thk = _to_twip(lthk)
+		self.cur_pen = self.CreatePenIndirect(wc.PS_SOLID, thk, 0, lcol)
 		self.SelectObject(self.cur_pen)
 		return self.cur_pen
 		
@@ -240,11 +240,15 @@ class WindowsMetaFile():
 	def DeleteBrush(self):
 		self.DeleteObject(self.cur_brush)
 		
-	def Line(self, x1, y1, x2, y2, lcol=0, thk=0):
-		if lcol != 0: self.MakePen(lcol, thk)
+	def Line(self, x1, y1, x2, y2, lcol=None, lthk=None):
+		if lcol: 
+			self.MakePen(lcol, lthk)
+			
 		self.MoveTo   (x1, y1)
 		self.LineTo   (x2, y2)
-		if lcol !=0: self.DeletePen()
+		
+		if lcol: 
+			self.DeletePen()
 
 	def CreatePenIndirect(self, style, x_wid, y_hgt, color):
 		self.rec.set_record(wc.META_CREATEPENINDIRECT, 5)
@@ -255,7 +259,8 @@ class WindowsMetaFile():
 		self.rec.set_param(gr)
 		self.rec.set_param(b)
 		self.UpdateHeaderInfo()
-		self.WriteMetaRecord()
+		#self.WriteMetaRecord()
+		self.fp.write(self.rec.get_bytes(format='=H'))
 		self.rec.release()
 		self.nTh_GDI_Object += 1
 		self.std_head.NumOfObjects += 1
@@ -316,12 +321,15 @@ class WindowsMetaFile():
 		self.WriteMetaRecord()
 		self.rec.release()
 		
-	def Polygon(self, x, y, lcol, fcol, thk):
+	def Polygon(self, x, y, lcol, lthk, fcol):
 		npoint = len(x)
-		self.cur_pen = self.CreatePenIndirect(wc.PS_SOLID, _to_twip(thk), 0, lcol)
-		self.SelectObject(self.cur_pen);
-		self.cur_brush = self.CreateBrushIndirect(wc.BS_SOLID, fcol, wc.BS_SOLID)
-		self.SelectObject(self.cur_brush)
+		if lcol:
+			if not lthk: lthk = 0.001 # dummy line thikness
+			self.cur_pen = self.CreatePenIndirect(wc.PS_SOLID, _to_twip(lthk), 0, lcol)
+			self.SelectObject(self.cur_pen);
+		if fcol:
+			self.cur_brush = self.CreateBrushIndirect(wc.BS_SOLID, fcol, wc.BS_SOLID)
+			self.SelectObject(self.cur_brush)
 		self.rec.set_record(wc.META_POLYGON, 1+npoint*2)
 		self.rec.set_param(npoint)
 		
@@ -331,8 +339,9 @@ class WindowsMetaFile():
 
 		self.UpdateHeaderInfo()
 		self.WriteMetaRecord()
-		self.DeleteObject(self.cur_brush)
-		self.DeleteObject(self.cur_pen)
+		
+		if fcol: self.DeleteObject(self.cur_brush)
+		if lcol: self.DeleteObject(self.cur_pen)
 		self.rec.release()
 
 	def CreateClip(self, sx, sy, ex, ey):
@@ -355,7 +364,6 @@ class WindowsMetaFile():
 		
 def main():
 	wmf = WindowsMetaFile('t.wmf', BBox(0,0,3,3))
-	#wmf.Line(0,0,2,2, (0,150,255), 0.03)
 	wmf.Polyline([1,1,2,2],[1,2,2,1], True)
 	wmf.CloseMetafile()
 	
