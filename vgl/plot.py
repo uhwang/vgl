@@ -29,18 +29,17 @@ def plot_mesh(dev, v3d, mesh):
 			n2 = e1.node2
 			dev.line(mx[n1], my[n1], mx[n2], my[n2], mesh.lcol, mesh.lthk * dev.frm.hgt())
 
-		for f in mesh.face:
-			p1= v3d.rotate_point(f.ref)
-			p2 = v3d.rotate_point(f.center)
-			p3 = (p1[0]+p2[0], p1[1]+p2[1])
-			dev.circle(p3[0], p3[1], 0.005, fcol=color.RED)
-			un = 0.25*f.unit_normal
-			p4 = v3d.rotate_point(un)
-			p5 = (p3[0]+p4[0], p3[1]+p4[1])
-			dev.line(p3[0], p3[1], p5[0], p5[1], color.MAGENTA, mesh.lthk * dev.frm.hgt())
-
-			E = v3d.rotate_point(mesh.render.eye)
-			dev.line(E[0],E[1], p3[0], p3[1], color.CUSTOM5, mesh.lthk * dev.frm.hgt())
+		#for f in mesh.face:
+		#	p1= v3d.rotate_point(f.ref)
+		#	p2 = v3d.rotate_point(f.center)
+		#	p3 = (p1[0]+p2[0], p1[1]+p2[1])
+		#	dev.circle(p3[0], p3[1], 0.005, fcol=color.RED)
+		#	un = 0.25*f.unit_normal
+		#	p4 = v3d.rotate_point(un)
+		#	p5 = (p3[0]+p4[0], p3[1]+p4[1])
+		#	dev.line(p3[0], p3[1], p5[0], p5[1], color.MAGENTA, mesh.lthk * dev.frm.hgt())
+		#	E = v3d.rotate_point(mesh.render.eye)
+		#	dev.line(E[0],E[1], p3[0], p3[1], color.CUSTOM5, mesh.lthk * dev.frm.hgt())
 				
 	elif mesh.mode is mesh3d.MESH_HIDDENLINE:
 			
@@ -60,19 +59,19 @@ def plot_mesh(dev, v3d, mesh):
 				dev.polygon(x, y, mesh.lcol, mesh.lthk*dev.frm.hgt(), color.WHITE)
 				
 				# draw a circle on the mesh center
-				p1= v3d.rotate_point(f.ref)
-				p2 = v3d.rotate_point(f.center)
-				p3 = (p1[0]+p2[0], p1[1]+p2[1])
-				dev.circle(p3[0], p3[1],0.005, fcol=color.RED)
+				#p1= v3d.rotate_point(f.ref)
+				#p2 = v3d.rotate_point(f.center)
+				#p3 = (p1[0]+p2[0], p1[1]+p2[1])
+				#dev.circle(p3[0], p3[1],0.005, fcol=color.RED)
 				
 				# draw surface normal vector
-				un = 0.25*f.unit_normal
-				p4 = v3d.rotate_point(un)
-				p5 = (p3[0]+p4[0], p3[1]+p4[1])
-				dev.line(p3[0], p3[1], p5[0], p5[1], color.CUSTOM4, mesh.lthk*dev.frm.hgt())
+				#un = 0.25*f.unit_normal
+				#p4 = v3d.rotate_point(un)
+				#p5 = (p3[0]+p4[0], p3[1]+p4[1])
+				#dev.line(p3[0], p3[1], p5[0], p5[1], color.CUSTOM4, mesh.lthk*dev.frm.hgt())
 				
-				E = v3d.rotate_point(mesh.render.eye)
-				dev.line(E[0],E[1], p3[0], p3[1])
+				#E = v3d.rotate_point(mesh.render.eye)
+				#dev.line(E[0],E[1], p3[0], p3[1])
 		else:
 			P = np.zeros((3,),dtype=np.float32)
 			for idx, val in sorted(enumerate(mesh.avg_z), key=itemgetter(1)):
@@ -92,35 +91,24 @@ def plot_mesh(dev, v3d, mesh):
 				p1= v3d.rotate_point(f.ref)
 				p2 = v3d.rotate_point(f.center)
 				p3 = np.array([p1[0]+p2[0], p1[1]+p2[1], p1[2]+p2[2]], dtype=np.float32)
-				dev.circle(p3[0], p3[1],0.005, fcol=color.RED)
+				#dev.circle(p3[0], p3[1],0.005, fcol=color.RED)
 
-				#E = v3d.rotate_point(mesh.render.eye)
-				#E = mesh.render.eye
-				#L = mesh.render.light
-				E = v3d.rotate_point(mesh.render.eye)
-				L = v3d.rotate_point(mesh.render.light)
-				N = v3d.rotate_point(f.normal)
+				E = mesh.render.eye
+				L = mesh.render.light
+				N = v3d.rotate_point(f.unit_normal)
+				#dev.line(E[0],E[1], p3[0], p3[1])
 				
-				dev.line(E[0],E[1], p3[0], p3[1])
-				
-				if mesh3d.is_face_visible(N,E,p3):
-					fcol = color.get_gray(mesh.render.get_intensity(L, p3, N))
-				else:
-					fcol = color.WHITE
+				fcol = color.get_gray(math.fabs(mesh.render.get_intensity(L, p3, N)))
 				dev.polygon(x, y, mesh.lcol, mesh.lthk*dev.frm.hgt(), fcol)
 
 				# draw surface normal vector
-				un = 0.5*f.unit_normal
-				p4 = v3d.rotate_point(un)
-				p5 = (p3[0]+p4[0], p3[1]+p4[1])
-				dev.line(p3[0], p3[1], p5[0], p5[1], color.MAGENTA, mesh.lthk*dev.frm.hgt())
+				#un = 0.5*f.unit_normal
+				#p4 = v3d.rotate_point(un)
+				#p5 = (p3[0]+p4[0], p3[1]+p4[1])
+				#dev.line(p3[0], p3[1], p5[0], p5[1], color.MAGENTA, mesh.lthk*dev.frm.hgt())
 
 	# plot axis
 	if mesh.is_axis_visible():
-		#label = text.Text(3.5, 4.7)
-		#tt.lthk = 0.002
-		#tt.lcol = color.BLUE
-		#tt.hn()
 		ax = mesh.get_axis()
 		oo = v3d.rotate_point(ax.center)
 		ox = v3d.rotate_point(ax.x)

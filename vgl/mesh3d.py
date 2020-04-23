@@ -36,7 +36,8 @@ class Rendering:
 	# P : a point(center) on a mesh
 	# N : face normal vector
 	def get_intensity(self, L, P, N):
-		s = L-P
+		s = normalize(L-P)
+		#s = L-P
 		return np.dot(s,N)
 	
 def compute_planar_squaremesh_center(f, node):
@@ -48,7 +49,6 @@ def compute_planar_squaremesh_center(f, node):
 def compute_face_normal(node, a,b,c,d):
 	p1 = np.array([node.x[a], node.y[a], node.z[a]], dtype=np.float32)
 	p2 = np.array([node.x[b], node.y[b], node.z[b]], dtype=np.float32)
-	p3 = np.array([node.x[c], node.y[c], node.z[c]], dtype=np.float32)
 	p4 = np.array([node.x[d], node.y[d], node.z[d]], dtype=np.float32)
 	v1 = p2-p1
 	v2 = p4-p1
@@ -64,7 +64,7 @@ def is_face_visible(N, E, P):
 	NN=N**2
 	MC = math.sqrt(CC[0]+CC[1]+CC[2])
 	MN = math.sqrt(NN[0]+NN[1]+NN[2])
-	beta = math.acos(np.dot(C,N)/(MC*MN))
+	beta = math.acos(np.dot(C,N)/(MC*MN))*180/np.pi
 	return True if beta < 90 else False
 	
 class Node3d():
@@ -128,8 +128,8 @@ class SquareMesh3d(LineLevelA):
 		#self.zvalue = np.zeros(self.nnode, dtype=np.float32)
 		self.avg_z  = np.zeros(self.nface,  dtype=np.float32)
 		self.render_show = False
-		self.render = Rendering(eye=np.array([0.6,0.6,0.6], dtype=np.float32), 
-		                        light=np.array([0.6,0.6,0.6], dtype=np.float32))
+		self.render = Rendering(eye=np.array([0.0,0.0,0.6], dtype=np.float32), 
+		                        light=np.array([0.0,0.0,0.6], dtype=np.float32))
 		self.face   = []#[Face3d()]*nface
 		self.edge   = []#[Edge3d()]*nface
 		self.show_axis = False
