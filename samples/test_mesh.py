@@ -54,8 +54,6 @@ mesh.set_show_axis(True)
 v3d = view3d.View3d(frm)
 
 running = True
-lbutton = False
-move = False
 old_pos = (0,0)
 new_pos = (0,0)
 m_xRotate = 0
@@ -67,9 +65,8 @@ buttons = (False,False,False)
 lbutton = False
 move = False
 prv_mode = mesh3d.MESH_WIREFRAME
-win_size = dev_rst.size()
 trans = False
-render = False
+shade = False
 fscale = 0
 scale = 0.5
 dev_rst.set_plot(frm)
@@ -139,8 +136,8 @@ while running:
 				prv_choice = choice
 				choice='m'
 			elif event.key == K_r:
-				render = ~render
-				mesh.set_render_show(render)
+				shade = ~shade
+				mesh.set_shade_show(shade)
 				plot_geom(dev_rst)
 				dev_rst.show()
 			elif event.key == K_w:
@@ -155,6 +152,8 @@ while running:
 			elif event.key == K_h:
 				print("... Hiddenline mode")
 				mesh.mode = mesh3d.MESH_HIDDENLINE
+				shade = False
+				mesh.set_shade_show(shade)
 				plot_geom(dev_rst)
 				dev_rst.show()
 				
@@ -184,8 +183,8 @@ while running:
 			elif buttons[2]:
 				diffy = new_pos[1]-old_pos[1]
 				if diffy!=0:
-					if diffy<0: scale += fscale#*= 1.1
-					if diffy>0: scale -= fscale#*= 0.9
+					if diffy<0: scale += fscale
+					if diffy>0: scale -= fscale
 					v3d.scaling(scale)
 					print('scaling.. ', diffy, scale)
 			old_pos = event.pos
@@ -197,7 +196,6 @@ while running:
 			buttons = pygame.mouse.get_pressed()
 			lbutton = False
 			move = False
-			#trans = False
 			mesh.mode = prv_mode
 			if mesh.mode is mesh3d.MESH_HIDDENLINE:
 				mesh.compute_avg_z()
