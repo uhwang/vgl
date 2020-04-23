@@ -18,6 +18,7 @@ from . mesh3d   import MESH_WIREFRAME, MESH_HIDDENLINE, SquareMesh3d
 from . view3d   import View3d
 from . plot     import plot_mesh
 from . linetype import LineLevelA, LineLevelB, LineLevelC
+from . util     import rad_to_deg, deg_to_rad
 
 __all__=[
 	"frame", 

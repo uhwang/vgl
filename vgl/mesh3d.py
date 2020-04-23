@@ -7,7 +7,7 @@ from vgl import color
 
 MESH_WIREFRAME  = 0x0001
 MESH_HIDDENLINE = 0x0002
-RENDER_FLAT     = 0x0001
+SHADE_FLAT     = 0x0001
 
 def normalize(v):
 	vv = v**2
@@ -25,9 +25,9 @@ class Axis():
 		self.ycol = LineLevelA(color.GREEN, 0.03)
 		self.zcol = LineLevelA(color.BLUE , 0.03)
 		
-class Rendering:
+class Shading:
 	def __init__(self, eye=None, light=None):
-		self.mode = RENDER_FLAT
+		self.mode = SHADE_FLAT
 		self.eye   = eye
 		self.light = light
 		self.rend_col  = color.WHITE
@@ -36,9 +36,7 @@ class Rendering:
 	# P : a point(center) on a mesh
 	# N : face normal vector
 	def get_intensity(self, L, P, N):
-		s = normalize(L-P)
-		#s = L-P
-		return np.dot(s,N)
+		return np.dot(normalize(L-P),N)
 	
 def compute_planar_squaremesh_center(f, node):
 	i = f.index
@@ -121,17 +119,15 @@ class SquareMesh3d(LineLevelA):
 		self.jpnt   = jpnt
 		self.ipnt   = ipnt
 		self.nnode  = jpnt*ipnt
-		self.nface  =(jpnt-1)*(ipnt-1)
+		self.nface  = (jpnt-1)*(ipnt-1)
 		self.node   = NodeArray3d(self.nnode)
-		#self.tnode  = NodeArray2d(self.nnode)
 		self.tnode  = NodeArray3d(self.nnode)
-		#self.zvalue = np.zeros(self.nnode, dtype=np.float32)
 		self.avg_z  = np.zeros(self.nface,  dtype=np.float32)
-		self.render_show = False
-		self.render = Rendering(eye=np.array([0.0,0.0,0.6], dtype=np.float32), 
-		                        light=np.array([0.0,0.0,0.6], dtype=np.float32))
-		self.face   = []#[Face3d()]*nface
-		self.edge   = []#[Edge3d()]*nface
+		self.shade_show = False
+		self.shade = Shading(eye=np.array([0,0,2], dtype=np.float32), 
+		                     light=np.array([0,0,2], dtype=np.float32))
+		self.face   = []
+		self.edge   = []
 		self.show_axis = False
 		
 	def hiddenline(self): 
@@ -146,8 +142,8 @@ class SquareMesh3d(LineLevelA):
 	def get_axis(self):
 		return self.axis
 		
-	def set_render_show(self, v):
-		self.render_show = v
+	def set_shade_show(self, v):
+		self.shade_show = v
 		
 	def create_axis(self, c, x, y, z):
 		self.axis = Axis(c, x, y, z)

@@ -10,9 +10,7 @@
 
 import numpy as np
 import vgl.geom as geom
-
-deg_to_rad = lambda d: d*np.pi/180 
-rad_to_deg = lambda r: r*180/np.pi
+from vgl.util import deg_to_rad, rad_to_deg
 
 class Rotation():
 	def __init__(self):
