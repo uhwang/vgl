@@ -216,6 +216,7 @@ class Position():
 class DeviceRaster():
 	def __init__(self, gbox, dpi):
 		self.dpi  = dpi
+		self.gbbox = gbox
 		self.gwid = int(gbox.wid()*dpi)
 		self.ghgt = int(gbox.hgt()*dpi)
 		self.lscl = float(self.gwid/gbox.wid())

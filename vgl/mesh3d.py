@@ -2,6 +2,7 @@
 
 import numpy as np
 import math
+import re
 from vgl.linetype import *
 from vgl import color
 
@@ -72,9 +73,8 @@ class Node3d():
         self.z = coord[2]
 		
 class Face3d():
-	def __init__(self, node_index, fn):
+	def __init__(self, node_index):
 		self.index = node_index
-		self.normal = fn
 		
 	def compute_center(self, node):
 		self.center, self.ref = compute_planar_squaremesh_center(self, node)
@@ -87,10 +87,33 @@ class Face3d():
 		
 		a = np.array([x[i[0]], y[i[0]], z[i[0]]], dtype=np.float32)
 		b = np.array([x[i[1]], y[i[1]], z[i[1]]], dtype=np.float32)
+		c = np.array([x[i[2]], y[i[2]], z[i[2]]], dtype=np.float32)
 		d = np.array([x[i[3]], y[i[3]], z[i[3]]], dtype=np.float32)
-				
-		v1 = b-a
-		v2 = d-a
+		
+		if np.array_equal(a, b): 
+			p1 = a
+			p2 = c
+			p3 = d
+		elif np.array_equal(a, d):
+			p1 = a
+			p2 = b
+			p3 = c
+		elif np.array_equal(b, c):
+			p1 = b
+			p2 = d
+			p3 = a
+		elif np.array_equal(c, d):
+			p1 = c
+			p2 = a
+			p3 = b
+		else:
+			p1 = a
+			p2 = b
+			p3 = d
+		#v1 = b-a
+		#v2 = d-a
+		v1 = p2 - p1
+		v2 = p3 - p1
 		
 		self.normal = np.cross(v1,v2)
 		self.unit_normal = normalize(self.normal)
@@ -189,7 +212,7 @@ class SquareMesh3d(LineLevelA):
 				b = jjpnt + (i+1)
 				c = (j+1)*ipnt+(i+1)
 				d = (j+1)*ipnt+i
-				self.face.append(Face3d([a,b,c,d], compute_face_normal(self.node, a,b,c,d)))
+				self.face.append(Face3d([a,b,c,d]))
 				self.edge.append(Edge3d(a,b))
 				self.edge.append(Edge3d(a,d))
 				f = self.face[-1]
@@ -203,4 +226,143 @@ class SquareMesh3d(LineLevelA):
 			a = jjpnt + i
 			b = jjpnt + (i+1)
 			self.edge.append(Edge3d(a,b))
+
+		
+class RectangularMesh3d(LineLevelA):
+	def __init__(self, jpnt, ipnt):
+		super().__init__(color.BLACK, 0.001)
+		self.mode   = MESH_WIREFRAME
+		self.jpnt   = jpnt
+		self.ipnt   = ipnt
+		self.nnode  = jpnt*ipnt
+		self.node   = NodeArray3d(self.nnode)
+		self.tnode  = NodeArray3d(self.nnode)
+		self.edge   = []
+		self.show_axis = False
+		self.axis = None
+		
+	def is_axis_visible(self):
+		return self.show_axis and self.axis
+		
+class TecFace3d(Face3d):
+	def __init__(self, im, node_index):
+		super().__init__(node_index)
+		self.imesh = im
+	
+
+class Hiddenline():
+	def __init__(self, nface):
+		self.face = []
+		self.avg_z= np.zeros((nface), dtype=np.float32)
+		
+	def compute_avg_z(self, mlist):
+		for i, f in enumerate(self.face):
+			im = f.imesh
+			tz = mlist[im].tnode.z
+			z = (tz[f.index[0]] + tz[f.index[1]] +
+				 tz[f.index[2]] + tz[f.index[3]]) / 4.0
+			self.avg_z[i] = z
+	
+_find_ijpan = re.compile(r"[iI]\s*=\s*(\d*)\s*,\s*[jJ]\s*=\s*(\d*)")
+_non_empty_line = re.compile(r"[0-9a-zA-Z,=\"]")
+_get_value = re.compile(r"\s*([-+]?\d*\.?\d*[eE]?[-+]?\d*)")
+
+BIG_POSITIVE_NUMBER = 1.e+20
+BIG_NEGATIVE_NUMBER = 1.e-20
+
+class MeshBBox():
+	def __init__(self, mlist):
+		self.xmin = BIG_POSITIVE_NUMBER
+		self.xmax = BIG_NEGATIVE_NUMBER
+		self.ymin = BIG_POSITIVE_NUMBER
+		self.ymax = BIG_NEGATIVE_NUMBER
+		self.zmin = BIG_POSITIVE_NUMBER
+		self.zmax = BIG_NEGATIVE_NUMBER
+		
+		for m in mlist:
+			self.xmin = min(self.xmin, np.min(m.node.x))
+			self.xmax = max(self.xmax, np.max(m.node.x))
+			self.ymin = min(self.ymin, np.min(m.node.y))
+			self.ymax = max(self.ymax, np.max(m.node.y))
+			self.zmin = min(self.zmin, np.min(m.node.z))
+			self.zmax = max(self.zmax, np.max(m.node.z))
+			
+	def get_bbox(self):
+		return self.xmin, self.xmax, self.ymin, self.ymax, self.zmin, self.zmax
+			
+class TecMesh3d():
+	def __init__(self, fname):
+		fp = open(fname, "rt")
+		self.mesh = []
+		self.shade_show = False
+		self.mode = MESH_WIREFRAME
+		nface = 0
+		self.shade = Shading(eye=np.array([0,0,2], dtype=np.float32), 
+		                     light=np.array([0,0,2], dtype=np.float32))
+		for line in fp: 
+			if not _non_empty_line.search(line): 
+				continue
+			match = _find_ijpan.search(line)
+			if match:
+				ipnt = int(match.group(1))
+				jpnt = int(match.group(2))
+				rm = RectangularMesh3d(jpnt, ipnt)
+				self.mesh.append(rm)
+				nface += (jpnt-1)*(ipnt-1)
+				for j in range(jpnt):
+					jjpos = j * ipnt
+					for i in range(ipnt):
+						npos = jjpos+i
+						line = fp.readline()
+						if not _non_empty_line.search(line): continue
+						match = _get_value.findall(line)
+						rm.node.x[jjpos+i] = float(match[0])
+						rm.node.y[jjpos+i] = float(match[1])
+						rm.node.z[jjpos+i] = float(match[2])
+
+		self.hidn = Hiddenline(nface)
+	
+	def set_shade_show(self, v):
+		self.shade_show = v
+		
+	def create_mesh(self):
+		for mi, m in enumerate(self.mesh):
+			jpan = m.jpnt-1
+			ipan = m.ipnt-1
+			jpnt = m.jpnt
+			ipnt = m.ipnt
+			for j in range(jpan):
+				jjpnt = j*ipnt
+				for i in range(ipan):
+					a = jjpnt + i  
+					b = jjpnt + (i+1)
+					c = (j+1)*ipnt+(i+1)
+					d = (j+1)*ipnt+i
+					self.hidn.face.append(TecFace3d(mi, [a,b,c,d]))
+					m.edge.append(Edge3d(a,b))
+					m.edge.append(Edge3d(a,d))
+					f = self.hidn.face[-1]
+					f.compute_normal(m.node)
+					f.compute_center(m.node)
+					
+				m.edge.append(Edge3d(b,c))
+			jjpnt += ipnt
+			for i in range(ipan):
+				a = jjpnt + i
+				b = jjpnt + (i+1)
+				m.edge.append(Edge3d(a,b))
 				
+	def create_tansform_node(self, v3d):
+		for mi, m in enumerate(self.mesh):
+			nnode = m.jpnt*m.ipnt
+			for i in range(nnode):
+				px = m.node.x
+				py = m.node.y
+				pz = m.node.z
+				p = v3d.rotate_point([px[i],py[i],pz[i]])
+				m.tnode.x[i] = p[0]
+				m.tnode.y[i] = p[1]
+				m.tnode.z[i] = p[2]	
+
+		self.hidn.compute_avg_z(self.mesh)
+		
