@@ -27,6 +27,7 @@ def plot_tec_mesh(dev, v3d, geom, move=False):
 			mx = m.node.x
 			my = m.node.y
 			mz = m.node.z
+			
 			#p1[0] = mx[0]
 			#p1[1] = mx[1]
 			#p1[2] = mx[2]
@@ -36,7 +37,7 @@ def plot_tec_mesh(dev, v3d, geom, move=False):
 			#p11 = v3d.rotate_point(p1)
 			#p22 = v3d.rotate_point(p2)
 			#dev.line(p11[0], p11[0], p22[-1], p22[-2], m.lcol, m.lthk * dev.frm.hgt())
-			for xx,yy,zz in zip(mx[0::5],my[0::5],mz[0::5]):
+			for xx,yy,zz in zip(mx[0::8],my[0::8],mz[0::8]):
 				p1[0] = xx
 				p1[1] = yy
 				p1[2] = zz
