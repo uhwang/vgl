@@ -2,8 +2,10 @@
 import pygame 
 from pygame.locals import *
 import vgl
+import numpy as np
 
 tec_file = "sydney.tec"
+#tec_file = "4400.tec"
 
 tec_geom = vgl.mesh3d.TecMesh3d(tec_file)
 tec_geom.create_mesh()
@@ -11,12 +13,16 @@ mb = vgl.mesh3d.MeshBBox(tec_geom.mesh)
 xmin, xmax, ymin, ymax, zmin, zmax = mb.get_bbox()
 data = vgl.Data(xmin, xmax, ymin, ymax, zmin, zmax)
 fmm = vgl.FrameManager()
-frm = fmm.create(0,0,5,5,data)
-v3d = vgl.view3d.View3d(frm)
+frm1= fmm.create(0,0,4,4,data)
+
+x = np.arange(-3,3.2,0.2)
+y2 = x**2
+frm2 = fmm.create(4.2,0,2.3,4,vgl.Data(-3,3,-1,10))
+v3d = vgl.view3d.View3d(frm1)
 gbbox = fmm.get_gbbox()
 
-pyg_dev = vgl.DevicePygame(gbbox, 150)
-pyg_dev.set_plot(frm)
+pyg_dev = vgl.DevicePygame(gbbox, 100)
+pyg_dev.set_plot(frm1)
 ctrl = vgl.util.Pygame3DUtil(pyg_dev)
 
 v3d.xrotation(30)
@@ -24,26 +30,48 @@ v3d.yrotation(30)
 v3d.scaling(ctrl.scale)
 tec_geom.create_tansform_node(v3d)
 
+plot_x2_visible = False
+
+def plot_x2(dev):
+	#global plot_x2_visible
+	#if plot_x2_visible: return
+	vgl.drawaxis.draw_axis(dev)
+	vgl.drawtick.draw_tick_2d(dev)	
+	vgl.drawlabel.draw_label_2d(dev)
+	dev.polyline(x, y2, vgl.color.BLUE, 0.001*dev.frm.hgt())
+	sym = vgl.symbol.Circle(0.01, dev.frm.hgt(), 0.003)
+	dev.begin_symbol(sym)
+	for i in range(0,x.size): dev.symbol(x[i],y2[i],sym)
+	dev.end_symbol()
+	#plot_x2_visible = True
+	
 def plot_geom(dev, move=False):
 	vgl.plot.plot_tec_mesh(dev, v3d, tec_geom, move)
 
+def plot_all(dev, move=None):
+	dev.set_plot(frm2)
+	plot_x2(dev)
+	
+	dev.set_plot(frm1)
+	plot_geom(dev, move)
+	
 def save_cairo():
 	dev_cairo = vgl.DeviceCairo("mulmesh.jpg", gbbox, 200)
 	dev_cairo.fill_white()
-	dev_cairo.set_plot(frm)
-	plot_geom(dev_cairo)
+	#dev_cairo.set_plot(frm)
+	plot_all(dev_cairo)
 	dev_cairo.close()
 
 def save_wmf():
 	dev_wmf = vgl.DeviceWindowsMetafile("mulmesh.wmf", gbbox)
-	dev_wmf.set_device(frm)
-	plot_geom(dev_wmf)
+	#dev_wmf.set_device(frm)
+	plot_all(dev_wmf)
 	dev_wmf.close()
 
 choice = 1
 running = True
 pyg_dev.fill_white()
-plot_geom(pyg_dev)
+plot_all(pyg_dev)
 pyg_dev.show()
 
 while running:
@@ -65,12 +93,12 @@ while running:
 			elif event.key == K_r:
 				ctrl.shade = ~ctrl.shade
 				tec_geom.set_shade_show(ctrl.shade)
-				plot_geom(pyg_dev)
+				plot_all(pyg_dev)
 				pyg_dev.show()
 			elif event.key == K_w:
 				print("... Wireframe mode")
 				tec_geom.mode = vgl.mesh3d.MESH_WIREFRAME
-				plot_geom(pyg_dev)
+				plot_all(pyg_dev)
 				pyg_dev.show()
 			elif event.key == K_t:
 				print("... translation")
@@ -81,7 +109,7 @@ while running:
 				tec_geom.mode = vgl.mesh3d.MESH_HIDDENLINE
 				ctrl.shade = False
 				tec_geom.set_shade_show(ctrl.shade)
-				plot_geom(pyg_dev)
+				plot_all(pyg_dev)
 				pyg_dev.show()
 				
 		elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -99,7 +127,7 @@ while running:
 				if ctrl.trans:
 					print("... Trans(dx: %d, dy: %d)"%(dx,dy))
 					dxx, dyy = ctrl.get_trans_amount()
-					frm.translate_xy(dxx, dyy)
+					frm1.translate_xy(dxx, dyy)
 					pyg_dev.set_plot(frm)
 				else:
 					ctrl.xrotation += dy
@@ -115,17 +143,18 @@ while running:
 		elif event.type == pygame.MOUSEBUTTONUP:
 			ctrl.buttons = pygame.mouse.get_pressed()
 			ctrl.lbutton = False
+			if ctrl.move:
+				tec_geom.create_tansform_node(v3d)
 			ctrl.move = False
-			tec_geom.create_tansform_node(v3d)
 			tec_geom.mode = ctrl.prv_view_mode
-			plot_geom(pyg_dev)
+			plot_all(pyg_dev)
 			pyg_dev.show()
 			#if tec_geom.mode is vgl.mesh3d.MESH_HIDDENLINE:
-			#	plot_geom(pyg_dev)
+			#	plot_all(pyg_dev)
 			#	pyg_dev.show()
 			
 	if ctrl.lbutton and ctrl.move:
-		plot_geom(pyg_dev, True)
+		plot_all(pyg_dev, True)
 		pyg_dev.show()
 
 	if choice == 's':
