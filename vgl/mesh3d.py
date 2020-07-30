@@ -297,8 +297,8 @@ class TecMesh3d():
 		self.shade_show = False
 		self.mode = MESH_WIREFRAME
 		nface = 0
-		self.shade = Shading(eye=np.array([0,0,2], dtype=np.float32), 
-		                     light=np.array([0,0,2], dtype=np.float32))
+		self.shade = Shading(eye=np.array([0,0,-12], dtype=np.float32), 
+		                     light=np.array([0,0,-10], dtype=np.float32))
 		for line in fp: 
 			if not _non_empty_line.search(line): 
 				continue
