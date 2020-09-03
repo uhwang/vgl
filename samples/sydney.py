@@ -26,13 +26,16 @@ v3d.scaling(ctrl.scale)
 tec_geom.create_tansform_node(v3d)
 
 def plot_geom(dev, move=False):
-	vgl.drawfrm.draw_frame(dev, frm)
-	vgl.plot.plot_tec_mesh(dev, v3d, tec_geom, move)
+    vgl.drawfrm.draw_frame(dev, frm)
+    clip = dev.frm.get_clip()
+    dev.create_clip(clip[0],clip[1],clip[2],clip[3])
+    vgl.plot.plot_tec_mesh(dev, v3d, tec_geom, move)
+    dev.delete_clip()
 
 def plot_all(dev, move=None):
-	dev.set_plot(frm)
-	plot_geom(dev, move)
-	
+    dev.set_plot(frm)
+    plot_geom(dev, move)
+    
 def save_cairo():
 	dev_cairo = vgl.DeviceCairo("sydney.jpg", gbbox, 200)
 	dev_cairo.fill_white()
@@ -134,11 +137,11 @@ while running:
 		pyg_dev.show()
 
 	if choice == 's':
-		print('... kp325 wmf')
+		print('... sydney wmf')
 		save_wmf()
 		choice = ctrl.prv_choice		
 	elif choice == 'i':
-		print('... kp325 jpg')
+		print('... sydney jpg')
 		save_cairo()
 		choice = ctrl.prv_choice		
 
