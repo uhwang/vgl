@@ -12,9 +12,9 @@ from vgl import color, frame
 
 def draw_axis(dev, data):
 	#draw x-axis
-	dev.line(data.xmin, 0, data.xmax, 0, color.BLACK, 0.005*dev.frm.hgt())
+	dev.line(data.xmin, data.ymin, data.xmax, data.ymin, color.BLACK, 0.005*dev.frm.hgt())
 	#draw y-axis
-	dev.line(0, data.ymin, 0, data.ymax, color.BLACK, 0.005*dev.frm.hgt())
+	dev.line(data.xmin, data.ymin, data.xmin, data.ymax, color.BLACK, 0.005*dev.frm.hgt())
 		
 def draw_grid(dev, data, spc):
 	nxgrid = int((data.xmax-data.xmin)/spc)+1
