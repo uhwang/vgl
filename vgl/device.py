@@ -29,15 +29,15 @@ get_line_thk = lambda x : 1 if int(x) == 0 else x
 
 class Pen():
 	def __init__(self):
-		self.lcol = 0
-		self.lthk = 0
+		self.lcol = None
+		self.lthk = None
 		
 	def set_pen(self, lcol, lthk):
 		self.lcol = lcol
 		self.lthk =lthk
 class Brush():
 	def __init__(self):
-		self.fcol=(0,0,0)
+		self.fcol= None #(0,0,0)
 	def set_brush(self, fcol):
 		self.fcol = fcol
 		
