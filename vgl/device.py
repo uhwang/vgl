@@ -647,6 +647,7 @@ class DeviceCairo(DeviceRaster):
 		self.cntx  = cairo.Context(self.surf)
 		self.lcol  = color.rgb()
 		self.fcol  = color.rgb()
+		self.fill_white()
 		self.nlineto = 0
 		
 	def set_device(self, frm):
