@@ -35,11 +35,14 @@ def get_rgb(c): return c[0]/255., c[1]/255., c[2]/255.
 #	return 
 
 class rgb():
-	def __init__(self,col=WHITE):
-		self.conv(col)
-		
-	def conv(self,col):
-		self.r, self.g, self.b = get_rgb(col)
+    def __init__(self,col=WHITE):
+        self.conv(col)
+        
+    def conv(self,col):
+        self.r, self.g, self.b = get_rgb(col)
+        
+    def __str__(self):
+        return "RGB: %03d, %03d, %03d"%(self.r, self.g, self.b)
 
 #inv_255 = 0.00392156862745
 

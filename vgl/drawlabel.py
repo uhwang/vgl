@@ -18,7 +18,7 @@ def draw_label_2d(dev):
 	
 	hgt = frm.hgt()
 	xaxis = frm.get_xaxis()
-	xlabel = xaxis.get_xlabel()
+	xlabel = xaxis.get_label()
 	maj_tick = xaxis.get_major_tick()
 	
 	wxx = xaxis.first_major_tick_pos
@@ -44,7 +44,7 @@ def draw_label_2d(dev):
 	#dev.delete_pen()
 	
 	yaxis = frm.get_yaxis()
-	ylabel = yaxis.get_ylabel()
+	ylabel = yaxis.get_label()
 	maj_tick = yaxis.get_major_tick()
 	wyy = yaxis.first_major_tick_pos
 	vi = 1
