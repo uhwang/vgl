@@ -50,14 +50,13 @@ def draw_tick_2d(dev):
                 wxx = xaxis.first_minor_tick_pos+mispc*i
                 wxxl= dev.wtol_x(wxx)
                 dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)
-            wxx += mispc
-        else: 
-            wxx = xaxis.first_major_tick_pos + mispc
-            #print(wxx)
+            #wxx += mispc*2
+        #else: 
+            #wxx = xaxis.first_major_tick_pos + mispc
+        wxx = xaxis.first_major_tick_pos + mispc
         j=1
         vi = 1
         owxx = wxx
-        #wxx = xaxis.first_minor_tick_pos
     
         while wxx <= xaxis.max:
             wxxl = dev.wtol_x(wxx)
