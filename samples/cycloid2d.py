@@ -46,10 +46,10 @@ cycloid_trail_y =[]
 def movie_cycloid(t):
     global dev, cycloid_trail_x, cycloid_trail_y
     dev.fill_white()
-    vgl.drawtick.draw_tick_2d(dev)	
+    vgl.draw_tick_2d(dev)	
+    vgl.draw_grid_2d(dev)
+    vgl.draw_label_2d(dev)
     vgl.draw_frame(dev, frm)
-    vgl.drawfrm.draw_grid(dev, dev.frm.data, 1)
-    vgl.drawlabel.draw_label_2d(dev)
     
     # draw circle
     t3 = t1 + dt * t * fps
@@ -68,16 +68,19 @@ def movie_cycloid(t):
     dev.circle(px, py, r2, lcol=None, lthk=None, fcol=vgl.color.RED)
     
 def plot_cycloid(dev):
-    vgl.drawtick.draw_tick_2d(dev)	
-    vgl.drawfrm.draw_grid(dev, dev.frm.data, 1)
-    vgl.drawlabel.draw_label_2d(dev)
+    vgl.draw_tick_2d(dev)	
+    vgl.draw_grid_2d(dev)
+    vgl.draw_label_2d(dev)
     dev.polyline(x,y,vgl.color.BLUE, dev.frm.hgt()*0.005)
+    vgl.draw_frame(dev, frm)
     
 import vgl
 xmin,xmax,ymin,ymax=0,20,-2,5
 data = vgl.Data(xmin,xmax,ymin,ymax)
 fmm = vgl.FrameManager()
 frm = fmm.create(0,0,5,2, data)
+frm.show_xgrid()
+frm.show_ymajor_grid()
 
 def write_tec():
     fp = open("cycloid2d.tec", "wt")
@@ -91,7 +94,6 @@ def write_tec():
 def save_cycloid_img():
     dev = vgl.DeviceCairo("cycloid.jpg", fmm.get_gbbox(), 300)
     dev.set_device(frm)
-    vgl.draw_frame(dev, frm)
     plot_cycloid(dev)
     dev.close()
 
