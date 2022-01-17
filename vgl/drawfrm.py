@@ -36,10 +36,10 @@ def draw_grid(dev, data, spc):
     	dev.line(xmin, y, xmax, y)
     dev.delete_pen()
 	
-def draw_frame(dev, frm):
+def draw_frame(dev):
+    frm = dev.frm
     fp = frm.get_property()
-    #if fb.bk_show:
-    	
+    
     if fp.header_show:
     	sx = frm.bbox.sx
     	sy = frm.bbox.sy

@@ -366,12 +366,12 @@ class FrameManager():
             if ey < bbox.ey: ey = bbox.ey
         return BBox(sx,sy,ex,ey)
         
-    def show_header_all(self):
+    def show_all_header(self):
         ids = self.f_list.keys()
         for i in range(len(ids)):
             self.f_list[ids[i]].show_header()
         
-    def hide_header_all(self):
+    def hide_all_header(self):
         ids = self.f_list.keys()
         for i in range(len(ids)):
             self.f_list[ids[i]].hide_header()
