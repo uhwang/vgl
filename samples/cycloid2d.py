@@ -68,11 +68,11 @@ def movie_cycloid(t):
     dev.circle(px, py, r2, lcol=None, lthk=None, fcol=vgl.color.RED)
     
 def plot_cycloid(dev):
+    vgl.draw_frame(dev, frm)
     vgl.draw_tick_2d(dev)	
     vgl.draw_grid_2d(dev)
     vgl.draw_label_2d(dev)
     dev.polyline(x,y,vgl.color.BLUE, dev.frm.hgt()*0.005)
-    vgl.draw_frame(dev, frm)
     
 import vgl
 xmin,xmax,ymin,ymax=0,20,-2,5
@@ -91,11 +91,9 @@ def write_tec():
         fp.write("%f %f\n"%(x1, y1))
     fp.close()
     
-def save_cycloid_img():
-    dev = vgl.DeviceCairo("cycloid.jpg", fmm.get_gbbox(), 300)
+def save_cycloid_img(dev):
     dev.set_device(frm)
     plot_cycloid(dev)
-    dev.close()
 
 def save_cycloid_mov():
     global dev
@@ -106,6 +104,17 @@ def save_cycloid_mov():
     dev_mov = vgl.DeviceCairoAnimation("cycloid.mp4", dev, movie_cycloid, dur, fps)
     dev_mov.save_video()
 
-#save_cycloid_img()
-save_cycloid_mov()
+def save_img():
+    dev = vgl.DeviceCairo("cycloid.jpg", fmm.get_gbbox(), 300)
+    dev.set_device(frm)
+    save_cycloid_img(dev)
+    dev.close()
+
+    dev = vgl.DeviceWindowsMetafile("cycloid.wmf", fmm.get_gbbox())
+    dev.set_device(frm)
+    save_cycloid_img(dev)
+    dev.close()
+    
+save_img()
+#save_cycloid_mov()
 #write_tec()
