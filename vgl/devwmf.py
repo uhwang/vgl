@@ -172,7 +172,8 @@ class WindowsMetaFile():
 		self.rec.release()
 		
 	def convert_color(self, color):
-		return color[0]|color[1]<<8, color[2]&0x00ff # (green, red), (blue)
+		#return color[0]|color[1]<<8, color[2]&0x00ff # (green, red), (blue)
+		return color.r|color.g<<8, color.b&0x00ff # (green, red), (blue)
 		
 	def SelectObject(self, gdi_obj):
 		self.rec.set_record(wc.META_SELECTOBJECT, 1)
