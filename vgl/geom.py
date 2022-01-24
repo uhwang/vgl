@@ -9,9 +9,7 @@
 #
 
 import numpy as np
-import vgl.color as color
-import vgl.rotation as rotation
-import vgl.vertex as vertex
+from vgl import color, rotation, vertex
 
 def distP(x1,y1,x2,y2): return np.sqrt((x2-x1)**2+(y2-y1)**2)
 def distV(vlist): return np.sqrt( (vlist[2]-vlist[0])**2+(vlist[3]-vlist[1])**2 )

@@ -25,9 +25,7 @@ def draw_label_2d(dev):
 	vi = 1
 	yy = frm.bbox.sy+frm.pdom.get_ey()
 	dev.make_pen(xlabel.lcol, xlabel.lthk*hgt)
-	#xlabel.size = 0.02
-	#xlabel.lcol = color.BLUE
-	#xlabel.lthk = 0.002
+
 	while wxx <= xaxis.max:
 		wxxl = dev.wtol_x(wxx)
 		#dev.lline(wxxl, yy+maj_ty0, wxxl, yy+maj_ty1)

@@ -917,15 +917,15 @@ class DeviceIPycanvas(DeviceRaster):
         
     def fill_black(self):
         self.canvas.fill_style = color.get_style(color.BLACK)
-        self.canvas.fill_rects(0,0, self.canvas.width, self.canvas.height)
+        self.canvas.fill_rect(0,0, self.canvas.width, self.canvas.height)
 
     def fill_white(self):
         self.canvas.fill_style = color.get_style(color.WHITE)
-        self.canvas.fill_rects(0,0, self.canvas.width, self.canvas.height)
+        self.canvas.fill_rect(0,0, self.canvas.width, self.canvas.height)
 
     def fill_cyan(self):
         self.canvas.fill_style = color.get_style(color.CYAN)
-        self.canvas.fill_rects(0,0, self.canvas.width, self.canvas.height)
+        self.canvas.fill_rect(0,0, self.canvas.width, self.canvas.height)
         
     def make_pen(self, lcol, lthk):
         self.pen.lthk = lthk
