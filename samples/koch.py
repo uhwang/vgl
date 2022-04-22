@@ -58,7 +58,6 @@ def save_wmf(fname, gbbox):
     
 def save_cairo(fname, gbox, dpi):
     dev = vgl.DeviceCairo(fname, gbox, dpi)
-    dev.fill_white()
     dev.set_device(frm)
     vgl.drawtick.draw_tick_2d(dev)	
     vgl.drawgrid.draw_grid(dev)
