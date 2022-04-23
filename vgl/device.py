@@ -11,7 +11,7 @@
 #
  
 import numpy as np
-import pygame 
+#import pygame 
 from PIL import Image
 import moviepy.editor as mpy
 
@@ -256,7 +256,8 @@ class DeviceRaster():
     def size  (self   ): return (self.gwid, self.ghgt)
     def get_xp(self, x): return int(self.sx_ltop + x)
     def get_yp(self, y): return int(self.sy_ltop + y)
-        
+ 
+''' 
 class DevicePygame(DeviceRaster):
     def __init__(self, gbox, dpi, fps=30):
         super().__init__(gbox, dpi)
@@ -277,13 +278,13 @@ class DevicePygame(DeviceRaster):
         return self.clock.tick(self.fps)/1000
 
     def fill_black(self):
-        self.screen.fill(color.BLACK)
+        self.screen.fill(color.BLACK.get_tuple())
 
     def fill_white(self):
-        self.screen.fill(color.WHITE)
+        self.screen.fill(color.WHITE.get_tuple())
 
     def fill_cyan(self):
-        self.screen.fill(color.CYAN)
+        self.screen.fill(color.CYAN.get_tuple())
 
     def show(self):
         pygame.display.update()
@@ -308,7 +309,7 @@ class DevicePygame(DeviceRaster):
         if lcol:
             self.make_pen(lcol, lthk)
             self.moveto(sx,sy)
-        pygame.draw.line(self.screen, self.pen.lcol, 
+        pygame.draw.line(self.screen, self.pen.lcol.get_tuple(), 
             (self.get_x(sx), self.get_y(sy)),
             (self.get_x(ex), self.get_y(ey)), math.ceil(self.pen.lthk))
         
@@ -335,17 +336,17 @@ class DevicePygame(DeviceRaster):
             if fcol: self.make_brush(fcol)
         
         if self.brush.fcol:
-            pygame.draw.polygon(self.screen, self.brush.fcol, pnt)
+            pygame.draw.polygon(self.screen, self.brush.fcol.get_tuple(), pnt)
             
         if self.pen.lcol: 
-            pygame.draw.polygon(self.screen, self.pen.lcol, pnt, math.ceil(self.pen.lthk))
+            pygame.draw.polygon(self.screen, self.pen.lcol.get_tuple(), pnt, math.ceil(self.pen.lthk))
 
     def polyline(self, x, y, lcol=None, lthk=None, closed=False):
         pnt = [(self.get_x(x[i]),
                 self.get_y(y[i])) for i in range(len(x))]
         if lcol:
             self.make_pen(lcol, lthk)
-        pygame.draw.lines(self.screen, self.pen.lcol, closed, pnt, math.ceil(self.pen.lthk))
+        pygame.draw.lines(self.screen, self.pen.lcol.get_tuple(), closed, pnt, math.ceil(self.pen.lthk))
         
     def begin(self,lcol,lthk,fcol): 
         return
@@ -375,10 +376,10 @@ class DevicePygame(DeviceRaster):
         rrad = int(rad*self.scal)
         
         if fcol: 
-            pygame.draw.circle(self.screen, fcol, (xx,yy), rrad)
+            pygame.draw.circle(self.screen, fcol.get_tuple(), (xx,yy), rrad)
         if lcol: 
             lthk = int(get_line_thk(lthk*self.lscl))
-            pygame.draw.circle(self.screen, lcol, (xx,yy), rrad, lthk)
+            pygame.draw.circle(self.screen, lcol.get_tuple(), (xx,yy), rrad, lthk)
         
     def symbol(self, x,y, sym, draw=False):
         px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
@@ -386,16 +387,16 @@ class DevicePygame(DeviceRaster):
         pnt = [(self.get_xl(px[i]),
                 self.get_yl(py[i])) for i in range(len(px))]
                 
-        pygame.draw.polygon(self.screen, sym.fcol, pnt)
+        pygame.draw.polygon(self.screen, sym.fcol.get_tuple(), pnt)
         
         if sym.lcol != sym.fcol: 
-            pygame.draw.polygon(self.screen, sym.lcol, pnt, 1)
+            pygame.draw.polygon(self.screen, sym.lcol.get_tuple(), pnt, 1)
 
     def lline(self, sx, sy, ex, ey, lcol=None, lthk=None):
         if lcol: 
             self.make_pen(lcol, lthk)
             
-        pygame.draw.line(self.screen, self.pen.lcol, 
+        pygame.draw.line(self.screen, self.pen.lcol.get_tuple(), 
             (self.get_xl(sx), self.get_yl(sy)),
             (self.get_xl(ex), self.get_yl(ey)), 
             math.ceil(self.pen.lthk))
@@ -406,7 +407,7 @@ class DevicePygame(DeviceRaster):
         self.pos.set(x,y)
         
     def llineto(self, x,y):
-        pygame.draw.line(self.screen, self.pen.lcol, 
+        pygame.draw.line(self.screen, self.pen.lcol.get_tuple(), 
             (self.get_xl(self.pos.x), self.get_yl(self.pos.y)),
             (self.get_xl(x), self.get_yl(y)))
         self.pos.set(x,y)
@@ -416,11 +417,11 @@ class DevicePygame(DeviceRaster):
                 self.get_yl(y[i])) for i in range(len(x))]
                 
         if fcol:             
-            pygame.draw.polygon(self.screen, fcol, pnt)
+            pygame.draw.polygon(self.screen, fcol.get_tuple(), pnt)
         
         if lcol and (lcol != fcol):
             self.make_pen(lcol, lthk)
-            pygame.draw.polygon(self.screen, self.pen.lcol, pnt, math.ceil(self.pen.lthk))
+            pygame.draw.polygon(self.screen, self.pen.lcol.get_tuple(), pnt, math.ceil(self.pen.lthk))
             
     def lpolyline(self, x, y, lcol=None, lthk=None, closed=False):
         pnt = [(self.get_xl(x[i]),
@@ -428,7 +429,7 @@ class DevicePygame(DeviceRaster):
         if lcol:
             self.make_pen(lcol, lthk)
             
-        pygame.draw.lines(self.screen, self.pen.lcol, closed, pnt, math.ceil(self.pen.lthk))
+        pygame.draw.lines(self.screen, self.pen.lcol.get_tuple(), closed, pnt, math.ceil(self.pen.lthk))
         
     def show(self):
         pygame.display.update()
@@ -438,7 +439,8 @@ class DevicePygame(DeviceRaster):
         
     def close(self):
         return
-        
+       
+'''       
 #
 # aggdraw device
 #
@@ -656,7 +658,7 @@ class DeviceCairo(DeviceRaster):
         self.set_plot(frm)
         
     def set_surface_pixel(self, x, y, col):
-        self.data[y][x] = int("0xFF%02X%02X%02X"%(col[0],col[1],col[2]),16)
+        self.data[y][x] = int("0xFF%02X%02X%02X"%(col.r,col.g,col.b),16)
         
     def set_pixel(self, x, y, col):
         self.set_surface_pixel(self.get_xp(x), self.get_yp(y), col)
@@ -828,6 +830,8 @@ class DeviceCairo(DeviceRaster):
         if lcol: self.make_pen(lcol, lthk)    
         else   : self.make_pen(self.pen.lcol, self.pen.lthk)
         self.cntx.stroke()
+        
+        if lcol: self.delete_pen()
     
     def create_clip(self, x1, y1, x2, y2):
         self.cntx.save()
