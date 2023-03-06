@@ -9,9 +9,14 @@
 #
 
 import math
-import vgl.color as color
-from vgl.linetype import *
-import vgl.text as text
+from . import color
+from . import text
+from .linetype import *
+#
+#import color
+#import text
+#from linetype import *
+
 
 TICK_DIR_IN     = 0x01
 TICK_DIR_OUT    = 0x02
@@ -158,7 +163,7 @@ class Label(text.Text):
         self.show = True
         self.color = color.BLACK
         self.pos = pos
-        self.size = 0.015
+        self.size = 0.015 # the percentage of frame height: 1.5%
 
 class Grid(LineLevelC):
     def __init__(self, show, lcol=color.BLACK, lthk=0.001, lpat=0, patlen=0):
@@ -175,6 +180,17 @@ class Tick(LineLevelB):
         self.auto_spacing = True
         self.dir          = TICK_DIR_IN
    
+_POS_LEFT    = 0x0001
+_POS_TOP     = 0x0002
+_POS_RIGHT   = 0x0003
+_POS_BOTTOM  = 0x0004
+_POS_ZERO    = 0x0005
+
+_AXIS_NAME = ["Axis-X", "Axis-Y", "Axis-X"]
+def _get_xaxis_name(): return _AXIS_NAME[0]
+def _get_yaxis_name(): return _AXIS_NAME[1]
+def _get_zaxis_name(): return _AXIS_NAME[2]
+
 class Axis(LineLevelA):
     def __init__(self, min=0, max=1, lcol = color.BLACK, lthk=0.004):
         super().__init__(lcol, lthk)
@@ -188,10 +204,14 @@ class Axis(LineLevelA):
         self.nminor_tick         = 4
         self.update_tick(min, max)
         self.label               = Label()
-        #self.ylabel              = Label()
 
+    def update_range(self, min, max):
+        self.min = min
+        self.max = max
+        
     def update_tick(self, min, max):
-        self.spacing             = compute_tick_spacing(min,max)
+        self.update_range(min, max)
+        self.spacing = compute_tick_spacing(min,max)
         a,b,c=compute_tick_position(min,max,self.spacing,self.nminor_tick)
         self.first_major_tick_pos = a
         self.first_minor_tick_pos = b
@@ -201,6 +221,7 @@ class Axis(LineLevelA):
     def get_minor_grid(self): return self.minor_grid	
     def get_major_tick(self): return self.major_tick	
     def get_minor_tick(self): return self.minor_tick
+    def get_range(self): return (self.max-self.min)
     def get_label(self): return self.label
     #def get_ylabel(self): return self.ylabel
     
@@ -211,7 +232,21 @@ class Axis(LineLevelA):
                self.first_minor_tick_pos,
                self.first_nminor_tick)
 
-	
+class AxisX(Axis):
+    def __init__(self, min=0, max=1, lcol = color.BLACK, lthk=0.004,\
+                 pos_t =_POS_BOTTOM):
+        super().__init__(min,max,lcol,lthk)
+        self.name = _get_xaxis_name()
+        self.pos_t  = pos_t
+        #self.pos    = 
+        
+class AxisY(Axis):
+    def __init__(self, min=0, max=1, lcol = color.BLACK, lthk=0.004,\
+                 pos_t =_POS_LEFT):
+        super().__init__(min,max,lcol,lthk)
+        self.name = _get_yaxis_name()
+        self.pos_t  = pos_t
+
 def main():
 	x=Axis(-3,3)
 	a,b,c=compute_tick_position(-1,1,0.25,4)

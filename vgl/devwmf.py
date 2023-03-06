@@ -2,15 +2,20 @@
 #
 # devwmf.py
 #
-# 2020-2-12 Ver 0.1
+# 02/12/2020 Ver 0.1
+# 03/05/2023 delete null brush at Circle 
 #
 # Author: Uisang Hwang
 # Email : uhwangtx@gmail.com
 #
 
 import struct
-import vgl.wmfconst as wc
-from vgl.size import BBox
+from . import wmfconst as wc
+from .size import BBox
+from . import color
+#import wmfconst as wc
+#from size import BBox
+
 
 _to_twip = lambda x: int((x)*wc.TWIP_PER_INCH)
 
@@ -234,7 +239,7 @@ class WindowsMetaFile():
 		return self.cur_brush
 	
 	def MakeNullBrush(self):
-		self.cur_brush = self.CreateBrushIndirect(wc.BS_HOLLOW, (255,255,255), wc.BS_HOLLOW)
+		self.cur_brush = self.CreateBrushIndirect(wc.BS_HOLLOW, color.Color(255,255,255), wc.BS_HOLLOW)
 		self.SelectObject(self.cur_brush)
 		return self.cur_brush
 		

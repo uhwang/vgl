@@ -1,26 +1,55 @@
-# axis.py
-import vgl.frame
-import vgl.axis
+# Vector Graphic Library (VGL) for Python
+#
+# drawaxis.py
+#
+# 03/06/2023
+#
+# Author: Uisang Hwang
+# Email : uhwangtx@gmail.com
+#
+
+from . import axis
+from . import drawtick
+from . import drawgrid
+from . import drawlabel
 
 def draw_axis(dev):
-    frm = dev.frm
-    xaxis = frm.get_xaxis()
-    yaxis = frm.get_yaxis()
+    # TODO: check plot type(xy, 2d, 3d)
+    xaxis = dev.frm.get_xaxis()
+    yaxis = dev.frm.get_yaxis()
+
+    xmin = xaxis.min
+    xmax = xaxis.max
+
+    ymin = yaxis.min
+    ymax = yaxis.max
     
     # draw x-axis
     if xaxis.show:
-        dev.make_pen(xaxis.lcol, xaxis.lthk*frm.hgt())
-        sx = frm.bbox.sx+frm.pdom.sx
-        yy = frm.bbox.sy+frm.pdom.get_ey()
-        ex = frm.bbox.sx+frm.pdom.get_ex()
-        dev.lline(sx, yy, ex, yy)
-        dev.delete_pen()
+        pos_y = ymin # default axis._POS_BOTTOM
+        pos_t = xaxis.pos_t
+        
+        if pos_t == axis._POS_TOP:
+            pos_y = ymax
+        elif pos_t == axis._POS_ZERO:
+            pos_y = 0
+        
+        dev.line(xmin, pos_y, xmax, pos_y, lcol= xaxis.lcol, 
+                                        lthk=xaxis.lthk*dev.frm.get_pdom_hgt())
     
-    # draw y-axis
+    #draw y-axis
     if yaxis.show:
-        dev.make_pen(yaxis.lcol, yaxis.lthk*frm.hgt())
-        xx = frm.bbox.sx+frm.pdom.sx
-        sy = frm.bbox.sy+frm.pdom.sy
-        ey = frm.bbox.sy+frm.pdom.get_ey()
-        dev.lline(xx, sy, xx, ey)
-        dev.delete_pen()
+        pos_x = xmin # default axis._POS_LEFT
+        pos_t = yaxis.pos_t
+        
+        if pos_t == axis._POS_RIGHT:
+            pos_x = xmax
+        elif pos_t == axis._POS_ZERO:
+            pos_x = 0
+        
+        dev.line(pos_x, ymin, pos_x, ymax, lcol=yaxis.lcol, 
+                                        lthk=yaxis.lthk*dev.frm.get_pdom_hgt())
+        
+    drawtick.draw_tick(dev)
+    drawgrid.draw_grid(dev)
+    drawlabel.draw_label(dev)

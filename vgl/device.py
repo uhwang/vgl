@@ -9,20 +9,32 @@
 # Author: Uisang Hwang
 # Email : uhwangtx@gmail.com
 #
- 
+import abc
+import math
+import cairo
 import numpy as np
-#import pygame 
+import pygame 
+import aggdraw
 from PIL import Image
 import moviepy.editor as mpy
 
-import aggdraw
-import vgl.devwmf as dw
-import vgl.color as color
-import vgl.geom as geom
-from vgl.size import BBox, Rect
-from vgl.data import Data
-import math
-import cairo
+from . import devwmf as dw
+from . import color
+from . import geom
+from . size import BBox, Rect
+from . data import Data
+
+#import devwmf as dw
+#import color
+#import geom
+#from size import BBox, Rect
+#from data import Data
+
+# Axis Fit Type
+_FIT_NONE      = None
+_FIT_EXTEND_X  = 0x0001
+_FIT_EXTEND_Y  = 0x0002
+_FIT_DEPENDENT = 0x0003
 
 two_pi = 2*math.pi
 
@@ -31,57 +43,164 @@ get_line_thk = lambda x : 1 if int(x) == 0 else x
 class Pen():
     def __init__(self):
         self.lcol = None
+        #self.lcol = color.Color()
         self.lthk = None
         
     def set_pen(self, lcol, lthk):
         self.lcol = lcol
         self.lthk =lthk
+        
+    def __str__(self):
+        return "Color: %s\nThickness: %f"%(self.lcol, self.lthk)
+        
 class Brush():
     def __init__(self):
         self.fcol=None #(0,0,0)
+        #self.fcol=color.Color()
+        
     def set_brush(self, fcol):
         self.fcol = fcol
         
-class DeviceVector():
-    def __init__(self, gbox):
-        self.gbox =gbox
-        self.xscl = 0
-        self.yscl = 0
-        self.scal = 0
         
-    def set_plot(self, frm):
+'''
+    Frame.py
+        default_plot_domain_xmargin = 0.09
+        default_plot_domain_ymargin = 0.09
+        
+        Frame Width: 4' Height: 4'
+        
+        Plot Domain: (0.09', 0.09', 4-2*0.09, 4-2*0.09)
+        (=viewport)  (0.09', 0.09', 3.82, 3.82)
+        (=logic)
+        (=paper)
+        
+        Data Range: (xmin, xmax) -> (0, 10)
+        (=word)     (ymin, ymax) -> (0, 5)
+                    
+    Device
+        xrange_data = (xmax-xmin) = 10
+        yrange_data = (ymax-ymin) = 5
+        
+        World coord to Viewport coord
+            xscale_viewport = width plot domain / x range of data
+                            = 3.82/10
+                            = 0.382
+            yscale_viewport = height plot domain / y range of data
+                            = 3.82/5
+                            = 0.764
+                            
+        Dependent on Axis is true(extend one axis(low range) accoring to the other(high range))
+        
+            if xrange_world == yrange_world and
+               wid_viewport != hgt_viewport
+                    if hgt_viewport < wid_viewport
+                        xmax = xmin+wid_viewport/yscale_viewport
+                    else
+                        ymax = ymin+hgt_viewport/xscale_viewport
+            else
+                if xrange_world < yrange_world
+                    => vertically long and horizontally narrow mesh
+                    => adjust x-axis maximum value
+                    xmax = xmin+wid_viewport/yscale_viewport
+                elif xrange_world > yrange_world
+                    => vertically short and horizontally wide mesh
+                    => adjust y-axis maximum value
+                    ymax = ymin+hgt_viewport/xscale_viewport
+        
+                            
+'''
+        
+class Device(abc.ABC):
+    def __init__(self):
+        self.frm=None
+
+    @abc.abstractmethod
+    def set_plot(self,frm,extend=_FIT_NONE):
+        pass
+        
+        
+class DeviceVector(Device):
+    def __init__(self):
+        self.xscale_viewport = 0
+        self.yscale_viewport = 0
+        self.scal_viewport = 0
+        
+    def set_plot(self, frm, extend=_FIT_NONE):
         self.frm = frm
-        wid          = frm.pdom.get_wid()
-        hgt          = frm.pdom.get_hgt()
-        self.xscl    = wid/(frm.data.xmax-frm.data.xmin)
-        self.yscl    = hgt/(frm.data.ymax-frm.data.ymin)
-        self.sx_plot = frm.bbox.sx+frm.pdom.sx
-        self.sy_plot = frm.bbox.ey-frm.pdom.sy
-        self.ref_y   = frm.bbox.sy+frm.pdom.sy
-        self.scal    = self.xscl if self.xscl < self.yscl else self.yscl
+        wid_viewport = frm.pdom.get_wid()
+        hgt_viewport = frm.pdom.get_hgt()
+        xmax, xmin = frm.data.xmax, frm.data.xmin
+        ymax, ymin = frm.data.ymax, frm.data.ymin
         
-    def wtol_x(self, x): return self.get_x(x)
-    def wtol_y(self, y): return self.get_y(y)
+        xrange_world = (xmax-xmin)
+        yrange_world = (ymax-ymin)
+
+        self.xscale_viewport = wid_viewport/xrange_world
+        self.yscale_viewport = hgt_viewport/yrange_world
+        
+        self.sx_viewport = frm.bbox.sx+frm.pdom.sx
+        self.sy_viewport = frm.bbox.sy+frm.pdom.sy
+        self.ey_viewport = self.sy_viewport+frm.pdom.hgt
+        
+        if extend!=_FIT_NONE:
+            if extend==_FIT_DEPENDENT:
+                if xrange_world == yrange_world and\
+                wid_viewport != hgt_viewport:
+                    if hgt_viewport < wid_viewport:
+                        xmax = xmin+wid_viewport/self.yscale_viewport
+                    else:
+                        ymax = ymin+hgt_viewport/self.xscale_viewport
+                else:
+                    if xrange_world < yrange_world:
+                        # vertically long and horizontally narrow mesh
+                        # adjust x-axis maximum value
+                        xmax = xmin+wid_viewport/self.yscale_viewport
+                    elif xrange_world > yrange_world:
+                        # vertically short and horizontally wide mesh
+                        # adjust y-axis maximum value
+                        ymax = ymin+hgt_viewport/self.xscale_viewport
+            elif extend==_FIT_EXTEND_Y:
+                # long x range, long plot domain in x dir
+                # rectangular plot domain in x dir
+                # xrange > yrange
+                self.xscale_viewport = self.yscale_viewport
+                xmax = xmin+wid_viewport/self.yscale_viewport
+                
+            elif extend==_FIT_EXTEND_X:
+                # long y range, long plot domain in y dir
+                # rectangular plot domain in y dir
+                # long y, narro x
+                self.yscale_viewport = self.xscale_viewport
+                ymax = ymin+hgt_viewport/self.xscale_viewport
+                
+            #self.frm.xaxis.update_range(xmin, xmax)
+            #self.frm.yaxis.update_range(ymin, ymax)
+            self.frm.xaxis.update_tick(xmin, xmax)
+            self.frm.yaxis.update_tick(ymin, ymax)
+            
+    #def wtol_x(self, x): return self._x_viewport(x)
+    #def wtol_y(self, y): return self._y_viewport(y)
     
-    def get_x(self, x):
-        return self.sx_plot+(x-self.frm.data.xmin)*self.scal
+    def _x_viewport(self, x):
+        return self.sx_viewport+(x-self.frm.data.xmin)*self.xscale_viewport
         
-    def get_y(self, y):
-        return self.sy_plot-(y-self.frm.data.ymin)*self.scal
+    def _y_viewport(self, y):
+        return self.ey_viewport-(y-self.frm.data.ymin)*self.yscale_viewport
         
-    def get_ly(self, y):
-        return self.ref_y+(y-self.frm.data.ymin)*self.scal
+    #def get_ly(self, y):
+    #    return self.ey_viewport+(y-self.frm.data.ymin)*self.scal
         
 class DeviceWindowsMetafile(DeviceVector):
     def __init__(self, fname, gbox):
-        super().__init__(gbox)
+        super().__init__()
+        self.gbox =gbox
         self.dev = dw.WindowsMetaFile(fname, gbox)
         self.pen = Pen()
         self.brush = Brush()
         
-    def set_device(self, frm):
+    def set_device(self, frm, extend=_FIT_NONE):
         self.frm = frm
-        self.set_plot(frm)
+        self.set_plot(frm,extend)
         
     def fill_white(self):
         return
@@ -105,24 +224,26 @@ class DeviceWindowsMetafile(DeviceVector):
         self.brush.fcol = None
         
     def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
-        x1 = self.get_x(sx)
-        y1 = self.get_y(sy)
-        x2 = self.get_x(ex)
-        y2 = self.get_y(ey)
+        x1 = self._x_viewport(sx)
+        y1 = self._y_viewport(sy)
+        x2 = self._x_viewport(ex)
+        y2 = self._y_viewport(ey)
         self.dev.Line(x1, y1, x2, y2, lcol, lthk)
 
     def stroke(self):
         return
         
     def moveto(self, x, y):
-        self.dev.MoveTo(self.get_x(x),self.get_y(y))
+        self.dev.MoveTo(self._x_viewport(x),self._y_pixel(y))
         
     def lineto(self, x, y):
-        self.dev.LineTo(self.get_x(x),self.get_y(y))
+        self.dev.LineTo(self._x_viewport(x),self._y_viewport(y))
         
     def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
-        px=[self.get_x(x[i]) for i in range(len(x))]
-        py=[self.get_y(y[i]) for i in range(len(y))]
+        #px=[self.get_x(x[i]) for i in range(len(x))]
+        #py=[self.get_y(y[i]) for i in range(len(y))]
+        px=[self._x_viewport(xx) for xx in x]
+        py=[self._y_viewport(yy) for yy in y]
         
         #if lcol: self.make_pen(lcol, lthk)
         #if fcol: self.make_brush(fcol)
@@ -146,8 +267,8 @@ class DeviceWindowsMetafile(DeviceVector):
         self.dev.DeleteBrush()
         
     def symbol(self, x,y,sym,draw=False):
-        cx = self.get_x(x)
-        cy = self.get_y(y)
+        cx = self._x_viewport(x)
+        cy = self._y_viewport(y)
         px, py = sym.update_xy(cx,cy)
         if draw: self.begin_symbol(sym)
         self.dev.Symbol(px,py)
@@ -158,18 +279,19 @@ class DeviceWindowsMetafile(DeviceVector):
         else    : self.dev.MakePen(fcol, 0.01) # dummy line thickness 0.1
         if fcol : self.dev.MakeBrush(fcol)
         else    : self.dev.MakeNullBrush()
-        x1 = self.get_x(x-rad)
-        y1 = self.get_y(y-rad)
-        x2 = self.get_x(x+rad)
-        y2 = self.get_y(y+rad)
+        x1 = self._x_viewport(x-rad)
+        y1 = self._y_viewport(y-rad)
+        x2 = self._x_viewport(x+rad)
+        y2 = self._y_viewport(y+rad)
         self.dev.Circle(x1,y1,x2,y2)
+        self.dev.DeleteBrush()
         if lcol: self.dev.DeletePen()
-        if fcol: self.dev.DeleteBrush()
+        #if fcol: self.dev.DeleteBrush()
         
     def polyline(self, x, y, lcol=None, lthk=None, closed=False):
         if lcol: self.dev.MakePen(lcol, lthk)
-        px=[self.get_x(x[i]) for i in range(len(x))]
-        py=[self.get_y(y[i]) for i in range(len(y))]
+        px=[self._x_viewport(x[i]) for i in range(len(x))]
+        py=[self._y_viewport(y[i]) for i in range(len(y))]
         self.dev.Polyline(px,py,closed)
         if lcol: self.dev.DeletePen()
         
@@ -214,50 +336,65 @@ class Position():
         self.x = x
         self.y = y
         
-class DeviceRaster():
+class DeviceRaster(DeviceVector):
     def __init__(self, gbox, dpi):
         self.dpi  = dpi
         self.gbbox = gbox
         self.gwid = int(gbox.wid()*dpi)
         self.ghgt = int(gbox.hgt()*dpi)
-        self.lscl = float(self.gwid/gbox.wid())
         
-    def set_plot(self, frm):
-        self.frm = frm
-        xrange = frm.data.get_xrange()
-        yrange = frm.data.get_yrange()
+        # logic coord -> pixel coord
+        self.lxscl = float(self.gwid/gbox.wid())
+        self.lyscl = float(self.ghgt/gbox.hgt())
+        #self.lscl = float(self.gwid/gbox.wid())
+        self.lscl = min(self.lxscl, self.lyscl)
+        #self.axis_dependancy = True
         
-        # logical 
-        self.sx_wtol = frm.bbox.sx+frm.pdom.sx
-        self.sy_wtol = frm.bbox.sy+frm.pdom.sy
+    def set_plot(self, frm, extend=_FIT_NONE):
+        super().set_plot(frm, extend)
+        xrange = frm.xaxis.get_range()
+        yrange = frm.yaxis.get_range()
         
-        self.sx_ltop = (frm.bbox.sx+frm.pdom.sx)*self.dpi
-        self.sy_ltop = (frm.bbox.sy+frm.pdom.sy)*self.dpi
-        self.hgt     = self.frm.pdom.hgt*self.dpi
+        self.sx_viewport_pixel = self.sx_viewport*self.dpi
+        self.sy_viewport_pixel = self.sy_viewport*self.dpi
+        self.ey_viewport_pixel = self.ey_viewport*self.dpi
         
-        xscl = (frm.pdom.wid*self.dpi)/xrange
-        yscl = (frm.pdom.hgt*self.dpi)/yrange
-        self.scal = min(xscl, yscl)
-        
-        wtolx = frm.pdom.wid/xrange
-        wtoly = frm.pdom.hgt/yrange
-        self.wtol = min(wtolx,wtoly)
-        
-        self.ref_wtol_y = self.sy_wtol+self.frm.pdom.hgt
-        self.ref_y      = self.sy_ltop+self.hgt
+        self.xscale_pixel = (frm.pdom.wid*self.dpi)/xrange
+        self.yscale_pixel = (frm.pdom.hgt*self.dpi)/yrange
+        self.scale_pixel = min(self.xscale_pixel, self.yscale_pixel)
 
-    def wtol_x(self, x): return self.sx_wtol+self.wtol*(x-self.frm.data.xmin)
-    def wtol_y(self, y): return self.ref_wtol_y-self.wtol*(y-self.frm.data.ymin)
-    def get_xl(self, x): return x*self.lscl
-    def get_yl(self, y): return y*self.lscl
-    def get_x (self, x): return self.sx_ltop+(x-self.frm.data.xmin)*self.scal    
-    def get_y (self, y): return self.ref_y-(y-self.frm.data.ymin)*self.scal
-    def get_v (self, v): return v*self.scal
+    def set_axis_dependancy(self):
+        xrange = self.frm.data.get_xrange()
+        yrange = self.frm.data.get_yrange()
+        
+        #self.axis_dependancy = status
+        self.xscale = (self.frm.pdom.wid*self.dpi)/xrange
+        self.yscale = (self.frm.pdom.hgt*self.dpi)/yrange
+        self.scale = min(self.xscale, self.yscale)
+        
+        if xrange == yrange and self.frm.pdom.wid == self.frm.pdom.hgt:
+            self.xscale, self.yscale = self.scale, self.scale
+        else:
+            self.xscale, self.yscale = self.xscale, self.yscale
+
+        self.scale = min(self.xscale, self.yscale)
+            
+    #def wtol_x(self, x): return self.sx_wtol+self.wtol*(x-self.frm.data.xmin)
+    #def wtol_y(self, y): return self.ref_wtol_y-self.wtol*(y-self.frm.data.ymin)
+    #def wtol_x(self, x): return self.sx_viewport+self.xscale_viewport*(x-self.frm.data.xmin)
+    #def wtol_y(self, y): return self.ey_viewport-self.yscale_viewport*(y-self.frm.data.ymin)
+    def get_xl(self, x): return x*self.lxscl
+    def get_yl(self, y): return y*self.lyscl
+    #def get_x (self, x): return self.sx_viewport_pixel+(x-self.frm.data.xmin)*self.scal    
+    #def get_y (self, y): return self.ref_y-(y-self.frm.data.ymin)*self.scal
+    #def get_v (self, v): return v*self.scal
+    def _x_pixel (self, x): return self.sx_viewport_pixel+(x-self.frm.data.xmin)*self.xscale_pixel    
+    def _y_pixel (self, y): return self.ey_viewport_pixel-(y-self.frm.data.ymin)*self.yscale_pixel
+    def get_v (self, v): return v*self.scale_pixel
     def size  (self   ): return (self.gwid, self.ghgt)
-    def get_xp(self, x): return int(self.sx_ltop + x)
-    def get_yp(self, y): return int(self.sy_ltop + y)
+    def get_xp(self, x): return int(self.sx_viewport_pixel + x)
+    def get_yp(self, y): return int(self.sy_viewport_pixel + y)
  
-''' 
 class DevicePygame(DeviceRaster):
     def __init__(self, gbox, dpi, fps=30):
         super().__init__(gbox, dpi)
@@ -270,8 +407,8 @@ class DevicePygame(DeviceRaster):
         self.brush = Brush()
         self.pos = Position(0,0)
         
-    def set_device(self, frm):
-        self.set_plot(frm)
+    def set_device(self, frm, extend=_FIT_NONE):
+        self.set_plot(frm, extend)
         return
 
     def get_tick(self):
@@ -310,8 +447,8 @@ class DevicePygame(DeviceRaster):
             self.make_pen(lcol, lthk)
             self.moveto(sx,sy)
         pygame.draw.line(self.screen, self.pen.lcol.get_tuple(), 
-            (self.get_x(sx), self.get_y(sy)),
-            (self.get_x(ex), self.get_y(ey)), math.ceil(self.pen.lthk))
+            (self._x_pixel(sx), self._y_pixel(sy)),
+            (self._x_pixel(ex), self._y_pixel(ey)), math.ceil(self.pen.lthk))
         
     def stroke(self):
         return
@@ -321,15 +458,15 @@ class DevicePygame(DeviceRaster):
         
     def lineto(self, x, y):
         pygame.draw.line(self.screen, self.pen.lcol, 
-            (self.get_x(self.pos.x),
-             self.get_y(self.pos.y)),
-            (self.get_x(x),
-             self.get_y(y)), math.ceil(self.pen.lthk))
+            (self._x_pixel(self.pos.x),
+             self._y_pixel(self.pos.y)),
+            (self._x_pixel(x),
+             self._y_pixel(y)), math.ceil(self.pen.lthk))
         self.pos.set(x,y)
         
     def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
-        pnt = [(self.get_x(x[i]),
-                self.get_y(y[i])) for i in range(len(x))]
+        pnt = [(self._x_pixel(x[i]),
+                self._y_pixel(y[i])) for i in range(len(x))]
                 
         if lcol or fcol:
             if lcol: self.make_pen(lcol, lthk)
@@ -342,8 +479,8 @@ class DevicePygame(DeviceRaster):
             pygame.draw.polygon(self.screen, self.pen.lcol.get_tuple(), pnt, math.ceil(self.pen.lthk))
 
     def polyline(self, x, y, lcol=None, lthk=None, closed=False):
-        pnt = [(self.get_x(x[i]),
-                self.get_y(y[i])) for i in range(len(x))]
+        pnt = [(self._x_pixel(x[i]),
+                self._y_pixel(y[i])) for i in range(len(x))]
         if lcol:
             self.make_pen(lcol, lthk)
         pygame.draw.lines(self.screen, self.pen.lcol.get_tuple(), closed, pnt, math.ceil(self.pen.lthk))
@@ -371,9 +508,9 @@ class DevicePygame(DeviceRaster):
         self.screen.set_clip(None)
     
     def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
-        xx = int(self.get_x(x))
-        yy = int(self.get_y(y))
-        rrad = int(rad*self.scal)
+        xx = int(self._x_pixel(x))
+        yy = int(self._y_pixel(y))
+        rrad = int(rad*self.scale_pixel)
         
         if fcol: 
             pygame.draw.circle(self.screen, fcol.get_tuple(), (xx,yy), rrad)
@@ -382,7 +519,7 @@ class DevicePygame(DeviceRaster):
             pygame.draw.circle(self.screen, lcol.get_tuple(), (xx,yy), rrad, lthk)
         
     def symbol(self, x,y, sym, draw=False):
-        px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
+        px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
         
         pnt = [(self.get_xl(px[i]),
                 self.get_yl(py[i])) for i in range(len(px))]
@@ -440,7 +577,7 @@ class DevicePygame(DeviceRaster):
     def close(self):
         return
        
-'''       
+       
 #
 # aggdraw device
 #
@@ -455,8 +592,7 @@ class DeviceAggdraw(DeviceRaster):
         self.img = Image.new('RGB', (self.gwid, self.ghgt), (255,255,255))
         self.agg = aggdraw.Draw(self.img)
         
-    def set_device(self, frm):
-        self.frm = frm
+    def set_device(self, frm, extend=_FIT_NONE):
         self.set_plot(frm)
 
     def fill_black(self):
@@ -492,8 +628,8 @@ class DeviceAggdraw(DeviceRaster):
         if lcol           : self.make_pen(lcol, lthk)
         elif self.pen.lcol: self.make_pen(self.pen.lcol, self.pen.lthk)
         
-        self.agg.line((self.get_x(sx), self.get_y(sy),
-                      self.get_x(ex), self.get_y(ey)), self.agg_pen)
+        self.agg.line((self._x_pixel(sx), self._y_pixel(sy),
+                      self._x_pixel(ex), self._y_pixel(ey)), self.agg_pen)
         self.agg.flush()
         
         if lcol: self.delete_pen()
@@ -518,7 +654,7 @@ class DeviceAggdraw(DeviceRaster):
             self.pnt[npnt*2+1]=self.pnt[1]
         
     def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
-        self.create_pnt_list(x,y,self.get_x, self.get_y,False)
+        self.create_pnt_list(x,y,self._x_pixel, self._y_pixel,False)
         
         if lcol: self.make_pen(lcol, lthk)
         else   : self.make_pen(self.pen.lcol, self.pen.lthk)
@@ -537,7 +673,7 @@ class DeviceAggdraw(DeviceRaster):
         if fcol: self.delete_brush()
         
     def polyline(self, x, y, lcol=0, lthk=0, closed=False):
-        self.create_pnt_list(x,y,self.get_x,self.get_y, closed)
+        self.create_pnt_list(x,y,self._x_pixel,self._y_pixel, closed)
         if lcol !=0: self.make_pen(lcol, lthk)
         self.agg.line(self.pnt, self.agg_pen)
         self.agg.flush()
@@ -552,10 +688,10 @@ class DeviceAggdraw(DeviceRaster):
     def end_symbol(self): return
     
     def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
-        x1 = self.get_x(x-rad)
-        y1 = self.get_y(y-rad)
-        x2 = self.get_x(x+rad)
-        y2 = self.get_y(y+rad)
+        x1 = self._x_pixel(x-rad)
+        y1 = self._y_pixel(y-rad)
+        x2 = self._x_pixel(x+rad)
+        y2 = self._y_pixel(y+rad)
         xy = (x1,y1,x2,y2)
         #if fcol!=0: 
         #    self.make_brush(fcol)
@@ -578,7 +714,7 @@ class DeviceAggdraw(DeviceRaster):
         if fcol: self.delete_brush()
         
     def symbol(self, x,y, sym, draw=False):
-        px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
+        px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
         self.create_pnt_list(px,py,self.get_xl, self.get_yl,False)
         if draw: self.begin_symbol(sym)
         self.agg.polygon(self.pnt, self.agg_pen, self.agg_brush)
@@ -653,9 +789,8 @@ class DeviceCairo(DeviceRaster):
         self.fill_white()
         self.nlineto = 0
         
-    def set_device(self, frm):
-        self.frm = frm
-        self.set_plot(frm)
+    def set_device(self, frm, extend=_FIT_NONE):
+        self.set_plot(frm, extend)
         
     def set_surface_pixel(self, x, y, col):
         self.data[y][x] = int("0xFF%02X%02X%02X"%(col.r,col.g,col.b),16)
@@ -697,15 +832,15 @@ class DeviceCairo(DeviceRaster):
         if lcol:
             self.make_pen(lcol, lthk)
             
-        self.cntx.move_to(self.get_x(sx),self.get_y(sy))
-        self.cntx.line_to(self.get_x(ex),self.get_y(ey))
+        self.cntx.move_to(self._x_pixel(sx),self._y_pixel(sy))
+        self.cntx.line_to(self._x_pixel(ex),self._y_pixel(ey))
         self.cntx.stroke()
         
     def moveto(self, x, y):
-        self.cntx.move_to(self.get_x(x),self.get_y(y))
+        self.cntx.move_to(self._x_pixel(x),self._y_pixel(y))
         
     def lineto(self, x, y):
-        self.cntx.line_to(self.get_x(x),self.get_y(y))
+        self.cntx.line_to(self._x_pixel(x),self._y_pixel(y))
         self.nlineto += 1
 
     def stroke(self):
@@ -719,28 +854,33 @@ class DeviceCairo(DeviceRaster):
     
     def draw_geometry(self, lcol, lthk, fcol):
         if fcol or self.brush.fcol: 
-            if fcol: self.make_brush(fcol)
-            else   : self.make_brush(self.brush.fcol)
+            if fcol: 
+                #print("fcol")
+                self.make_brush(fcol)
+            elif self.brush.fcol:
+                #print("brush.fclo")
+                self.brush.fcol : self.make_brush(self.brush.fcol)
+            
             if lcol or self.pen.lcol:
                 self.cntx.fill_preserve()
             else:
                 self.cntx.fill()
             
         if lcol or self.pen.lcol:
-            if lcol: self.make_pen(lcol, lthk)
-            else   : self.make_pen(self.pen.lcol, self.pen.lthk)
+            if lcol: 
+                self.make_pen(lcol, lthk)
             self.cntx.stroke()
         
         if lcol: self.delete_pen()
         if fcol: self.delete_brush()
         
     def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
-        self.create_pnt_list(x,y,self.get_x,self.get_y)
+        self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
         self.cntx.close_path()        
         self.draw_geometry(lcol, lthk, fcol)
 
     def polyline(self, x, y, lcol=None, lthk=None, closed=False):
-        self.create_pnt_list(x,y,self.get_x,self.get_y)
+        self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
                         
         if closed: 
             self.cntx.close_path()
@@ -765,14 +905,14 @@ class DeviceCairo(DeviceRaster):
         return
     
     def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
-        cx = self.get_x(x)
-        cy = self.get_y(y)
+        cx = self._x_pixel(x)
+        cy = self._y_pixel(y)
         rr = self.get_v(rad)
         self.cntx.arc(cx,cy,rr,0,two_pi)
         self.draw_geometry(lcol, lthk, fcol)
         
     def symbol(self, x,y, sym, draw=False):
-        px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
+        px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
         self.create_pnt_list(px,py,self.get_xl, self.get_yl)
         self.cntx.close_path()
         self.make_brush(sym.fcol)
@@ -912,9 +1052,8 @@ class DeviceIPycanvas(DeviceRaster):
         #self.fill_white()
         self.nlineto = 0
         
-    def set_device(self, frm):
-        self.frm = frm
-        self.set_plot(frm)
+    def set_device(self, frm, extend=_FIT_NONE):
+        self.set_plot(frm, extend)
                 
     def set_pixel(self, x, y, col):
         return
@@ -952,10 +1091,10 @@ class DeviceIPycanvas(DeviceRaster):
         self.pos.set(x,y)
         
     def lineto(self, x, y):
-        x1 = self.get_x(self.pos.x)
-        y1 = self.get_y(self.pos.y)
-        x2 = self.get_x(x)
-        y2 = self.get_y(y)
+        x1 = self._x_pixel(self.pos.x)
+        y1 = self._y_pixel(self.pos.y)
+        x2 = self._x_pixel(x)
+        y2 = self._y_pixel(y)
         self.canvas.stroke_line(x1, y1, x2, y2)
         self.nlineto += 1
 
@@ -982,11 +1121,11 @@ class DeviceIPycanvas(DeviceRaster):
             self.delete_pen()
         
     def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
-        self.create_pnt_list(x,y,self.get_x,self.get_y)
+        self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
         self.draw_geometry(lcol, lthk, fcol)
 
     def polyline(self, x, y, lcol=None, lthk=None, closed=False):
-        self.create_pnt_list(x,y,self.get_x,self.get_y)
+        self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
                         
         if lcol: 
             self.make_pen(lcol, lthk)
@@ -1014,8 +1153,8 @@ class DeviceIPycanvas(DeviceRaster):
         self.delete_pen()
     
     def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
-        cx = self.get_x(x)
-        cy = self.get_y(y)
+        cx = self._x_pixel(x)
+        cy = self._y_pixel(y)
         rr = self.get_v(rad)
         
         if fcol or self.brush.fcol:
@@ -1029,7 +1168,7 @@ class DeviceIPycanvas(DeviceRaster):
             self.delete_pen()
         
     def symbol(self, x,y, sym, draw=False):
-        px, py = sym.update_xy(self.wtol_x(x),self.wtol_y(y))
+        px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
         self.create_pnt_list(px,py,self.get_xl, self.get_yl)
         #self.polygon(px, py, sym.lcol, sym.lthk, sym.fcol)
         self.draw_geometry(sym.lcol, sym.lthk, sym.fcol)
@@ -1037,10 +1176,10 @@ class DeviceIPycanvas(DeviceRaster):
     def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
         if lcol: self.make_pen(lcol, lthk)
         
-        x1 = int(self.get_x(sx))
-        y1 = int(self.get_y(sy))
-        x2 = int(self.get_x(ex))
-        y2 = int(self.get_y(ey))
+        x1 = int(self._x_pixel(sx))
+        y1 = int(self._y_pixel(sy))
+        x2 = int(self._x_pixel(ex))
+        y2 = int(self._y_pixel(ey))
         
         self.canvas.stroke_line(x1, y1, x2, y2)
         

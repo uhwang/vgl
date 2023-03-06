@@ -9,8 +9,10 @@
 # Email : uhwangtx@gmail.com
 #
 
-import vgl.frame
-import vgl.axis as axis
+from . import frame
+from . import axis
+#import frame
+#import axis
 
 def tick_pos_dir(tick, len):
 	if   tick.dir == axis.TICK_DIR_IN:
@@ -20,7 +22,7 @@ def tick_pos_dir(tick, len):
 	elif tick.dir == axis.TICK_DIR_CENTER:
 		return -len*0.5, len*0.5
 	
-def draw_tick_2d(dev):
+def draw_tick(dev):
     frm = dev.frm
     xx = yy = mispc = oxx = wxx = wyy = mitlen = mjtlen = 0.0
     i  = j  = vi    = 0
@@ -47,7 +49,7 @@ def draw_tick_2d(dev):
         if fnt > 0:
             for i in range(fnt):
                 wxx = xaxis.first_minor_tick_pos+mispc*i
-                wxxl= dev.wtol_x(wxx)
+                wxxl= dev._x_viewport(wxx)
                 dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)
                 
         wxx = xaxis.first_major_tick_pos + mispc
@@ -56,7 +58,7 @@ def draw_tick_2d(dev):
         owxx = wxx
     
         while wxx <= xaxis.max:
-            wxxl = dev.wtol_x(wxx)
+            wxxl = dev._x_viewport(wxx)
             dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)	
             if j == xaxis.nminor_tick:
                 vi += 1
@@ -73,7 +75,7 @@ def draw_tick_2d(dev):
         wxx = xaxis.first_major_tick_pos
         dev.make_pen(maj_tick.lcol, maj_tick.lthk*hgt)
         while wxx <= xaxis.max:
-            wxxl = dev.wtol_x(wxx)
+            wxxl = dev._x_viewport(wxx)
             dev.lline(wxxl, yy+maj_ty0, wxxl, yy+maj_ty1)
             wxx = xaxis.first_major_tick_pos+xaxis.spacing*vi
             vi+=1
@@ -97,7 +99,7 @@ def draw_tick_2d(dev):
         if fnt != 0:
             for i in range(fnt):
                 wyy = yaxis.first_minor_tick_pos+mispc*i
-                wyyl= dev.wtol_y(wyy)
+                wyyl= dev._y_viewport(wyy)
                 dev.lline(xx-min_tx0, wyyl, xx-min_tx1, wyyl)
             wyy += mispc
             
@@ -107,7 +109,7 @@ def draw_tick_2d(dev):
         owyy = wyy
     
         while wyy <= yaxis.max:
-            wyyl = dev.wtol_y(wyy)
+            wyyl = dev._y_viewport(wyy)
             dev.lline(xx-min_tx0,wyyl,xx-min_tx1,wyyl)	
             if j == yaxis.nminor_tick:
                 vi += 1
@@ -125,7 +127,7 @@ def draw_tick_2d(dev):
         wyy = yaxis.first_major_tick_pos
         dev.make_pen(maj_tick.lcol, maj_tick.lthk*hgt)
         while wyy <= yaxis.max:
-            wyyl = dev.wtol_y(wyy)
+            wyyl = dev._y_viewport(wyy)
             dev.lline(xx-maj_tx0, wyyl, xx-maj_tx1, wyyl)
             wyy = yaxis.first_major_tick_pos+yaxis.spacing*vi
             vi+=1

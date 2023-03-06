@@ -20,13 +20,26 @@
 #  +-----------------+
 #
 
-from vgl.size import BBox, Rect
-from vgl.data import Data
-import vgl.color as color
-import vgl.vertex as vertex
-import vgl.axis as axis
-import vgl.text as text
+from .size import BBox, Rect
+from .data import Data
+from . import color
+from . import vertex
+from . import axis
+from . import text
 
+#from size import BBox, Rect
+#from data import Data
+#import color
+#import vertex
+#import axis
+#import text
+
+class PlotDomain():
+    def __init__(self):
+        self.box_show = False
+        self.fill = False
+        self.fcol = color.WHITE
+        
 default_plot_domain_xmargin = 0.09
 default_plot_domain_ymargin = 0.09
 
@@ -47,7 +60,7 @@ class FrameProperty():
         self.pdombk_lthk = 0.001
 		
 class Frame():
-    def __init__(self, id, sx, sy, wid, hgt, data=None):
+    def __init__(self, id, sx, sy, wid, hgt, data=None, fit_axis=False):
         self.id   = id
         #self.view_mode = 
         self.fvtx = vertex.Vertex(4)          # frame vertex
@@ -70,40 +83,46 @@ class Frame():
         #self.yaxis3 = 
         #self.zaxis3 = 
         
-        if data is not None:
-            xrange = data.get_xrange()
-            yrange = data.get_yrange()
-            xmin = data.xmin
-            ymin = data.ymin
-            xmax = data.xmax
-            ymax = data.ymax
+        #if data is not None:
+        if isinstance(data, Data):
+            if fit_axis is True:
+                self.fit_axis()
+            else:
+                self.create_axis(data.xmin, data.xmax, data.ymin, data.ymax)
             
-            xscal = wid/xrange
-            yscal = hgt/yrange
-            
-            minscl = min(xscal, yscal)
-            wid1 = xrange*minscl
-            hgt1 = yrange*minscl
-            wid2 = wid-wid1
-            hgt2 = hgt-hgt1
-
-            if wid2 > 0.05:
-                xmax += wid2/minscl
-                
-            if hgt2 > 0.05:
-                ymax += hgt2/minscl
-                
-            #print(hgt, hgt1, hgt2, ymax)                
-            self.xaxis = axis.Axis(xmin, xmax)# x axis
-            self.yaxis = axis.Axis(ymin, ymax)# y axis
-            self.xaxis.label.hn()
-            self.yaxis.label.wv()
-            
-            #self.xaxis.xlabel.hn()
-            #self.yaxis.ylabel.wv()
         self.update_pdom()                    # compute plot domain vertex
         self.update_vertex()                  # compute frame vertex
    
+    def create_axis(self, xmin, xmax, ymin, ymax):
+        self.xaxis = axis.AxisX(xmin, xmax)# x axis
+        self.yaxis = axis.AxisY(ymin, ymax)# y axis
+        self.xaxis.label.hn()
+        self.yaxis.label.wv()
+            
+    def fit_axis(self):
+        xmin = self.frm.data.xmin
+        ymin = self.frm.data.ymin
+        xmax = self.frm.data.xmax
+        ymax = self.frm.data.ymax
+
+        xrange = data.get_xrange()
+        yrange = data.get_yrange()
+        xscal = wid/xrange
+        yscal = hgt/yrange
+        
+        minscl = min(xscal, yscal)
+        wid1 = xrange*minscl
+        hgt1 = yrange*minscl
+        wid2 = wid-wid1
+        hgt2 = hgt-hgt1
+        
+        if wid2 > 0.05:
+            xmax += wid2/minscl
+            
+        if hgt2 > 0.05:
+            ymax += hgt2/minscl
+        self.create_axis(xmin, xmax, ymin, ymax)
+        
     def update_vertex(self):
         self.fvtx.set_vertex(0, self.bbox.sx, self.bbox.sy)
         self.fvtx.set_vertex(1, self.bbox.sx, self.bbox.ey)
@@ -313,7 +332,7 @@ class FrameId():
     
     def get(self):
         new_id = 0
-        if len(self.id_pool) is 0:
+        if len(self.id_pool) == 0:
             new_id = self.cur_id
             self.id.append(self.cur_id)
             self.cur_id += 1
@@ -375,7 +394,7 @@ class FrameManager():
         ids = self.f_list.keys()
         for i in range(len(ids)):
             self.f_list[ids[i]].hide_header()
-'''		
+	
 def main():
 	fm = FrameManager()
 	fm1=fm.create(0,0,1,1,Data(0,1,0,1))
@@ -396,4 +415,3 @@ def main():
 	
 if __name__ == '__main__':
 	main()
-'''
