@@ -23,6 +23,7 @@ from . import color
 from . import geom
 from . size import BBox, Rect
 from . data import Data
+from . import patline
 
 #import devwmf as dw
 #import color
@@ -177,30 +178,34 @@ class DeviceVector(Device):
             #self.frm.yaxis.update_range(ymin, ymax)
             self.frm.xaxis.update_tick(xmin, xmax)
             self.frm.yaxis.update_tick(ymin, ymax)
-            
-    #def wtol_x(self, x): return self._x_viewport(x)
-    #def wtol_y(self, y): return self._y_viewport(y)
-    
+ 
     def _x_viewport(self, x):
         return self.sx_viewport+(x-self.frm.data.xmin)*self.xscale_viewport
         
     def _y_viewport(self, y):
         return self.ey_viewport-(y-self.frm.data.ymin)*self.yscale_viewport
         
-    #def get_ly(self, y):
-    #    return self.ey_viewport+(y-self.frm.data.ymin)*self.scal
-        
 class DeviceWindowsMetafile(DeviceVector):
+    
+    _default_circle_point = 100
+    _circle_point = _default_circle_point
+    
     def __init__(self, fname, gbox):
         super().__init__()
         self.gbox =gbox
         self.dev = dw.WindowsMetaFile(fname, gbox)
         self.pen = Pen()
         self.brush = Brush()
-        
+
     def set_device(self, frm, extend=_FIT_NONE):
         self.frm = frm
         self.set_plot(frm,extend)
+        
+    def set_circle_point(self, npnt):
+        _circle_point = npnt
+        
+    def reset_circle_point(self):
+        _circle_point = _default_circle_point
         
     def fill_white(self):
         return
@@ -223,12 +228,22 @@ class DeviceWindowsMetafile(DeviceVector):
         self.dev.DeleteBrush()
         self.brush.fcol = None
         
-    def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
-        x1 = self._x_viewport(sx)
-        y1 = self._y_viewport(sy)
-        x2 = self._x_viewport(ex)
-        y2 = self._y_viewport(ey)
-        self.dev.Line(x1, y1, x2, y2, lcol, lthk)
+    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=patline._PAT_SOLID):
+    
+        if isinstance(lpat, patline.LinePattern):
+            xp = [sx, ex]
+            yp = [sy, ey]
+            pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.dev.Polyline(x1, y1) 
+        else:
+            x1 = self._x_viewport(sx)
+            y1 = self._y_viewport(sy)
+            x2 = self._x_viewport(ex)
+            y2 = self._y_viewport(ey)
+            self.dev.Line(x1, y1, x2, y2, lcol, lthk)
 
     def stroke(self):
         return
@@ -274,31 +289,67 @@ class DeviceWindowsMetafile(DeviceVector):
         self.dev.Symbol(px,py)
         if draw: self.end_symbol()
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None):
+    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=patline._PAT_SOLID):
         if lcol : self.dev.MakePen(lcol, lthk)
         else    : self.dev.MakePen(fcol, 0.01) # dummy line thickness 0.1
         if fcol : self.dev.MakeBrush(fcol)
         else    : self.dev.MakeNullBrush()
-        x1 = self._x_viewport(x-rad)
-        y1 = self._y_viewport(y-rad)
-        x2 = self._x_viewport(x+rad)
-        y2 = self._y_viewport(y+rad)
-        self.dev.Circle(x1,y1,x2,y2)
+        
+        #x1 = self._x_viewport(x-rad)
+        #y1 = self._y_viewport(y-rad)
+        #x2 = self._x_viewport(x+rad)
+        #y2 = self._y_viewport(y+rad)
+        #self.dev.Circle(x1,y1,x2,y2)
+        rrad = np.linspace(rad1, rad2, _circle_point)
+        x1 = x+rad*np.cos(rrad)
+        y1 = y+rad*np.sin(rrad)
+        
+        if lcol != fcol and isinstance(lpat, patline.LinePattern):
+            pat_seg = patline.get_pattern_line(self, x1, y1, lpat.pat_len, lpat.pat_t)
+            for p1 in pat_seg:
+                x2 = [ p2[0] for p2 in p1 ]
+                y2 = [ p2[1] for p2 in p1 ]
+                self.dev.Polyline(x1, y1, closed)
+        else:
+            #xp = [self._x_viewport(x2) for x2 in x1]
+            #yp = [self._y_viewport(y2) for y2 in y1]
+            #self.dev.Polyline(xp, yp, closed)
+            self.polygon(x,y,lcol, lthk, fcol)
+            
         self.dev.DeleteBrush()
         if lcol: self.dev.DeletePen()
         #if fcol: self.dev.DeleteBrush()
         
-    def polyline(self, x, y, lcol=None, lthk=None, closed=False):
+    def polyline(self, x, y, lcol=None, lthk=None, lpat=patline._PAT_SOLID, closed=False):
         if lcol: self.dev.MakePen(lcol, lthk)
-        px=[self._x_viewport(x[i]) for i in range(len(x))]
-        py=[self._y_viewport(y[i]) for i in range(len(y))]
-        self.dev.Polyline(px,py,closed)
+        
+        if isinstance(lpat, patline.LinePattern):
+            pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.dev.Polyline(x1, y1,closed)
+        else:
+            px=[self._x_viewport(x[i]) for i in range(len(x))]
+            py=[self._y_viewport(y[i]) for i in range(len(y))]
+            self.dev.Polyline(px,py,closed)
         if lcol: self.dev.DeletePen()
         
-    def lline(self, x1, y1, x2, y2, lcol=None, lthk=None):
+    def lline(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=patline._PAT_SOLID):
         if lcol: self.dev.MakePen(lcol,lthk)
-        self.dev.MoveTo(x1,y1)
-        self.dev.LineTo(x2,y2)
+        
+        if isinstance(lpat, patline.LinePattern):
+            x = [x1, x2]
+            y = [y1, y2]
+            pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t, viewport=True)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.dev.Polyline(x1, y1)
+        else:
+            self.dev.MoveTo(x1,y1)
+            self.dev.LineTo(x2,y2)
+            
         if lcol: self.dev.DeletePen()
 
     def lmoveto(self, x, y):
@@ -307,14 +358,30 @@ class DeviceWindowsMetafile(DeviceVector):
     def llineto(self, x, y):
         self.dev.LineTo(x,y)
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None):
+    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=patline._PAT_SOLID):
         self.dev.Polygon(x,y,lcol,lthk,fcol)
         
-    def lpolyline(self, x, y, lcol=None, lthk=None, closed=False):
+        if lcol != fcol and isinstance(lpat, patline.LinePattern):
+            pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t, viewport=True)
+            self.dev.MakePen(lcol,lthk)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.dev.Polyline(x1, y1)
+            self.dev.DeletePen()
+        
+    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=patline._PAT_SOLID, closed=False):
         if lcol: 
             self.dev.MakePen(lcol, lthk)
             
-        self.dev.Polyline(x, y, closed)
+        if isinstance(lpat, patline.LinePattern):
+            pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t, viewport=True)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.dev.Polyline(x1, y1)
+        else:        
+            self.dev.Polyline(x, y, closed)
         
         if lcol: 
             self.dev.DeletePen()
@@ -828,13 +895,25 @@ class DeviceCairo(DeviceRaster):
     def delete_brush(self):
         self.brush.fcol = None
         
-    def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
+    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=patline._PAT_SOLID):
         if lcol:
             self.make_pen(lcol, lthk)
             
-        self.cntx.move_to(self._x_pixel(sx),self._y_pixel(sy))
-        self.cntx.line_to(self._x_pixel(ex),self._y_pixel(ey))
-        self.cntx.stroke()
+        if isinstance(lpat, patline.LinePattern):
+            xp = [sx, ex]
+            yp = [sy, ey]
+            pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.cntx.move_to(self.get_xl(x1[0]),self.get_yl(y1[0]))
+                for x2, y2 in zip(x1, y1):
+                    self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
+                self.cntx.stroke()
+        else:
+            self.cntx.move_to(self._x_pixel(sx),self._y_pixel(sy))
+            self.cntx.line_to(self._x_pixel(ex),self._y_pixel(ey))
+            self.cntx.stroke()
         
     def moveto(self, x, y):
         self.cntx.move_to(self._x_pixel(x),self._y_pixel(y))
@@ -874,21 +953,31 @@ class DeviceCairo(DeviceRaster):
         if lcol: self.delete_pen()
         if fcol: self.delete_brush()
         
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
+    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=patline._PAT_SOLID):
         self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
         self.cntx.close_path()        
         self.draw_geometry(lcol, lthk, fcol)
 
-    def polyline(self, x, y, lcol=None, lthk=None, closed=False):
-        self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
-                        
-        if closed: 
-            self.cntx.close_path()
-
+    def polyline(self, x, y, lcol=None, lthk=None, lpat=patline._PAT_SOLID, closed=False):
+        if isinstance(lpat, patline.LinePattern):
+            pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.cntx.move_to(self.get_xl(x1[0]),self.get_yl(y1[0]))
+                for x2, y2 in zip(x1[1:], y1[1:]):
+                    self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
+                #self.cntx.stroke()            
+        else:
+            self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
+                            
+            if closed: 
+                self.cntx.close_path()
+    
         if lcol: self.make_pen(lcol, lthk)
         else   : self.make_pen(self.pen.lcol, self.pen.lthk)
         self.cntx.stroke()
-        
+            
         if lcol: self.delete_pen()
         
     def begin(self,lcol,lthk,fcol): 
