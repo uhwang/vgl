@@ -19,6 +19,9 @@ class Color():
         self.g = g
         self.b = b
         
+    def __eq__(self, c):
+        return self.r == c.r and self.g == c.g and self.b == c.b
+        
     def __str__(self):
         return "%03d, %03d, %03d"%(self.r, self.g, self.b)
         
