@@ -4,8 +4,7 @@ import vgl
 data = vgl.data.Data(-3,10,-3,3)
 fmm = vgl.frame.FrameManager()
 frm = fmm.create(0.0,0.0,5,3, data)
-frm.show_all_grid()
-frm.show_all_axis()
+frm.show_all_major_grid()
 gbox = fmm.get_gbbox()
 
 rad = 2.0
@@ -16,9 +15,10 @@ y = rad*np.cos(theta)
 
 def circle(dev):
     vgl.drawaxis.draw_axis(dev)
-    dev.circle(4,0,rad,vgl.color.BLACK, 0.003*dev.frm.hgt(), lpat=vgl.patline.get_stock_dash())
-    #dev.polyline(x, y, vgl.color.RED, 0.002*dev.frm.hgt())
-    dev.circle(0, 0, rad, vgl.color.BLUE, 0.003*dev.frm.hgt(), lpat=vgl.patline.get_stock_dashdot())
+    dev.circle(4,0,rad,vgl.color.RED, 0.007*dev.frm.hgt(), lpat=vgl.linepat.get_stock_dash())
+    dev.circle(0, 0, rad, vgl.color.CYAN, 0.02*dev.frm.hgt(), lpat=vgl.linepat.get_stock_dash())
+    dev.circle(0, 0, rad/3, vgl.color.GREEN, 0.02*dev.frm.hgt(), fcol=vgl.color.PURPLE)
+    dev.polyline(x, y, vgl.color.BLACK, 0.003*dev.frm.hgt())
    
 def main():
     dev_img = vgl.device.DeviceCairo("circle.jpg", gbox, 300)
