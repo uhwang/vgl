@@ -44,14 +44,21 @@ def parabola(t):
     eqy = [f, py, -f]
     dev.polyline(eqx, eqy, vgl.color.MAGENTA, 0.002*dev.frm.hgt())
     
-    dev.line(-5, f, 5, f, vgl.color.BLACK, 0.001*dev.frm.hgt())
-    dev.line(0, -1, 0, 6, vgl.color.BLACK, 0.001*dev.frm.hgt())
+    dev.line(-5, f, 5, f, vgl.color.CUSTOM4, 0.004*dev.frm.hgt())
+    dev.line(0, -1, 0, 6, vgl.color.CUSTOM4, 0.004*dev.frm.hgt())
     dev.circle(0,-f, 0.1, fcol=vgl.color.GREEN) 
     dev.circle(px,f, 0.1, fcol=vgl.color.GREEN) 
     dev.circle(eqx[1], eqy[1], 0.1, fcol=vgl.color.BLACK) 
     
-dev = vgl.DeviceCairo("===.png", gbox, 250)
+dev = vgl.DeviceCairo("", gbox, 250)
 dev.set_plot(frm)
-
 dev_ani = vgl.DeviceCairoAnimation('parabola.mp4', dev, parabola, fps=fps, duration=duration)
 dev_ani.save_video()
+
+px, py = sx, 0
+pxx, pyy = [], []
+
+dev = vgl.DeviceCairo("", gbox, 100)
+dev.set_plot(frm)
+dev_ani = vgl.DeviceCairoAnimation('parabola.gif', dev, parabola, fps=fps, duration=duration)
+dev_ani.save_gif()
