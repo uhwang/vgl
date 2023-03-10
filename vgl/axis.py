@@ -136,7 +136,8 @@ def compute_tick_position(vmin, vmax, mjspace, nMiTick):
         startMjTick = a
     else:
         a = 0
-        while a > vmin: a-= mjspace
+        #while a > vmin: a-= mjspace
+        while a >= vmin: a-= mjspace
         a += mjspace
         startMjTick = a
         

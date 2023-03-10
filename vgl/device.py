@@ -13,8 +13,8 @@ import abc
 import math
 import cairo
 import numpy as np
-import pygame 
-import aggdraw
+#import pygame 
+#import aggdraw
 from PIL import Image
 import moviepy.editor as mpy
 
@@ -24,6 +24,7 @@ from . import geom
 from . size import BBox, Rect
 from . data import Data
 from . import patline
+from . import linepat
 
 #import devwmf as dw
 #import color
@@ -223,9 +224,9 @@ class DeviceWindowsMetafile(DeviceVector):
         self.dev.DeleteBrush()
         self.brush.fcol = None
         
-    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=patline._PAT_SOLID):
+    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
     
-        if isinstance(lpat, patline.LinePattern):
+        if isinstance(lpat, linepat.LinePattern):
             xp = [sx, ex]
             yp = [sy, ey]
             pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
@@ -249,25 +250,41 @@ class DeviceWindowsMetafile(DeviceVector):
     def lineto(self, x, y):
         self.dev.LineTo(self._x_viewport(x),self._y_viewport(y))
         
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None):
-        #px=[self.get_x(x[i]) for i in range(len(x))]
-        #py=[self.get_y(y[i]) for i in range(len(y))]
-        px=[self._x_viewport(xx) for xx in x]
-        py=[self._y_viewport(yy) for yy in y]
+    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+        pat_inst = isinstance(lpat, linepat.LinePattern)
         
-        #if lcol: self.make_pen(lcol, lthk)
-        #if fcol: self.make_brush(fcol)
-
-        #if lcol or fcol:
-        #    self.dev.Polygon(px,py,lcol,lthk,fcol)
-        #else:
-        #    #self.dev.Polygon(px,py,self.pen.lcol, self.pen.lthk, self.brush.fcol)
-        #    self.dev.Polygon(px,py,self.pen.lcol, self.pen.lthk, self.brush.fcol)
-        self.dev.Polygon(px,py,lcol,lthk,fcol)
+        if (pat_inst ==False and lcol) or fcol:
+            if viewport:
+                px = x
+                py = y
+            else:
+                px=[self._x_viewport(xx) for xx in x]
+                py=[self._y_viewport(yy) for yy in y]
+            if lpat == linepat._PAT_SOLID:
+                self.dev.Polygon(px,py,lcol,lthk,fcol)
+            elif fcol:
+                self.dev.Polygon(px,py,lcol=None,lthk=lthk,fcol=fcol)
+    
+        if lcol and pat_inst:
+            if isinstance(x, np.ndarray):
+                xp = np.append(x, x[0])
+                yp = np.append(y, y[0])
+            elif isinstance(x, list):
+                xp = x.copy()
+                yp = y.copy()
+                xp.append(x[0])
+                yp.append(y[0])
+            if viewport:
+                pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
+            else:
+                pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
+            self.make_pen(lcol, lthk)
+            for p1 in pat_seg:
+                x2 = [ p2[0] for p2 in p1 ]
+                y2 = [ p2[1] for p2 in p1 ]
+                self.dev.Polyline(x2, y2, closed=False)
+            self.delete_pen()
             
-        #if lcol: self.delete_pen(lcol, lthk)
-        #if fcol: self.delete_brush(fcol)
-        
     def begin_symbol(self, sym):
         self.dev.MakePen(sym.lcol, sym.lthk)
         self.dev.MakeBrush(sym.fcol)
@@ -284,7 +301,7 @@ class DeviceWindowsMetafile(DeviceVector):
         self.dev.Symbol(px,py)
         if draw: self.end_symbol()
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=patline._PAT_SOLID):
+    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
         if lcol : self.dev.MakePen(lcol, lthk)
         else    : self.dev.MakePen(fcol, 0.01) # dummy line thickness 0.1
         if fcol : self.dev.MakeBrush(fcol)
@@ -299,28 +316,29 @@ class DeviceWindowsMetafile(DeviceVector):
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
         
-        if isinstance(lpat, patline.LinePattern):
-            pat_seg = patline.get_pattern_line(self, x1, y1, lpat.pat_len, lpat.pat_t)
-            for p1 in pat_seg:
-                x2 = [ p2[0] for p2 in p1 ]
-                y2 = [ p2[1] for p2 in p1 ]
-                self.dev.Polyline(x2, y2, closed=False)
-        else:
-            #xp = [self._x_viewport(x2) for x2 in x1]
-            #yp = [self._y_viewport(y2) for y2 in y1]
-            #self.dev.Polyline(xp, yp, closed)
-            self.polygon(x1,y1,lcol, lthk, fcol)
-            
-        self.dev.DeleteBrush()
-        if lcol: self.dev.DeletePen()
+        self.polygon(x1, y1, lcol, lthk, fcol, lpat)
+        #if isinstance(lpat, linepat.LinePattern):
+        #    pat_seg = patline.get_pattern_line(self, x1, y1, lpat.pat_len, lpat.pat_t)
+        #    for p1 in pat_seg:
+        #        x2 = [ p2[0] for p2 in p1 ]
+        #        y2 = [ p2[1] for p2 in p1 ]
+        #        self.dev.Polyline(x2, y2, closed=False)
+        #else:
+        #    #xp = [self._x_viewport(x2) for x2 in x1]
+        #    #yp = [self._y_viewport(y2) for y2 in y1]
+        #    #self.dev.Polyline(xp, yp, closed)
+        #    self.polygon(x1,y1,lcol, lthk, fcol)
+        #    
+        #self.dev.DeleteBrush()
+        #if lcol: self.dev.DeletePen()
         #if fcol: self.dev.DeleteBrush()
         
-    def polyline(self, x, y, lcol=None, lthk=None, lpat=patline._PAT_SOLID, closed=False):
+    def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
         if lcol: self.dev.MakePen(lcol, lthk)
         
-        if isinstance(lpat, patline.LinePattern):
+        if isinstance(lpat, linepat.LinePattern):
             if closed:
-                if isinstance(x, numpy.ndarray):
+                if isinstance(x, np.ndarray):
                     xp = np.append(x, x[0])
                     yp = np.append(x, y[0])
                 elif isinstance(x, list):
@@ -342,10 +360,10 @@ class DeviceWindowsMetafile(DeviceVector):
             self.dev.Polyline(px,py,closed)
         if lcol: self.dev.DeletePen()
         
-    def lline(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=patline._PAT_SOLID):
+    def lline(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         if lcol: self.dev.MakePen(lcol,lthk)
         
-        if isinstance(lpat, patline.LinePattern):
+        if isinstance(lpat, linepat.LinePattern):
             x = [x1, x2]
             y = [y1, y2]
             pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t, viewport=True)
@@ -365,33 +383,16 @@ class DeviceWindowsMetafile(DeviceVector):
     def llineto(self, x, y):
         self.dev.LineTo(x,y)
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=patline._PAT_SOLID):
-        self.dev.Polygon(x,y,lcol,lthk,fcol)
-        
-        if isinstance(lpat, patline.LinePattern):
-            if isinstance(x, numpy.ndarray):
-                xp = np.append(x, x[0])
-                yp = np.append(x, y[0])
-            elif isinstance(x, list):
-                xp = x.copy()
-                yp = y.copy()
-                xp.append(x[0])
-                yp.append(y[0])        
-            pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
-            self.dev.MakePen(lcol,lthk)
-            for p1 in pat_seg:
-                x1 = [ p2[0] for p2 in p1 ]
-                y1 = [ p2[1] for p2 in p1 ]
-                self.dev.Polyline(x1, y1)
-            self.dev.DeletePen()
-        
-    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=patline._PAT_SOLID, closed=False):
+    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+        self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
+
+    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
         if lcol: 
             self.dev.MakePen(lcol, lthk)
             
-        if isinstance(lpat, patline.LinePattern):
+        if isinstance(lpat, linepat.LinePattern):
             if closed:
-                if isinstance(x, numpy.ndarray):
+                if isinstance(x, np.ndarray):
                     xp = np.append(x, x[0])
                     yp = np.append(x, y[0])
                 elif isinstance(x, list):
@@ -489,6 +490,7 @@ class DeviceRaster(DeviceVector):
     def get_xp(self, x): return int(self.sx_viewport_pixel + x)
     def get_yp(self, y): return int(self.sy_viewport_pixel + y)
  
+'''
 class DevicePygame(DeviceRaster):
     def __init__(self, gbox, dpi, fps=30):
         super().__init__(gbox, dpi)
@@ -865,7 +867,7 @@ class DeviceAggdraw(DeviceRaster):
         self.pnt = None
         self.img.save(self.fname)
         return        
-
+'''
 class DeviceCairo(DeviceRaster):
     def __init__(self, fname, gbox, dpi):
         super().__init__(gbox, dpi)
@@ -922,11 +924,11 @@ class DeviceCairo(DeviceRaster):
     def delete_brush(self):
         self.brush.fcol = None
         
-    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=patline._PAT_SOLID):
+    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         if lcol:
             self.make_pen(lcol, lthk)
             
-        if isinstance(lpat, patline.LinePattern):
+        if isinstance(lpat, linepat.LinePattern):
             xp = [sx, ex]
             yp = [sy, ey]
             pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
@@ -958,19 +960,19 @@ class DeviceCairo(DeviceRaster):
         for i in range(1,self.npnt):
             self.cntx.line_to(convx(x[i]), convy(y[i]))
     
-    def draw_geometry(self, lcol, lthk, fcol, lpat=patline._PAT_SOLID):
+    def draw_geometry(self, lcol, lthk, fcol, lpat):
         if fcol or self.brush.fcol: 
             if fcol: 
                 self.make_brush(fcol)
             elif self.brush.fcol:
-                self.brush.fcol : self.make_brush(self.brush.fcol)
+                self.make_brush(self.brush.fcol)
             
-            if lpat==patline._PAT_SOLID and (lcol or self.pen.lcol):
+            if lpat==linepat._PAT_SOLID and (lcol or self.pen.lcol):
                 self.cntx.fill_preserve()
             else:
                 self.cntx.fill()
             
-        if lcol or self.pen.lcol:
+        if lpat==linepat._PAT_SOLID and (lcol or self.pen.lcol):
             if lcol: 
                 self.make_pen(lcol, lthk)
             self.cntx.stroke()
@@ -978,22 +980,28 @@ class DeviceCairo(DeviceRaster):
         if lcol: self.delete_pen()
         if fcol: self.delete_brush()
         
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=patline._PAT_SOLID):
-    
-        self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
-        self.cntx.close_path()        
-        self.draw_geometry(lcol, lthk, fcol, lpat)
-        
-        if isinstance(lpat, patline.LinePattern):
-            if isinstance(x, numpy.ndarray):
+    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+        if (lpat == linepat._PAT_SOLID and lcol) or fcol:
+            if viewport:
+                self.create_pnt_list(x,y,self.get_xl,self.get_yl)
+            else:
+                self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
+            self.cntx.close_path()        
+            self.draw_geometry(lcol, lthk, fcol, lpat)
+
+        if lcol and isinstance(lpat, linepat.LinePattern):
+            if isinstance(x, np.ndarray):
                 xp = np.append(x, x[0])
-                yp = np.append(x, y[0])
+                yp = np.append(y, y[0])
             elif isinstance(x, list):
                 xp = x.copy()
                 yp = y.copy()
                 xp.append(x[0])
                 yp.append(y[0])
-            pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
+            if viewport:
+                pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport = True)
+            else:
+                pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
             self.make_pen(lcol, lthk)
             for p1 in pat_seg:
                 x1 = [ p2[0] for p2 in p1 ]
@@ -1002,11 +1010,12 @@ class DeviceCairo(DeviceRaster):
                 for x2, y2 in zip(x1, y1):
                     self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
             self.delete_pen()
+            self.cntx.stroke()
             
-    def polyline(self, x, y, lcol=None, lthk=None, lpat=patline._PAT_SOLID, closed=False):
-        if isinstance(lpat, patline.LinePattern):
+    def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
+        if isinstance(lpat, linepat.LinePattern):
             if closed:
-                if isinstance(x, numpy.ndarray):
+                if isinstance(x, np.ndarray):
                     xp = np.append(x, x[0])
                     yp = np.append(x, y[0])
                 elif isinstance(x, list):
@@ -1047,21 +1056,22 @@ class DeviceCairo(DeviceRaster):
     def end_symbol(self): 
         return
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=patline._PAT_SOLID):
-        if isinstance(lpat, patline.LinePattern):
+    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+        if isinstance(lpat, linepat.LinePattern):
             rrad = np.linspace(0, np.pi*2, _circle_point)
             x1 = x+rad*np.cos(rrad)
             y1 = y+rad*np.sin(rrad)
-            pat_seg = patline.get_pattern_line(self, x1, y1, lpat.pat_len, lpat.pat_t)
-            self.make_pen(lcol, lthk)
-            for p1 in pat_seg:
-                x2 = [ p2[0] for p2 in p1 ]
-                y2 = [ p2[1] for p2 in p1 ]
-                self.cntx.move_to(self.get_xl(x2[0]),self.get_yl(y2[0]))
-                for x3, y3 in zip(x2[1:], y2[1:]):
-                    self.cntx.line_to(self.get_xl(x3),self.get_yl(y3))
-            self.cntx.stroke()
-            self.delete_pen()
+            #pat_seg = patline.get_pattern_line(self, x1, y1, lpat.pat_len, lpat.pat_t)
+            #self.make_pen(lcol, lthk)
+            #for p1 in pat_seg:
+            #    x2 = [ p2[0] for p2 in p1 ]
+            #    y2 = [ p2[1] for p2 in p1 ]
+            #    self.cntx.move_to(self.get_xl(x2[0]),self.get_yl(y2[0]))
+            #    for x3, y3 in zip(x2[1:], y2[1:]):
+            #        self.cntx.line_to(self.get_xl(x3),self.get_yl(y3))
+            #self.cntx.stroke()
+            #self.delete_pen()
+            self.polygon(x1, y1, lcol, lthk, fcol, lpat)
         else:
             cx = self._x_pixel(x)
             cy = self._y_pixel(y)
@@ -1079,11 +1089,11 @@ class DeviceCairo(DeviceRaster):
         self.make_pen(sym.lcol, sym.lthk)
         self.cntx.stroke()
         
-    def lline(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=patline._PAT_SOLID):
+    def lline(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         if lcol: self.make_pen(lcol, lthk)
         else   : self.make_pen(self.pen.lcol, self.pen.lthk)
         
-        if isinstance(lpat, patline.LinePattern):
+        if isinstance(lpat, linepat.LinePattern):
             x = [sx, ex]
             y = [sy, ey]
             pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t, viewport=True)
@@ -1107,28 +1117,29 @@ class DeviceCairo(DeviceRaster):
     def llineto(self, x,y):
         self.cntx.line_to(self.get_xl(x),self.get_yl(y))
     
-    def lpolygon(self, x, y, lcol=None, fcol=None, lthk=None, lpat=patline._PAT_SOLID):
-        self.create_pnt_list(x,y,self.get_xl,self.get_yl)
-        self.cntx.close_path()
-        
-        if isinstance(lpat, patline.LinePattern):
-            if isinstance(x, numpy.ndarray):
-                xp = np.append(x, x[0])
-                yp = np.append(x, y[0])
-            elif isinstance(x, list):
-                xp = x.copy()
-                yp = y.copy()
-                xp.append(x[0])
-                yp.append(y[0])
-            pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
-            self.dev.MakePen(lcol,lthk)
-            for p1 in pat_seg:
-                x1 = [ p2[0] for p2 in p1 ]
-                y1 = [ p2[1] for p2 in p1 ]
-                self.cntx.move_to(self.get_xl(x1[0]),self.get_yl(y1[0]))
-                for x2, y2 in zip(x1[1:], y1[1:]):
-                    self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
-            self.dev.DeletePen()
+    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+        self.polygon(x,y,lcol,lthk, fcol, lpat, viewport=True)
+        #self.create_pnt_list(x,y,self.get_xl,self.get_yl)
+        #self.cntx.close_path()
+        #
+        #if isinstance(lpat, linepat.LinePattern):
+        #    if isinstance(x, np.ndarray):
+        #        xp = np.append(x, x[0])
+        #        yp = np.append(x, y[0])
+        #    elif isinstance(x, list):
+        #        xp = x.copy()
+        #        yp = y.copy()
+        #        xp.append(x[0])
+        #        yp.append(y[0])
+        #    pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
+        #    self.dev.MakePen(lcol,lthk)
+        #    for p1 in pat_seg:
+        #        x1 = [ p2[0] for p2 in p1 ]
+        #        y1 = [ p2[1] for p2 in p1 ]
+        #        self.cntx.move_to(self.get_xl(x1[0]),self.get_yl(y1[0]))
+        #        for x2, y2 in zip(x1[1:], y1[1:]):
+        #            self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
+        #    self.dev.DeletePen()
         
         
         #self.make_brush(fcol)
@@ -1152,13 +1163,13 @@ class DeviceCairo(DeviceRaster):
         #if lcol: self.delete_pen()
         #if fcol: self.delete_brush()
         
-        self.draw_geometry(lcol, lthk, fcol)
+        #self.draw_geometry(lcol, lthk, fcol)
         
-    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=patline._PAT_SOLID, closed=False):
+    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
     
-        if isinstance(lpat, patline.LinePattern):
+        if isinstance(lpat, linepat.LinePattern):
             if closed:
-                if isinstance(x, numpy.ndarray):
+                if isinstance(x, np.ndarray):
                     xp = np.append(x, x[0])
                     yp = np.append(x, y[0])
                 elif isinstance(x, list):

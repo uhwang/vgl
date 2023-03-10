@@ -11,65 +11,28 @@
 import numpy as np
 import math
 from . import color
-#import color
+from . import linepat
 
-class LinePattern():
-    def __init__(self, pat_len, pat_t):
-        self.pat_len = pat_len
-        self.pat_t = pat_t
+_PAT_EPS    = 1.e-6
+_PAT_MARK_0 = '0' # no drawing
+_PAT_MARK_1 = '1' # drawing 
 
-_default_pattern_length = 0.04
-_pattern_length = _default_pattern_length
-        
-_pattern_name = ["SOLID", "DASHED", "DASHDOT", "DOTTED", "LONGDASH", "DASHDOTDOT"]
-
-_PAT_SOLID     = _pattern_name[0]
-_PAT_DASHED    = _pattern_name[1]
-_PAT_DASHDOT   = _pattern_name[2]
-_PAT_DOTTED    = _pattern_name[3]
-_PAT_LONGDASH  = _pattern_name[4]
-_PAT_DASHDOTDOT= _pattern_name[5]
-_PAT_EPS       = 1.e-6
-
-_PAT_MARK_0 ='0'
-_PAT_MARK_1 ='1'
-
-def set_stock_pattern_length(pat_len): _pattern_length = pat_len
-def reset_stock_pattern_length(pat_len): _pattern_length = pat_len
-
-def get_dash(pat_len): return LinePattern(pat_len, _PAT_DASHED)  
-def get_dashdot(pat_len): return LinePattern(pat_len, _PAT_DASHDOT)  
-def get_dotted(pat_len): return LinePattern(pat_len, _PAT_DOTTED)  
-def get_longdash(pat_len): return LinePattern(pat_len, _PAT_LONGDASH)  
-def get_dashdotdot(pat_len): return LinePattern(pat_len, _PAT_DASHDOTDOT)  
-
-def get_stock_dash(): return LinePattern(_pattern_length, _PAT_DASHED)  
-def get_stock_dashdot(): return LinePattern(_pattern_length, _PAT_DASHDOT)  
-def get_stock_dotted(): return LinePattern(_pattern_length, _PAT_DOTTED)  
-def get_stock_longdash(): return LinePattern(_pattern_length, _PAT_LONGDASH)  
-def get_stock_dashdotdot(): return LinePattern(_pattern_length, _PAT_DASHDOTDOT)  
-
-def _get_pattern_name_dashed(): return _pattern_name[1]
-def _get_pattern_name_dashdot(): return _pattern_name[2]
-def _get_pattern_name_dotted(): return _pattern_name[3]
-def _get_pattern_name_longdash(): return _pattern_name[4]
-def _get_pattern_name_dashdotdot(): return _pattern_name[5]
 
 _pat_line_info = {
     # DASHED
-	_get_pattern_name_dashed(): ["10", ( 1.0, 1.0, )], 
+	linepat.get_pattern_name_dash(): ["10", ( 1.0, 1.0, )], 
     # DASHDOT
-	_get_pattern_name_dashdot(): ["1010", ( 1.0, 0.399132, 0.199566, 0.399132, 0.0, )],  
+	linepat.get_pattern_name_dashdot(): ["1010", ( 1.0, 0.399132, 0.199566, 0.399132, 0.0, )],  
     # DOTTED
-	_get_pattern_name_dotted(): ["10", ( 0.247289, 0.0021692, 0.0 )],
+	linepat.get_pattern_name_dot(): ["10", ( 0.247289, 0.0021692, 0.0 )],
     # LONGDASH
-	_get_pattern_name_longdash(): ["10", ( 1.49892, 0.498915, 0.0 )] ,
+	linepat.get_pattern_name_longdash(): ["10", ( 1.49892, 0.498915, 0.0 )] ,
     # DASHDOTDOT
-	_get_pattern_name_dashdotdot(): ["101010", ( 1.0, 0.249458, 0.167028, 0.249458, 0.167028, 0.249458 )]
+	linepat.get_pattern_name_dashdotdot(): ["101010", ( 1.0, 0.249458, 0.167028, 0.249458, 0.167028, 0.249458 )]
 }
 
 def _get_pattern_info(pat):
-    return _pat_line_info[pat] if pat in _pattern_name else None
+    return _pat_line_info[pat] if pat in linepat._pattern_name else None
 
 def distPP(p1,p2): 
 	return np.sqrt((p2[0]-p1[0])**2+(p2[1]-p1[1])**2)
@@ -82,12 +45,13 @@ def get_norm(vp):
 
 def get_pattern_line(dev, x, y, patlen, pat_t, viewport=False):
     '''
-        x, y : real world to plot
-        getxl
-        getyl: return viewport coord in response data(x,y)
-        patlen: pattern length in percent of the hgt of plot domain
-        pat: pattern list in viewport coord
-        viewport: x, y is not world data but logical unit (inch)
+        x, y    : real world to plot
+        getxl   : return viewport coord x in response data(x,y)
+        getyl   : return viewport coord y in response data(x,y)
+        patlen  : pattern length in percent of the hgt of plot domain
+        pat     : pattern list in viewport coord
+        viewport: True --> x, y is logical unit (inch), no conversion needed
+                  False --> x, y is world data
     '''
     if viewport:
         f_x = lambda x: x
@@ -96,7 +60,7 @@ def get_pattern_line(dev, x, y, patlen, pat_t, viewport=False):
         f_x = dev._x_viewport
         f_y = dev._y_viewport
     
-    if pat_t == _PAT_SOLID: return
+    if pat_t == linepat._PAT_SOLID: return
     
     sp = np.empty(2, dtype='float32')
     ep = np.empty(2, dtype='float32')

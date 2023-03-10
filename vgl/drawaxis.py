@@ -34,8 +34,11 @@ def draw_axis(dev):
         elif pos_t == axis._POS_ZERO:
             pos_y = 0
         
-        dev.line(xmin, pos_y, xmax, pos_y, lcol= xaxis.lcol, 
-                                        lthk=xaxis.lthk*dev.frm.get_pdom_hgt())
+        x1 = dev._x_viewport(xmin)
+        x2 = dev._x_viewport(xmax)
+        yy = dev._y_viewport(pos_y)
+        dev.lline(x1, yy, x2, yy, lcol= xaxis.lcol, 
+                                 lthk=xaxis.lthk*dev.frm.get_pdom_hgt())
     
     #draw y-axis
     if yaxis.show:
@@ -47,8 +50,12 @@ def draw_axis(dev):
         elif pos_t == axis._POS_ZERO:
             pos_x = 0
         
-        dev.line(pos_x, ymin, pos_x, ymax, lcol=yaxis.lcol, 
-                                        lthk=yaxis.lthk*dev.frm.get_pdom_hgt())
+        y1 = dev._y_viewport(ymin)
+        y2 = dev._y_viewport(ymax)
+        xx = dev._x_viewport(pos_x)
+        
+        dev.lline(xx, y1, xx, y2, lcol=yaxis.lcol, 
+                                 lthk=yaxis.lthk*dev.frm.get_pdom_hgt())
         
     drawtick.draw_tick(dev)
     drawgrid.draw_grid(dev)
