@@ -24,7 +24,7 @@ _pat_line_info = {
     # DASHDOT
 	linepat.get_pattern_name_dashdot(): ["1010", ( 1.0, 0.399132, 0.199566, 0.399132, 0.0, )],  
     # DOTTED
-	linepat.get_pattern_name_dot(): ["10", ( 0.247289, 0.0021692, 0.0 )],
+	linepat.get_pattern_name_dot(): ["10", ( 0.247289, 0.021692, 0.0 )],
     # LONGDASH
 	linepat.get_pattern_name_longdash(): ["10", ( 1.49892, 0.498915, 0.0 )] ,
     # DASHDOTDOT

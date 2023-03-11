@@ -11,8 +11,9 @@
 import numpy as np
 from . import color, rotation, vertex
 from . import linetype
-#from . import patline
+from . import shape
 from . import linepat
+from . import shape
 
 def distP(x1,y1,x2,y2): return np.sqrt((x2-x1)**2+(y2-y1)**2)
 def distV(vlist): return np.sqrt( (vlist[2]-vlist[0])**2+(vlist[3]-vlist[1])**2 )
@@ -24,36 +25,7 @@ SQUARE_MODE_RIGHTTOP = 2
 SQUARE_MODE_LEFTBOTTOM = 3 
 SQUARE_MODE_RIGHTBOTTOM = 4
 
-class Shape(vertex.Vertex, linetype.LineLevelC):
-    def __init__(   self, 
-                    x, y, 
-                    nvert, 
-                    edge, 
-                    lcol, 
-                    lthk,
-                    fcol=None, 
-                    pat_len=0.04, 
-                    lpat = linepat._PAT_SOLID):
-        super().__init__(nvert)
-        self.sx = x
-        self.sy = y
-        self.edge = edge 
-        self.lcol = lcol
-        self.lthk = lthk
-        self.fcol = fcol
-        self.pat_len = pat_len
-        self.pat_t = lpat
-    
-    def set_fillcolor(self, col): self.fcol = col
-    def set_linecolor(self, col): self.lcol = col
-    def set_fill(self, mode): self.fill = mode
-    def get_line_pattern(self): 
-        return self.pat_t\
-            if (self.pat_t == linepat._PAT_SOLID) or\
-               (self.pat_t == linepat._PAT_NULL)\
-            else linepat.LinePattern(self.pat_len, self.pat_t)
-	
-class Square(Shape):
+class Square(shape.Shape):
     def __init__(self,x,y,edge,lcol=color.BLACK, lthk=0.001,fcol=None, 
         mode=SQUARE_MODE_CENTER):
         super().__init__(x,y,4,edge,lcol,lthk,fcol,fill)
@@ -121,7 +93,7 @@ class Square(Shape):
         self.vertex.put([1,7], self.sy)
         self.vertex.put([3,5], self.sy+self.edge)	
 
-class EquiTriangle(Shape):
+class EquiTriangle(shape.Shape):
     def __init__(self,xc,yc,edge,lcol=color.BLACK,lthk=0.001,fcol=None):
         super().__init__(xc,yc,3,edge,lcol,lthk,fcol,fill)
         len = edge/np.sqrt(3)
@@ -134,7 +106,7 @@ class EquiTriangle(Shape):
         self.vertex[4] = xc+leg1
         self.vertex[5] = yc-leg2
 
-class Polygon(Shape):
+class Polygon(shape.Shape):
     def __init__(self,
                 xc, yc, 
                 nvert, 

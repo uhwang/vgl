@@ -93,6 +93,8 @@ class Frame():
         self.update_pdom()                    # compute plot domain vertex
         self.update_vertex()                  # compute frame vertex
    
+    #def resize(self, wid, hgt):
+        
     def create_axis(self, xmin, xmax, ymin, ymax):
         self.xaxis = axis.AxisX(xmin, xmax)# x axis
         self.yaxis = axis.AxisY(ymin, ymax)# y axis

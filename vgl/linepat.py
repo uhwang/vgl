@@ -44,16 +44,18 @@ _lpat_dashdotdot = LinePattern(_pattern_length, _PAT_DASHDOTDOT)
 def set_stock_pattern_length(pat_len): _pattern_length = pat_len
 def reset_stock_pattern_length(pat_len): _pattern_length = pat_len
 
+def _lpat(pat_len, pat_t): return LinePattern(pat_len, pat_t)
+
 #def get_null(): return _lpat_null
-def get_dash(pat_len): return _lpat_dash
-def get_dashdot(pat_len): return _lpat_dashdot
-def get_dotted(pat_len): return _lpat_dot
-def get_longdash(pat_len): return _lpat_longdash
-def get_dashdotdot(pat_len): return _lpat_dashdotdot 
+def get_dash(pat_len): return LinePattern(pat_len, _PAT_DASH) 
+def get_dashdot(pat_len): return LinePattern(pat_len, _PAT_DASHDOT)   
+def get_dot(pat_len): return LinePattern(pat_len, _PAT_DOT) 
+def get_longdash(pat_len): return LinePattern(pat_len, _PAT_LONGDASH) 
+def get_dashdotdot(pat_len): return LinePattern(pat_len, _PAT_DASHDOTDOT) 
 
 def get_stock_dash(): return LinePattern(_pattern_length, _PAT_DASH)  
 def get_stock_dashdot(): return LinePattern(_pattern_length, _PAT_DASHDOT)  
-def get_stock_dotted(): return LinePattern(_pattern_length, _PAT_DOT)  
+def get_stock_dot(): return LinePattern(_pattern_length, _PAT_DOT)  
 def get_stock_longdash(): return LinePattern(_pattern_length, _PAT_LONGDASH)  
 def get_stock_dashdotdot(): return LinePattern(_pattern_length, _PAT_DASHDOTDOT)  
 
