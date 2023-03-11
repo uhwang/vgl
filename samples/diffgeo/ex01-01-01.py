@@ -8,8 +8,8 @@
   (x,y) is a path on a circle and meets the line 
   parameterize x,y according to t
   
-  x = cos(th) 
-  y = sin(th) 
+  x = cos(th))
+  y = sin(th))
   th = th1 + th2
   th1 = th2
   th1 = atan(t/1)
@@ -25,7 +25,6 @@ import vgl
 
 dur = 20
 fps = 30
-dt = 1./fps
 cx,cy=0,0
 rr = 1.0
 r1 = rr * 0.025
@@ -39,11 +38,6 @@ fx = lambda r,t : r*np.cos(2*np.arctan(t/r))
 fy = lambda r,t : r*np.sin(2*np.arctan(t/r))
 
 def movie_tcircle(t):
-    """
-        t = 0 ... 300
-        
-        t = t_min + t*dt*fps
-    """
     global dev, tcircle_trail_x, tcircle_trail_y, it
     dev.fill_white()
     vgl.draw_axis(dev)
