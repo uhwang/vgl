@@ -71,7 +71,7 @@ frm.show_all_major_grid()
 def save_tcircle_mov():
     global dev
     dev = vgl.DeviceCairo("", fmm.get_gbbox(), 300)
-    dev.set_device(frm, extend=vgl.device._FIT_EXTEND_X)
+    dev.set_device(frm)
     dev_mov = vgl.DeviceCairoAnimation("tcircle.mp4", dev, movie_tcircle, dur, fps)
     dev_mov.save_video()
 
