@@ -36,9 +36,9 @@ def draw_label(dev):
             ypos = yy + xlabel.pos * hgt
             xlabel.x = wxxl
             xlabel.y = ypos
-            xlabel.str = "%1.2f"%wxx
-            xlabel.polyline = dev.lpolyline
-            xlabel.polygon  = dev.lpolygon
+            xlabel.text = "%1.2f"%wxx
+            #xlabel.polyline = dev.lpolyline
+            #xlabel.polygon  = dev.lpolygon
             text.write_text(dev, xlabel)
             wxx = xaxis.first_major_tick_pos+xaxis.spacing*vi
             vi+=1
@@ -66,9 +66,9 @@ def draw_label(dev):
             xpos = xx - ylabel.pos * hgt
             ylabel.x = xpos
             ylabel.y = wyyl
-            ylabel.str = "%1.2f"%wyy
-            ylabel.polyline = dev.lpolyline
-            ylabel.polygon  = dev.lpolygon
+            ylabel.text = "%1.2f"%wyy
+            #ylabel.polyline = dev.lpolyline
+            #ylabel.polygon  = dev.lpolygon
             text.write_text(dev, ylabel)
             wyy = yaxis.first_major_tick_pos+yaxis.spacing*vi
             vi+=1

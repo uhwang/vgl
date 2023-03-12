@@ -8,7 +8,7 @@
 # Email : uhwangtx@gmail.com
 #
 
-import vgl.romans as romans
+from .font import romans
 import math
 import numpy as np
 import vgl.color as color
@@ -46,252 +46,239 @@ IS_BOTTOM    = lambda a: (a)&TEXT_ALIGN_BOTTOM
 IS_VCENTER   = lambda a: (a)&TEXT_ALIGN_VCENTER
 
 class Font():
-	def __init__(self, fid=fontid.FONT_ROMANSIMPLEX, size=0.05,\
-	                   lcol = color.BLACK, lthk=0.001, align = TEXT_ALIGN_BOTTOM):
-		self.font_name = fontm.font_manager.get_font_name(fid)
-		self.font_id   = fid
-		self.size      = size
-		self.lcol      = lcol
-		self.lthk      = lthk
-		self.align     = align
-		self.show_box  = False
-		self.fill_box  = False
-		self.box_lcol  = color.BLACK
-		self.box_fcol  = color.WHITE
-		self.box_lthk  = 0.001
-		
-	def set_size(self, size): self.size = sz
-	#def set_halign_center(self): self.align = 
+    def __init__(self, fid=fontid.FONT_ROMANSIMPLEX, size=0.05,\
+                    lcol = color.BLACK, lthk=0.001, align = TEXT_ALIGN_BOTTOM):
+        self.font_name = fontm.font_manager.get_font_name(fid)
+        self.font_id   = fid
+        self.size      = size
+        self.lcol      = lcol
+        self.lthk      = lthk
+        self.align     = align
+        self.show_box  = False
+        self.fill_box  = False
+        self.box_lcol  = color.BLACK
+        self.box_fcol  = color.WHITE
+        self.box_lthk  = 0.001
+        
+    def set_size(self, size): self.size = sz
+    #def set_halign_center(self): self.align = 
 
 class Text(Font):
-	def __init__(self, x=0, y=0, str='', polyline=0, polygon=0,rotation=0):
-		super().__init__()
-		self.x     = x
-		self.y     = y
-		self.str   = str
-		#self.moveto= moveto
-		#self.lineto= lineto
-		self.polyline = polyline
-		self.polygon  = polygon
-		self.rotation = rotation
-		
-	'''
-		E(ast) : LEFT
-		W(est) : RIGHT
-		N(orth): TOP
-		S(outh): BOTTOM
-		V(center), H(center)
-	'''
-	def wv(self): self.align = TEXT_ALIGN_LEFT|TEXT_ALIGN_VCENTER
-	def wn(self): self.align = TEXT_ALIGN_LEFT|TEXT_ALIGN_TOP
-	def ws(self): self.align = TEXT_ALIGN_LEFT|TEXT_ALIGN_BOTTOM
-	def ev(self): self.align = TEXT_ALIGN_RIGHT|TEXT_ALIGN_VCENTER
-	def en(self): self.align = TEXT_ALIGN_RIGHT|TEXT_ALIGN_TOP 
-	def es(self): self.align = TEXT_ALIGN_RIGHT|TEXT_ALIGN_BOTTOM
-	#def nv(self): self.align = TEXT_ALIGN_TOP|TEXT_ALIGN_VCENTER
-	#def ne(self): self.align = TEXT_ALIGN_TOP|TEXT_ALIGN_LEFT
-	#def nw(self): self.align = TEXT_ALIGN_TOP|TEXT_ALIGN_RIGHT
-	#def sv(self): self.align = TEXT_ALIGN_BOTTOM|TEXT_ALIGN_VCENTER
-	#def se(self): self.align = TEXT_ALIGN_BOTTOM|TEXT_ALIGN_LEFT
-	#def sw(self): self.align = TEXT_ALIGN_BOTTOM|TEXT_ALIGN_RIGHT
-	def hv(self): self.align = TEXT_ALIGN_HCENTER|TEXT_ALIGN_VCENTER
-	def hn(self): self.align = TEXT_ALIGN_HCENTER|TEXT_ALIGN_TOP
-	def hs(self): self.align = TEXT_ALIGN_HCENTER|TEXT_ALIGN_BOTTOM
+    def __init__(self, x=0, y=0, text=''):
+        super().__init__()
+        self.x     = x
+        self.y     = y
+        self.text  = text
+        self.rotation = 0
+        #self.moveto= moveto
+        #self.lineto= lineto
+        #self.polyline = polyline
+        #self.polygon  = polygon
+        #self.rotation = rotation
+        
+    def set_text(self, x, y, text):
+        self.x     = x
+        self.y     = y
+        self.text  = text
+    '''
+        E(ast) : LEFT
+        W(est) : RIGHT
+        N(orth): TOP
+        S(outh): BOTTOM
+        V(center), H(center)
+    '''
+    def wv(self): self.align = TEXT_ALIGN_LEFT|TEXT_ALIGN_VCENTER
+    def wn(self): self.align = TEXT_ALIGN_LEFT|TEXT_ALIGN_TOP
+    def ws(self): self.align = TEXT_ALIGN_LEFT|TEXT_ALIGN_BOTTOM
+    def ev(self): self.align = TEXT_ALIGN_RIGHT|TEXT_ALIGN_VCENTER
+    def en(self): self.align = TEXT_ALIGN_RIGHT|TEXT_ALIGN_TOP 
+    def es(self): self.align = TEXT_ALIGN_RIGHT|TEXT_ALIGN_BOTTOM
+    #def nv(self): self.align = TEXT_ALIGN_TOP|TEXT_ALIGN_VCENTER
+    #def ne(self): self.align = TEXT_ALIGN_TOP|TEXT_ALIGN_LEFT
+    #def nw(self): self.align = TEXT_ALIGN_TOP|TEXT_ALIGN_RIGHT
+    #def sv(self): self.align = TEXT_ALIGN_BOTTOM|TEXT_ALIGN_VCENTER
+    #def se(self): self.align = TEXT_ALIGN_BOTTOM|TEXT_ALIGN_LEFT
+    #def sw(self): self.align = TEXT_ALIGN_BOTTOM|TEXT_ALIGN_RIGHT
+    def hv(self): self.align = TEXT_ALIGN_HCENTER|TEXT_ALIGN_VCENTER
+    def hn(self): self.align = TEXT_ALIGN_HCENTER|TEXT_ALIGN_TOP
+    def hs(self): self.align = TEXT_ALIGN_HCENTER|TEXT_ALIGN_BOTTOM
 
 class Point():
-	def __init__(self,x=0,y=0):
-		self.x = x
-		self.y = y
-		
-def write_text(dev, t):
-	SHIFT_FACTOR = 1.2;
-	ich=0 
-	ias=0 
-	ivt=0 
-	chwid=0 
-	chhgt=0 
-	nvert=0 
-	moveto=0
-	nstr=0 
-	px=0 
-	py=0
-	ccos = math.cos(t.rotation*to_rad)
-	csin = math.sin(t.rotation*to_rad)
-	curx=t.x 
-	cury=t.y 
-	rx=0.0 
-	ry=0.0 
-	cx=0.0 
-	cy=0.0 
-	tx=0.0 
-	ty=0.0
-	
-	#TG_Float 
-	scale=0.0 
-	max_y=0.0 
-	max_x=0.0 
-	delx =0.0 
-	dely =0.0 
-	#xx=np.zeros(5)
-	#yy=np.zeros(5)
-	ll=Point(0.0,0.0) 
-	rt=Point(0.0,0.0)
-	box = [Point]*5
-
-	if t.str == '': return
-	
-	if t.font_id == fontid.FONT_CURSIVE or \
-	   t.font_id == fontid.FONT_SCRIPTCOMPLEX or \
-	   t.font_id == fontid.FONT_SCRIPTSIMPLEX:
-		SHIFT_FACTOR=1.0
-
-	nstr = len(t.str)
-	curx = 0
-	cury = 0
-	scale = 1./STD_FONT_HEIGHT*t.size*dev.frm.hgt();
-	fbox = BBox(-1000, 1000, -1000, -1000)
-
-	clist = []
-	font_map = fontm.font_manager.get_font_map(t.font_id)
-	
-	for ich in range(nstr):
-		#glyp  = romans.font_map[ord(t.str[ich])-ord(' ')]
-		glyp = font_map[ord(t.str[ich])-ord(' ')]
-		npnt  = glyp[0]
-		prs   = glyp[1]
-		bbox  = glyp[2] # ll(x,y), rt(x,y)
-		chwid = bbox[1][0] - bbox[0][0]
-		
-		nvert = npnt
-		llist = []
-		xp  = []
-		yp  = []
-		nline = 0
-		for ivt in range(nvert):
-			pp = prs[ivt]
-			px = pp[0]
-			py = pp[1]
-			
-			if px==-1 and py==-1:
-				llist.append((xp,yp))
-				xp = []
-				yp = []
-				continue
-			else:
-				cx = px*scale;
-				cy = (py+TEXT_DROP)*scale
-				#rx = cx*ccos-cy*csin
-				#ry = cx*csin+cy*ccos
-				#tx = curx+rx+scale*(chwid*0.5)*ccos
-				#ty = cury+ry
-				rx = cx
-				ry = cy
-				tx = curx+rx+scale*(chwid*0.5)
-				ty = cury+ry
-				if fbox.sy > ty: fbox.sy = ty
-				if fbox.ey < ty: fbox.ey = ty
-				xp.append(tx)
-				yp.append(ty)
-		
-		if len(xp) != 0:
-			llist.append((xp,yp))
-		clist.append(llist)
-		
-		chwid = 2 if chwid == 2 else chwid
-		#delx = chwid*ccos*SHIFT_FACTOR*scale
-		#dely = chwid*csin*SHIFT_FACTOR*scale
-		delx = chwid*SHIFT_FACTOR*scale
-		dely = 0
-		curx += delx
-		cury += dely
-
-	el = clist[-1]
-	for l in el: ex = max(l[0])
-	fbox.sx = 0
-	fbox.ex = ex
-	
-	#fbox.expand(min(fbox.hgt(), fbox.wid())*0.05)
-	dx = 0
-	dy = 0
-	# default align is Left & Vcenter
-	#if IS_LEFT   (t.align): dx =  fbox.wid()
-	if IS_RIGHT  (t.align): dx = -fbox.wid()
-	if IS_HCENTER(t.align): dx = -fbox.wid()*0.5
-	if IS_TOP    (t.align): dy = fbox.hgt()*0.5
-	if IS_BOTTOM (t.align): dy = -fbox.hgt()*0.5
-
-	fthk = t.lthk*dev.frm.hgt()
-	bthk = t.box_lthk*dev.frm.hgt()
-	if t.show_box:
-		if t.rotation != 0:
-			x1 = fbox.sx*ccos-fbox.sy*csin
-			y1 = fbox.sx*csin+fbox.sy*ccos
-			x2 = fbox.ex*ccos-fbox.ey*csin
-			y2 = fbox.ex*csin+fbox.ey*ccos
-			fbox.set_bbox(x1,y1,x2,y2)
-		fbox.transx(dx)
-		fbox.transy(dy)
-		fbox.trans(t.x,t.y)
-		if t.fill_box:
-			t.polygon(fbox.get_xs(), fbox.get_ys(), t.box_lcol, t.box_fcol, bthk)
-		else:
-			t.polyline(fbox.get_xs(), fbox.get_ys(), t.box_lcol, bthk, True)
-
-	dev.make_pen(t.lcol, fthk)
-	for ll in clist:
-		for ls in ll:
-			xx = np.array(ls[0])
-			yy = np.array(ls[1])
-			if t.rotation != 0:
-				for i in range(xx.size):
-					xs = xx[i]*ccos-yy[i]*csin
-					ys = xx[i]*csin-yy[i]*ccos
-					xx[i] = xs
-					yy[i] = ys
-			xx += dx + t.x
-			yy += dy + t.y
-			t.polyline(xx,yy)
-			#dev.lpolyline(xx,yy)
-	dev.delete_pen()
-
-def test(dev):
-	tx = 1.5
-	ty = 1.5
-	txt = Text(tx,ty,"!=3", dev.lpolyline, dev.lpolygon)
-	txt.lcol = color.BLUE
-	txt.size *= 2
-	txt.lthk = 0.001
-	txt.rotation = 0
-	txt.show_box = True
-	txt.fill_box = False
-	txt.box_fcol = color.YELLOW
-	txt.box_lcol = color.BLACK
-	#txt.box_lthk = 0.004
-	write_text(dev, txt)
-	#txt.str = "es"
-	#txt.es()
-	#write_text(dev, txt)
-	
-def main():
-	import frame
-	import data
-	from device import DeviceCairo, DeviceWindowsMetafile
-	
-	fmm = frame.FrameManager()
-	dat = data.Data(-1,1,-1,1)
-	frm = fmm.create(0,0,3,3, dat)
-	dev1 = DeviceCairo('fnt.png', fmm.get_gbbox(), 100)
-	dev2 = DeviceWindowsMetafile('fnt.wmf', fmm.get_gbbox())
-	
-	dev1.set_device(frm)
-	dev1.fill_white()
-	test(dev1)
-	dev1.close()
-	
-	dev2.set_device(frm)
-	dev2.fill_white()
-	test(dev2)
-	dev2.close()
-
-if __name__ == '__main__':
-	main()
+    def __init__(self,x=0,y=0):
+        self.x = x
+        self.y = y
+        
+def write_text(dev, t, viewport=True):
+    SHIFT_FACTOR = 1.2;
+    ich=0 
+    ias=0 
+    ivt=0 
+    chwid=0 
+    chhgt=0 
+    nvert=0 
+    moveto=0
+    nstr=0 
+    px=0 
+    py=0
+    ccos = math.cos(t.rotation*to_rad)
+    csin = math.sin(t.rotation*to_rad)
+    
+    if viewport:
+        curx=t.x 
+        cury=t.y 
+    else:
+        curx=dev._x_viewport(t.x)
+        cury=dev._y_viewport(t.y) 
+    rx=0.0 
+    ry=0.0 
+    cx=0.0 
+    cy=0.0 
+    tx=0.0 
+    ty=0.0
+    
+    #TG_Float 
+    scale=0.0 
+    max_y=0.0 
+    max_x=0.0 
+    delx =0.0 
+    dely =0.0 
+    #xx=np.zeros(5)
+    #yy=np.zeros(5)
+    ll=Point(0.0,0.0) 
+    rt=Point(0.0,0.0)
+    box = [Point]*5
+    
+    if t.text == '': return
+    
+    if t.font_id == fontid.FONT_CURSIVE or \
+    t.font_id == fontid.FONT_SCRIPTCOMPLEX or \
+    t.font_id == fontid.FONT_SCRIPTSIMPLEX:
+        SHIFT_FACTOR=1.0
+    
+    nstr = len(t.text)
+    curx = 0
+    cury = 0
+    scale = 1./STD_FONT_HEIGHT*t.size*dev.frm.hgt();
+    fbox = BBox(-1000, 1000, -1000, -1000)
+    
+    clist = []
+    font_map = fontm.font_manager.get_font_map(t.font_id)
+    
+    for ich in range(nstr):
+        #glyp  = romans.font_map[ord(t.text[ich])-ord(' ')]
+        glyp = font_map[ord(t.text[ich])-ord(' ')]
+        npnt  = glyp[0]
+        prs   = glyp[1]
+        bbox  = glyp[2] # ll(x,y), rt(x,y)
+        chwid = bbox[1][0] - bbox[0][0]
+        
+        nvert = npnt
+        llist = []
+        xp  = []
+        yp  = []
+        nline = 0
+        for ivt in range(nvert):
+            pp = prs[ivt]
+            px = pp[0]
+            py = pp[1]
+            
+            if px==-1 and py==-1:
+                llist.append((xp,yp))
+                xp = []
+                yp = []
+                continue
+            else:
+                cx = px*scale;
+                cy = (py+TEXT_DROP)*scale
+                #rx = cx*ccos-cy*csin
+                #ry = cx*csin+cy*ccos
+                #tx = curx+rx+scale*(chwid*0.5)*ccos
+                #ty = cury+ry
+                rx = cx
+                ry = cy
+                tx = curx+rx+scale*(chwid*0.5)
+                ty = cury+ry
+                if fbox.sy > ty: fbox.sy = ty
+                if fbox.ey < ty: fbox.ey = ty
+                xp.append(tx)
+                yp.append(ty)
+        
+        if len(xp) != 0:
+            llist.append((xp,yp))
+        clist.append(llist)
+        
+        chwid = 2 if chwid == 2 else chwid
+        #delx = chwid*ccos*SHIFT_FACTOR*scale
+        #dely = chwid*csin*SHIFT_FACTOR*scale
+        delx = chwid*SHIFT_FACTOR*scale
+        dely = 0
+        curx += delx
+        cury += dely
+    
+    el = clist[-1]
+    for l in el: ex = max(l[0])
+    fbox.sx = 0
+    fbox.ex = ex
+    
+    #fbox.expand(min(fbox.hgt(), fbox.wid())*0.05)
+    dx = 0
+    dy = 0
+    # default align is Left & Vcenter
+    #if IS_LEFT   (t.align): dx =  fbox.wid()
+    if IS_RIGHT  (t.align): dx = -fbox.wid()
+    if IS_HCENTER(t.align): dx = -fbox.wid()*0.5
+    if IS_TOP    (t.align): dy = fbox.hgt()*0.5
+    if IS_BOTTOM (t.align): dy = -fbox.hgt()*0.5
+    
+    fthk = t.lthk*dev.frm.hgt()
+    bthk = t.box_lthk*dev.frm.hgt()
+    if t.show_box or t.fill_box:
+        if t.rotation != 0:
+            x1 = fbox.sx*ccos-fbox.sy*csin
+            y1 = fbox.sx*csin+fbox.sy*ccos
+            x2 = fbox.ex*ccos-fbox.ey*csin
+            y2 = fbox.ex*csin+fbox.ey*ccos
+            fbox.set_bbox(x1,y1,x2,y2)
+        fbox.transx(dx)
+        fbox.transy(dy)
+        if viewport:
+            curx = t.x
+            cury = t.y
+        else:
+            curx = dev._x_viewport(t.x)
+            cury = dev._y_viewport(t.y)
+            
+        #fbox.trans(t.x,t.y)
+        fbox.trans(curx,cury)
+        if t.fill_box:
+            dev.lpolygon(fbox.get_xs(), fbox.get_ys(), None, None, t.box_fcol)
+        if t.show_box:
+            dev.lpolyline(fbox.get_xs(), fbox.get_ys(), t.box_lcol, bthk, True)
+    
+    dev.make_pen(t.lcol, fthk)
+    for ll in clist:
+        for ls in ll:
+            #xx = np.array(ls[0])
+            #yy = np.array(ls[1])
+            if viewport:
+                xx = np.array(ls[0])
+                yy = np.array(ls[1])
+            else:
+                xx = dev._x_viewport(np.array(ls[0]))
+                yy = dev._y_viewport(np.array(ls[1]))
+            
+            if t.rotation != 0:
+                for i in range(xx.size):
+                    xs = xx[i]*ccos-yy[i]*csin
+                    ys = xx[i]*csin-yy[i]*ccos
+                    xx[i] = xs
+                    yy[i] = ys
+            if viewport:
+                xx += dx + t.x
+                yy += dy + t.y
+            else:
+                xx += dx + dev._x_viewport(t.x)
+                yy += dy + dev._y_viewport(t.y)
+            #t.polyline(xx,yy)
+            dev.lpolyline(xx,yy)
+    dev.delete_pen()
