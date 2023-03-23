@@ -177,8 +177,12 @@ class DeviceRaster(DeviceVector):
             
     def get_xl(self, x): return x*self.lxscl
     def get_yl(self, y): return y*self.lyscl
-    def _x_pixel (self, x): return self.sx_viewport_pixel+(x-self.frm.data.xmin)*self.xscale_pixel    
-    def _y_pixel (self, y): return self.ey_viewport_pixel-(y-self.frm.data.ymin)*self.yscale_pixel
+    def _x_pixel(self, x): return int(self.sx_viewport_pixel+\
+                                     (x-self.frm.data.xmin)*\
+                                     self.xscale_pixel)    
+    def _y_pixel(self, y): return int(self.ey_viewport_pixel-\
+                                     (y-self.frm.data.ymin)*\
+                                     self.yscale_pixel)
     def get_v (self, v): return v*self.scale_pixel
     def size  (self   ): return (self.gwid, self.ghgt)
     def get_xp(self, x): return int(self.sx_viewport_pixel + x)

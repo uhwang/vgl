@@ -7,13 +7,16 @@
 # Author: Uisang Hwang
 # Email : uhwangtx@gmail.com
 #
-import vgl
-#import vgl.color as col
-#import vgl.vertex as vertex
 from numpy import pi, sin, cos
-#from vgl.rotation import deg_to_rad
 
-class Symbol(vgl.vertex.Vertex):
+from . import color
+from . import vertex
+from .rotation import deg_to_rad
+#import color
+#import vertex
+#from rotation import deg_to_rad
+
+class Symbol(vertex.Vertex):
 	def __init__(self, nvert, show, type, lcol, fill, fcol, size, lthk, skip):
 		super().__init__(nvert)
 		self.show     = show
@@ -45,7 +48,7 @@ class Symbol(vgl.vertex.Vertex):
 
 class Circle(Symbol):
 	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(12,True,'circle',vgl.color.BLACK,True,vgl.color.RED,size,lthk*hgt,0)
+		super().__init__(12,True,'circle',color.BLACK,True,color.RED,size,lthk*hgt,0)
 		self.hgt = hgt
 		self.update(0,0)
 			
@@ -54,13 +57,13 @@ class Circle(Symbol):
 		len= self.hgt * self.size
 		step = 360.0/nvert
 		for i in range(nvert):
-			rad = vgl.rotation.deg_to_rad(i*step)
+			rad = deg_to_rad(i*step)
 			self.vertex[i*2]=x+len*cos(rad)
 			self.vertex[i*2+1]=y+len*sin(rad)
 			
 class Gradient(Symbol):
 	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(3,True,'gradient',vgl.color.BLACK,True,vgl.color.RED,size,lthk*hgt,0)
+		super().__init__(3,True,'gradient',color.BLACK,True,color.RED,size,lthk*hgt,0)
 		self.hgt = hgt
 		self.update(0,0)
 			
@@ -80,7 +83,7 @@ class Gradient(Symbol):
 		
 class RightTriangle(Symbol):
 	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(3,True,'right triangle',vgl.color.BLACK,True,vgl.color.RED,size,lthk*hgt,0)
+		super().__init__(3,True,'right triangle',color.BLACK,True,color.RED,size,lthk*hgt,0)
 		self.hgt = hgt
 		self.update(0,0)
 
@@ -99,7 +102,7 @@ class RightTriangle(Symbol):
 		
 class LeftTriangle(Symbol):
 	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(3,True,'left triangle',vgl.color.BLACK,True,vgl.color.RED,size,lthk*hgt,0)
+		super().__init__(3,True,'left triangle',color.BLACK,True,color.RED,size,lthk*hgt,0)
 		self.hgt = hgt
 		self.update(0,0)
 		
@@ -118,7 +121,7 @@ class LeftTriangle(Symbol):
 
 class Diamond(Symbol):
 	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(4,True,'diamond',vgl.color.BLACK,True,vgl.color.RED,size,lthk*hgt,0)
+		super().__init__(4,True,'diamond',color.BLACK,True,color.RED,size,lthk*hgt,0)
 		self.hgt = hgt
 		self.update(0,0)
 		
@@ -137,7 +140,7 @@ class Diamond(Symbol):
 		
 class Square(Symbol):
 	def __init__(self, size, hgt,lthk=0.001):
-		super().__init__(4,True,'square',vgl.color.BLACK,True,vgl.color.RED,size,lthk*hgt,0)
+		super().__init__(4,True,'square',color.BLACK,True,color.RED,size,lthk*hgt,0)
 		self.hgt = hgt
 		self.update(0,0)
 		

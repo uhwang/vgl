@@ -1,4 +1,4 @@
-# Vector Graphic Library (VGL) for Python
+ # Vector Graphic Library (VGL) for Python
 #
 # devwmf.py
 #
@@ -11,10 +11,8 @@
 
 import struct
 from . import wmfconst as wc
-from .size import BBox
+from . size import BBox
 from . import color
-#import wmfconst as wc
-#from size import BBox
 
 
 _to_twip = lambda x: int((x)*wc.TWIP_PER_INCH)
