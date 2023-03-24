@@ -10,6 +10,7 @@ from . import device
 from . import drvemf 
 from . import linepat
 from . import patline
+from . import gdiobj
 
 class DeviceEnhancedMetafile(device.DeviceRaster):
     def __init__(self, fname, gbox, dpi=300):
@@ -17,8 +18,8 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
         self.gbox =gbox
         self.dpi = dpi
         self.dev = drvemf.EnhancedMetaFile(fname, gbox)
-        self.pen = device.Pen()
-        self.brush = device.Brush()
+        self.pen = gdiobj.Pen()
+        self.brush = gdiobj.Brush()
 
     def set_device(self, frm, extend=device._FIT_NONE):
         self.frm = frm
@@ -173,21 +174,6 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
         x = [x1, x2]
         y = [y1, y2]
         self.lpolyline(x,y,lcol,lthk,lpat)
-        #if lcol: self.dev.MakePen(lcol,lthk)
-        #
-        #if isinstance(lpat, linepat.LinePattern):
-        #    x = [x1, x2]
-        #    y = [y1, y2]
-        #    pat_seg = patline.get_pattern_line(self, x, y, lpat.pat_len, lpat.pat_t, viewport=True)
-        #    for p1 in pat_seg:
-        #        x1 = [ self.get_xl(p2[0]) for p2 in p1 ]
-        #        y1 = [ self.get_xl(p2[1]) for p2 in p1 ]
-        #        self.dev.Polyline(x1, y1)
-        #else:
-        #    self.dev.MoveTo(self.get_xl(x1),self.get_yl(y1))
-        #    self.dev.LineTo(self.get_xl(x2),self.get_yl(y2))
-        #    
-        #if lcol: self.dev.DeletePen()
 
     def lmoveto(self, x, y):
         self.dev.MoveTo(int(self.get_xl(x)),int(self.get_yl(y)))

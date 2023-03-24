@@ -10,14 +10,15 @@ from . import device
 from . import drvwmf as dw
 from . import linepat
 from . import patline
+from . import gdiobj
 
 class DeviceWindowsMetafile(device.DeviceVector):
     def __init__(self, fname, gbox):
         super().__init__()
         self.gbox =gbox
         self.dev = dw.WindowsMetaFile(fname, gbox)
-        self.pen = device.Pen()
-        self.brush = device.Brush()
+        self.pen = gdiobj.Pen()
+        self.brush = gdiobj.Brush()
 
     def set_device(self, frm, extend=device._FIT_NONE):
         self.frm = frm

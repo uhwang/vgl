@@ -1,5 +1,13 @@
 '''
     drvemf.py
+    
+    DWORD 
+    WORD
+
+    Rectangle (16 bytes, optional): A RectL object ([MS-WMF] section 2.2.2.19) that defines a clipping
+and/or opaquing rectangle in logical units
+
+
 '''
 
 import struct

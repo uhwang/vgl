@@ -17,6 +17,7 @@ from . size import BBox, Rect
 from . data import Data
 from . import patline
 from . import linepat
+from . gdiobj import Pen, Brush
 
 # Axis Fit Type
 _FIT_NONE      = None
@@ -34,25 +35,7 @@ class Position():
         self.x = x
         self.y = y
 
-class Pen():
-    def __init__(self):
-        self.lcol = None
-        self.lthk = None
-        
-    def set_pen(self, lcol, lthk):
-        self.lcol = lcol
-        self.lthk =lthk
-        
-    def __str__(self):
-        return "Color: %s\nThickness: %f"%(self.lcol, self.lthk)
-        
-class Brush():
-    def __init__(self):
-        self.fcol=None #(0,0,0)
-        
-    def set_brush(self, fcol):
-        self.fcol = fcol
-        
+
 #class Device(abc.ABC):
 #    _default_circle_point = 100
 #
@@ -76,7 +59,7 @@ _default_circle_point = 100
 
 class DeviceVector():
     def __init__(self):
-        super().__init__()
+        #super().__init__()
         self.frm=None
         self._circle_point = _default_circle_point
         self.xscale_viewport = 0

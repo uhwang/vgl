@@ -41,11 +41,11 @@ def draw_tick(dev):
     min_ty0, min_ty1 = tick_pos_dir(min_tick, mitlen)
     
     # draw first minor ticks
-    dev.make_pen(min_tick.lcol, min_tick.lthk*hgt)
     yy = frm.bbox.sy+frm.pdom.get_ey()
     fnt = xaxis.first_nminor_tick
     
     if xaxis.minor_tick.show:
+        dev.make_pen(min_tick.lcol, min_tick.lthk*hgt)
         if fnt > 0:
             for i in range(fnt):
                 wxx = xaxis.first_minor_tick_pos+mispc*i
@@ -69,6 +69,7 @@ def draw_tick(dev):
                 wxx = owxx+mispc*vi
                 vi += 1
             j += 1
+        dev.delete_pen()
 	
     if xaxis.major_tick.show:
         vi = 1;
@@ -79,7 +80,7 @@ def draw_tick(dev):
             dev.lline(wxxl, yy+maj_ty0, wxxl, yy+maj_ty1)
             wxx = xaxis.first_major_tick_pos+xaxis.spacing*vi
             vi+=1
-    dev.delete_pen()
+        dev.delete_pen()
 	
     ## draw tick on y axis
     yaxis = frm.get_yaxis()
@@ -89,13 +90,13 @@ def draw_tick(dev):
     mjtlen = maj_tick.llen*hgt
     mispc = yaxis.spacing/(yaxis.nminor_tick+1)
     
-    dev.make_pen(min_tick.lcol, min_tick.lthk*hgt)
     xx = frm.bbox.sx+frm.pdom.get_sx()#frm.pdom.get_sx()
     fnt = yaxis.first_nminor_tick
     maj_tx0, maj_tx1 = tick_pos_dir(maj_tick, mjtlen)
     min_tx0, min_tx1 = tick_pos_dir(min_tick, mitlen)
     
     if yaxis.minor_tick.show:
+        dev.make_pen(min_tick.lcol, min_tick.lthk*hgt)
         if fnt != 0:
             for i in range(fnt):
                 wyy = yaxis.first_minor_tick_pos+mispc*i
@@ -120,7 +121,7 @@ def draw_tick(dev):
                 wyy = owyy+mispc*vi
                 vi += 1
             j += 1
-	#dev.delete_pen()
+        dev.delete_pen()
 	
     if yaxis.major_tick.show:
         vi = 1;
@@ -131,4 +132,4 @@ def draw_tick(dev):
             dev.lline(xx-maj_tx0, wyyl, xx-maj_tx1, wyyl)
             wyy = yaxis.first_major_tick_pos+yaxis.spacing*vi
             vi+=1
-    dev.delete_pen()
+        dev.delete_pen()

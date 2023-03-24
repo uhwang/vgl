@@ -13,14 +13,15 @@ from . import device
 from . import color
 from . import linepat
 from . import patline
+from . import gdiobj
 
 class DeviceCairo(device.DeviceRaster):
     def __init__(self, fname, gbox, dpi):
         super().__init__(gbox, dpi)
         self.fname = fname
         self.pen   = device.Pen()
-        self.prv_pen = device.Pen()
-        self.brush = device.Brush()
+        self.prv_pen = gdiobj.Pen()
+        self.brush = gdiobj.Brush()
         self.pos   = device.Position(0,0)
         self.data  = np.ndarray(shape=(self.ghgt, self.gwid), dtype=np.uint32)
         self.surf  = cairo.ImageSurface.create_for_data(self.data, 

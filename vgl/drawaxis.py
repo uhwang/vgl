@@ -38,7 +38,7 @@ def draw_axis(dev):
         x2 = dev._x_viewport(xmax)
         yy = dev._y_viewport(pos_y)
         dev.lline(x1, yy, x2, yy, lcol= xaxis.lcol, 
-                                 lthk=xaxis.lthk*dev.frm.get_pdom_hgt())
+                                 lthk=xaxis.lthk*dev.frm.hgt())
     
     #draw y-axis
     if yaxis.show:
@@ -55,7 +55,7 @@ def draw_axis(dev):
         xx = dev._x_viewport(pos_x)
         
         dev.lline(xx, y1, xx, y2, lcol=yaxis.lcol, 
-                                 lthk=yaxis.lthk*dev.frm.get_pdom_hgt())
+                                 lthk=yaxis.lthk*dev.frm.hgt())
         
     drawtick.draw_tick(dev)
     drawgrid.draw_grid(dev)

@@ -26,7 +26,9 @@ from . drawgrid  import *
 from . devwmf    import *
 from . devemf    import *
 from . devcairo  import *
+from . devpdf    import *
 from . drvemf    import *
+from . drvpdf    import *
 from . emfconst  import *
 
 #from . import frame     
