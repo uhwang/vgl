@@ -23,6 +23,7 @@ from . import paper
 class DevicePDF(device.DeviceVector):
     def __init__(self, fname, gbox, p=(8.5,11.0)):
         super().__init__()
+        self.coordsys_t = device._COORDSYS_CARTESIAN
         self.gbox =gbox
         self.wid = p[0]        
         self.hgt = p[1]        
