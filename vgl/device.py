@@ -25,6 +25,10 @@ _FIT_EXTEND_X  = 0x0001
 _FIT_EXTEND_Y  = 0x0002
 _FIT_DEPENDENT = 0x0003
 
+# Coordinate System Types 
+_COORDSYS_CARTESIAN = Ox0001
+_COORDSYS_PAPER.    = 0x0002
+
 get_line_thk = lambda x : 1 if int(x) == 0 else x
 
 class Position():
@@ -60,6 +64,7 @@ _default_circle_point = 100
 class DeviceVector():
     def __init__(self):
         #super().__init__()
+        self.coordsys_t = _COORDSYS_PAPER
         self.frm=None
         self._circle_point = _default_circle_point
         self.xscale_viewport = 0
