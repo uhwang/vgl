@@ -11,7 +11,7 @@
 
 from . import axis
 
-def tick_pos_dir(tick, len, cartesian=False):
+def tick_pos_dir(tick, len):
     if   tick.dir == axis.TICK_DIR_IN:
         return 0, -len
     elif tick.dir == axis.TICK_DIR_OUT:
@@ -37,8 +37,8 @@ def draw_tick(dev):
     mitlen = min_tick.llen*hgt
     mispc  = xaxis.spacing/(xaxis.nminor_tick+1)
     
-    maj_ty0, maj_ty1 = tick_pos_dir(maj_tick, mjtlen, dev.iscartesian())
-    min_ty0, min_ty1 = tick_pos_dir(min_tick, mitlen, dev.iscartesian())
+    maj_ty0, maj_ty1 = tick_pos_dir(maj_tick, mjtlen)
+    min_ty0, min_ty1 = tick_pos_dir(min_tick, mitlen)
     
     # draw first minor ticks
     #yy = frm.bbox.sy+frm.pdom.get_ey()
