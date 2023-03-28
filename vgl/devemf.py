@@ -87,10 +87,10 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
             else:
                 px = [int(self._x_pixel(xx)) for xx in x]
                 py = [int(self._y_pixel(yy)) for yy in y]
-            if lpat == linepat._PAT_SOLID:
+            if isinstance(lcol, color.Color) and lpat == linepat._PAT_SOLID:
                 self.dev.Polygon(px,py,lcol, int(self.get_xl(lthk)),fcol)
             elif fcol:
-                self.dev.Polygon(px,py,None, int(self.get_xl(lthk)),fcol)
+                self.dev.Polygon(px,py,None, None, fcol)
     
         if lcol and pat_inst:
             if isinstance(x, np.ndarray):

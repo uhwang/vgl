@@ -138,10 +138,10 @@ class DevicePDF(device.DeviceVector):
             else:
                 px = [self._x_viewport(xx)*drvpdf._points_inch for xx in x]
                 py = [self._y_viewport(yy)*drvpdf._points_inch for yy in y]
-            if lpat == linepat._PAT_SOLID:
+            if isinstance(lcol, color.Color) and lpat == linepat._PAT_SOLID:
                 self.dev.Polygon(px,py,lcol,_lthk,fcol)
             elif fcol:
-                self.dev.Polygon(px,py,None,_lthk,fcol)
+                self.dev.Polygon(px,py,None,None,fcol)
     
         if lcol and pat_inst:
             if isinstance(x, np.ndarray):

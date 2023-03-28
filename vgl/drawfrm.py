@@ -9,34 +9,7 @@
 #
 
 from . import color, frame
-#import color, frame
 
-#def draw_axis(dev, data):
-#	#draw x-axis
-#	dev.line(data.xmin, 0, data.xmax, 0, color.BLACK, 0.005*dev.frm.hgt())
-#	#draw y-axis
-#	dev.line(0, data.ymin, 0, data.ymax, color.BLACK, 0.005*dev.frm.hgt())
-		
-#def draw_grid(dev, data, spc):
-#
-#    xmin = dev.frm.xaxis.min
-#    xmax = dev.frm.xaxis.max
-#    ymin = dev.frm.yaxis.min
-#    ymax = dev.frm.yaxis.max
-#    
-#    nxgrid = int((xmax-xmin)/spc)+1
-#    nygrid = int((ymax-ymin)/spc)+1
-#    dev.make_pen(color.GRAY50, 0.001*dev.frm.hgt())
-#    for i in range(nxgrid):
-#    	x = xmin+i*spc
-#    	dev.line(x, ymin, x, ymax)
-#    # draw y grid
-#    y=ymin
-#    for i in range(nygrid):
-#    	y = ymin+i*spc
-#    	dev.line(xmin, y, xmax, y)
-#    dev.delete_pen()
-	
 def draw_frame(dev):
     frm = dev.frm
     fp = frm.get_property()
