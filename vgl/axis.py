@@ -165,6 +165,7 @@ class Label(text.Text):
         self.color = color.BLACK
         self.pos = pos
         self.size = 0.015 # the percentage of frame height: 1.5%
+        self.rotation = 0
 
 class Grid(LineLevelC):
     def __init__(self, show, lcol=color.BLACK, lthk=0.001, lpat=0, patlen=0):
@@ -191,6 +192,30 @@ _AXIS_NAME = ["Axis-X", "Axis-Y", "Axis-X"]
 def _get_xaxis_name(): return _AXIS_NAME[0]
 def _get_yaxis_name(): return _AXIS_NAME[1]
 def _get_zaxis_name(): return _AXIS_NAME[2]
+
+
+def get_xaxis_ypos(xaxis, yaxis):
+    pos_y = yaxis.min # default axis._POS_BOTTOM
+    pos_t = xaxis.pos_t
+        
+    if pos_t == _POS_TOP:
+        pos_y = yaxis.max
+    elif pos_t == _POS_ZERO:
+        pos_y = 0
+        
+    return pos_y
+
+def get_yaxis_xpos(xaxis, yaxis):
+    pos_x = xaxis.min # default axis._POS_LEFT
+    pos_t = yaxis.pos_t
+        
+    if pos_t == _POS_RIGHT:
+        pos_x = xaxis.max
+    elif pos_t == _POS_ZERO:
+        pos_x = 0
+        
+    return pos_x
+        
 
 class Axis(LineLevelA):
     def __init__(self, min=0, max=1, lcol = color.BLACK, lthk=0.004):
@@ -238,7 +263,7 @@ class AxisX(Axis):
                  pos_t =_POS_BOTTOM):
         super().__init__(min,max,lcol,lthk)
         self.name = _get_xaxis_name()
-        self.pos_t  = pos_t
+        self.pos_t= pos_t
         #self.pos    = 
         
 class AxisY(Axis):
@@ -246,7 +271,7 @@ class AxisY(Axis):
                  pos_t =_POS_LEFT):
         super().__init__(min,max,lcol,lthk)
         self.name = _get_yaxis_name()
-        self.pos_t  = pos_t
+        self.pos_t= pos_t
 
 def main():
 	x=Axis(-3,3)

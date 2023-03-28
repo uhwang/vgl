@@ -190,6 +190,12 @@ class Frame():
     def hide_yaxis(self):
         self.yaxis.show = False
         
+    def hide_xlabel(self):
+        self.xaxis.label.show = False
+        
+    def hide_ylabel(self):
+        self.yaxis.label.show = False
+        
     def show_all_tick(self):
         self.show_xtick()
         self.show_ytick()

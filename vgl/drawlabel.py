@@ -10,8 +10,8 @@
 
 from . import color
 from . import text
-#import color
-#import text
+from . import axis
+
 
 def draw_label(dev):
     frm = dev.frm
@@ -20,57 +20,43 @@ def draw_label(dev):
     
     hgt = frm.hgt()
     xaxis = frm.get_xaxis()
+    yaxis = frm.get_yaxis()
+
     xlabel = xaxis.get_label()
+    ylabel = yaxis.get_label()
     
     if xlabel.show:
         maj_tick = xaxis.get_major_tick()
         
         wxx = xaxis.first_major_tick_pos
         vi = 1
-        yy = frm.bbox.sy+frm.pdom.get_ey()
-        dev.make_pen(xlabel.lcol, xlabel.lthk*hgt)
+        yy = axis.get_xaxis_ypos(xaxis,yaxis)
+        yy = dev._y_viewport(yy)
     
         while wxx <= xaxis.max:
             wxxl = dev._x_viewport(wxx)
-            #dev.lline(wxxl, yy+maj_ty0, wxxl, yy+maj_ty1)
             ypos = yy + xlabel.pos * hgt
             xlabel.x = wxxl
             xlabel.y = ypos
             xlabel.text = "%1.2f"%wxx
-            #xlabel.polyline = dev.lpolyline
-            #xlabel.polygon  = dev.lpolygon
-            text.write_text(dev, xlabel)
+            text.write_text(dev, xlabel, True)
             wxx = xaxis.first_major_tick_pos+xaxis.spacing*vi
             vi+=1
-            #if wxx >= xaxis.max: break
-        #dev.delete_pen()
-    
-    yaxis = frm.get_yaxis()
-    ylabel = yaxis.get_label()
-    
+
     if ylabel.show:
         maj_tick = yaxis.get_major_tick()
         wyy = yaxis.first_major_tick_pos
         vi = 1
-        xx = frm.bbox.sx+frm.pdom.get_sx()
+        xx = axis.get_yaxis_xpos(xaxis,yaxis)
+        xx = dev._x_viewport(xx)
         ylabel.ev()
-        #dev.make_pen(xlabel.lcol, xlabel.lthk*hgt)
-        #ylabel.size = 0.02
-        #ylabel.lcol = color.BLUE
-        #ylabel.lthk = 0.002
         ylabel.pos  = 0.01
         while wyy <= yaxis.max:
-            #print(wyy, yaxis.max)
             wyyl = dev._y_viewport(wyy)
-            #dev.lline(wxxl, yy+maj_ty0, wxxl, yy+maj_ty1)
             xpos = xx - ylabel.pos * hgt
             ylabel.x = xpos
             ylabel.y = wyyl
             ylabel.text = "%1.2f"%wyy
-            #ylabel.polyline = dev.lpolyline
-            #ylabel.polygon  = dev.lpolygon
-            text.write_text(dev, ylabel)
+            text.write_text(dev, ylabel, True)
             wyy = yaxis.first_major_tick_pos+yaxis.spacing*vi
             vi+=1
-            #if wyy >= yaxis.max: break
-        #dev.delete_pen()

@@ -195,7 +195,7 @@ def write_text(dev, t, viewport=True):
                 #tx = curx+rx+scale*(chwid*0.5)*ccos
                 #ty = cury+ry
                 rx = cx
-                ry = cy
+                ry = cy#*y_reverse
                 tx = curx+rx+scale*(chwid*0.5)
                 ty = cury+ry
                 if fbox.sy > ty: fbox.sy = ty
@@ -225,10 +225,11 @@ def write_text(dev, t, viewport=True):
     dy = 0
     # default align is Left & Vcenter
     #if IS_LEFT   (t.align): dx =  fbox.wid()
+    fhgt = fbox.hgt()*0.5
     if IS_RIGHT  (t.align): dx = -fbox.wid()
     if IS_HCENTER(t.align): dx = -fbox.wid()*0.5
-    if IS_TOP    (t.align): dy = fbox.hgt()*0.5
-    if IS_BOTTOM (t.align): dy = -fbox.hgt()*0.5
+    if IS_TOP    (t.align): dy = -fhgt if dev.iscartesian() else fhgt
+    if IS_BOTTOM (t.align): dy =  fhgt if dev.iscartesian() else -fhgt
     
     fthk = t.lthk*dev.frm.hgt()
     bthk = t.box_lthk*dev.frm.hgt()
@@ -255,7 +256,7 @@ def write_text(dev, t, viewport=True):
         if t.show_box:
             dev.lpolyline(fbox.get_xs(), fbox.get_ys(), t.box_lcol, bthk, True)
     
-    dev.make_pen(t.lcol, fthk)
+    #dev.make_pen(t.lcol, fthk)
     for ll in clist:
         for ls in ll:
             #xx = np.array(ls[0])
@@ -280,5 +281,5 @@ def write_text(dev, t, viewport=True):
                 xx += dx + dev._x_viewport(t.x)
                 yy += dy + dev._y_viewport(t.y)
             #t.polyline(xx,yy)
-            dev.lpolyline(xx,yy)
-    dev.delete_pen()
+            dev.lpolyline(xx,yy,t.lcol, fthk)
+    #dev.delete_pen()

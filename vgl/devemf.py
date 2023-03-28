@@ -31,7 +31,7 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
     def make_pen(self, color, thk):
         self.pen.lcol = color
         self.pen.lthk = thk
-        self.dev.MakePen(color, int(self.get_xl(thk)))
+        self.dev.MakePen(color, int(self.get_xlt(thk)))
     
     def delete_pen(self):
         self.dev.DeletePen()
@@ -144,7 +144,7 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
         self.polygon(x1, y1, lcol, int(lthk*self.dpi), fcol, lpat)
         
     def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
-        if lcol: self.dev.MakePen(lcol, int(self.get_xl(lthk)))
+        if lcol: self.dev.MakePen(lcol, int(self.get_xlt(lthk)))
         
         if isinstance(lpat, linepat.LinePattern):
             if closed:

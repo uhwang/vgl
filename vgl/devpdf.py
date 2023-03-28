@@ -27,7 +27,7 @@ class DevicePDF(device.DeviceVector):
         self.gbox =gbox
         self.wid = p[0]        
         self.hgt = p[1]        
-        self.dev = drvpdf.PDFDriver(fname, p[0], p[1])
+        self.dev = drvpdf.PDFDriver(fname, gbox, p[0], p[1])
         self.pen = False
         self.brush = device.Brush()
 
@@ -35,8 +35,13 @@ class DevicePDF(device.DeviceVector):
         self.frm = frm
         self.set_plot(frm,extend)
 
-    def _y_viewport(self, y):
-        return self.sy_viewport+(y-self.frm.data.ymin)*self.yscale_viewport
+    #def _y_viewport(self, y):
+    #    #return self.sy_viewport+(y-self.frm.data.ymin)*self.yscale_viewport\
+    #    #        +(self.hgt - self.gbox.hgt())
+    #    return self.sy_viewport+(y-self.frm.data.ymin)*self.yscale_viewport
+      
+    def _y_pdf(self, y):
+        return self.ey_viewport -y
         
     def fill_white(self):
         return
@@ -60,29 +65,28 @@ class DevicePDF(device.DeviceVector):
     #    pass
         
     def _line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, viewport=False):
+        xx = [sx, ex]
+        yy = [sy, ey]
+            
         if viewport:
-            sxp = sx*drvpdf._points_inch 
+            sxp = sx*drvpdf._points_inch
             syp = sy*drvpdf._points_inch
             exp = ex*drvpdf._points_inch
             eyp = ey*drvpdf._points_inch
         else:
-            sxp = self._x_viewport(sx)*drvpdf._points_inch
-            syp = self._x_viewport(sy)*drvpdf._points_inch
-            exp = self._x_viewport(ex)*drvpdf._points_inch
-            eyp = self._x_viewport(ey)*drvpdf._points_inch
+            sxp = sx
+            syp = sy
+            exp = ex
+            eyp = ey
             
         if isinstance(lpat, linepat.LinePattern):
-            x = [x1, x2]
-            y = [y1, y2]
-            self.polyline(x,y,lcol,lthk,lpat,viewport=True)
+            self.polyline(xx,yy,lcol,lthk,lpat,viewport=True)
         else:
             if self.pen:
                 self.dev.MoveTo(sxp, syp)
                 self.dev.LineTo(exp, eyp)
             else:
-                xx = [sx,ex]
-                yy = [sy,ey]
-                self.polyline(xx,yy,lcol,lthk,lpat,viewport)
+                self.polyline(xx,yy,lcol,lthk,linepat._PAT_SOLID,viewport=True)
         
     def _moveto(self, x, y, viewport=False):
         if viewport:
@@ -90,7 +94,7 @@ class DevicePDF(device.DeviceVector):
             syp = y*drvpdf._points_inch 
         else:
             sxp = self._x_viewport(x)*drvpdf._points_inch, 
-            syp = self._x_viewport(y)*drvpdf._points_inch 
+            syp = self._y_viewport(y)*drvpdf._points_inch 
         self.dev.MoveTo(sxp, syp)
 
     def _lineto(self, x, y, viewport=False):
@@ -99,8 +103,8 @@ class DevicePDF(device.DeviceVector):
             syp = y*drvpdf._points_inch 
         else:
             sxp = self._x_viewport(x)*drvpdf._points_inch, 
-            syp = self._x_viewport(y)*drvpdf._points_inch 
-        self.dev.MoveTo(sxp, syp)
+            syp = self._y_viewport(y)*drvpdf._points_inch 
+        self.dev.LineTo(sxp, syp)
         
     def moveto(self, x, y):
         self._moveto(x,y,False)
@@ -155,7 +159,7 @@ class DevicePDF(device.DeviceVector):
             #self.make_pen(lcol, lthk)
             for p1 in pat_seg:
                 x2 = [p2[0]*drvpdf._points_inch for p2 in p1 ]
-                y2 = [p2[1]*drvpdf._points_inch for p2 in p1 ]
+                y2 = [-p2[1]*drvpdf._points_inch for p2 in p1 ]
                 self.dev.Polyline(x2, y2, lcol, _lthk, fcol=None, closed=False)
             #self.delete_pen()
             
@@ -187,6 +191,8 @@ class DevicePDF(device.DeviceVector):
         pat_inst = isinstance(lpat, linepat.LinePattern)
 
         if lthk: _lthk = lthk*drvpdf._points_inch
+        else: lthk = 0
+        
         if pat_inst == False and lcol:
             if viewport:
                 px = [xx*drvpdf._points_inch for xx in x]
@@ -223,10 +229,13 @@ class DevicePDF(device.DeviceVector):
         self.polyline(x,y,lcol,lthk,lpat,closed,viewport=True)
         
     def create_clip(self, sx, sy, ex, ey):
-        self.dev.CreateClip(sx, sy, ex, ey)
+        self.dev.CreateClip(sx*drvpdf._points_inch, 
+                            sy*drvpdf._points_inch, 
+                            ex*drvpdf._points_inch, 
+                            ey*drvpdf._points_inch)
         
     def delete_clip(self):
-        self.dev.DeleteClip(0)
+        self.dev.DeleteClip()
         
     def close(self):
         self.dev.Close()

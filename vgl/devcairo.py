@@ -57,7 +57,7 @@ class DeviceCairo(device.DeviceRaster):
         #self.cntx.set_source_rgb(self.lcol.r,self.lcol.g,self.lcol.b)
         #self.cntx.set_source_rgb(r,g,b)
         self.cntx.set_source_rgb(c.r,c.g,c.b)
-        self.cntx.set_line_width(self.get_xl(lthk))
+        self.cntx.set_line_width(self.get_xlt(lthk))
         
     def make_brush(self, fcol):
         self.fcol = color.normalize(fcol)

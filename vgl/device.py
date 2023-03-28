@@ -25,11 +25,11 @@ _FIT_EXTEND_X  = 0x0001
 _FIT_EXTEND_Y  = 0x0002
 _FIT_DEPENDENT = 0x0003
 
-# Coordinate System Types 
-_COORDSYS_CARTESIAN = Ox0001
-_COORDSYS_PAPER.    = 0x0002
+#get_line_thk = lambda x : 1 if int(x) == 0 else x
 
-get_line_thk = lambda x : 1 if int(x) == 0 else x
+# Coordinate System Type
+_COORDSYS_CARTESIAN = 0x0001
+_COORDSYS_PAPER     = 0x0002
 
 class Position():
     def __init__(self, x, y):
@@ -65,12 +65,14 @@ class DeviceVector():
     def __init__(self):
         #super().__init__()
         self.coordsys_t = _COORDSYS_PAPER
-        self.frm=None
         self._circle_point = _default_circle_point
         self.xscale_viewport = 0
         self.yscale_viewport = 0
         self.scal_viewport = 0
 
+    def iscartesian(self):
+        return self.coordsys_t == _COORDSYS_CARTESIAN
+        
     def set_circle_point(self, npnt): 
         self._circle_point = npnt
 
@@ -136,7 +138,6 @@ class DeviceVector():
     def _y_viewport(self, y):
         return self.ey_viewport-(y-self.frm.data.ymin)*self.yscale_viewport
         
-        
 class DeviceRaster(DeviceVector):
     def __init__(self, gbox, dpi):
         super().__init__()
@@ -155,16 +156,22 @@ class DeviceRaster(DeviceVector):
         xrange = frm.xaxis.get_range()
         yrange = frm.yaxis.get_range()
         
-        self.sx_viewport_pixel = self.sx_viewport*self.dpi
-        self.sy_viewport_pixel = self.sy_viewport*self.dpi
-        self.ey_viewport_pixel = self.ey_viewport*self.dpi
+        #self.sx_viewport_pixel = self.sx_viewport*self.dpi
+        #self.sy_viewport_pixel = self.sy_viewport*self.dpi
+        #self.ey_viewport_pixel = self.ey_viewport*self.dpi
+        self.sx_viewport_pixel = (self.sx_viewport-self.gbbox.sx)*self.dpi
+        self.sy_viewport_pixel = (self.sy_viewport-self.gbbox.sy)*self.dpi
+        self.ey_viewport_pixel = (self.ey_viewport-self.gbbox.sy)*self.dpi
         
         self.xscale_pixel = (frm.pdom.wid*self.dpi)/xrange
         self.yscale_pixel = (frm.pdom.hgt*self.dpi)/yrange
         self.scale_pixel = min(self.xscale_pixel, self.yscale_pixel)
             
-    def get_xl(self, x): return x*self.lxscl
-    def get_yl(self, y): return y*self.lyscl
+    def get_xl(self, x): return (x-self.gbbox.sx)*self.lxscl
+    def get_yl(self, y): return (y-self.gbbox.sy)*self.lyscl
+    
+    def get_xlt(self, x): return x*self.lxscl
+    def get_ylt(self, y): return y*self.lyscl
     def _x_pixel(self, x): return int(self.sx_viewport_pixel+\
                                      (x-self.frm.data.xmin)*\
                                      self.xscale_pixel)    

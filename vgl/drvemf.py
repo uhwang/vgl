@@ -143,17 +143,19 @@ class EhancedMetaHeader():
         self.initialize()
         
     def initialize(self):
+        left, top, right, bottom = 0,0,self.bbox.wid(), self.bbox.hgt()
+        
         h_size = get_format_size(self.format)
         self.iType = ec.EMR_HEADER                               
         self.nSize = h_size                                      
-        self.rclBounds_left   = int(self.bbox.sx*self.dpi)       
-        self.rclBounds_top    = int(self.bbox.sy*self.dpi)       
-        self.rclBounds_right  = int(self.bbox.ex*self.dpi)       
-        self.rclBounds_bottom = int(self.bbox.ey*self.dpi)       
-        self.rclFrame_left    = int(self.bbox.sx*_mm_per_inch*100)       
-        self.rclFrame_top     = int(self.bbox.sy*_mm_per_inch*100)       
-        self.rclFrame_right   = int(self.bbox.ex*_mm_per_inch*100)       
-        self.rclFrame_bottom  = int(self.bbox.ey*_mm_per_inch*100)       
+        self.rclBounds_left   = int(left*self.dpi)       
+        self.rclBounds_top    = int(top*self.dpi)       
+        self.rclBounds_right  = int(right*self.dpi)       
+        self.rclBounds_bottom = int(bottom*self.dpi)       
+        self.rclFrame_left    = int(left*_mm_per_inch*100)       
+        self.rclFrame_top     = int(top*_mm_per_inch*100)       
+        self.rclFrame_right   = int(right*_mm_per_inch*100)       
+        self.rclFrame_bottom  = int(bottom*_mm_per_inch*100)       
         self.dSignature       = ec.ENHMETA_SIGNATURE    # "EMF"        
         self.nVersion         = 0x10000                          
         self.nBytes           = h_size                                       
@@ -576,20 +578,22 @@ class EnhancedMetaFile():
         self.DeleteObject(self.cur_pen)
     
     def CreateClip(self, sx, sy, ex, ey):
-        self.rec.set_record(ec.EMR_INTERSECTCLIPRECT, 4)
-        self.rec.set_param(_to_twip(ey))
-        self.rec.set_param(_to_twip(ex))
-        self.rec.set_param(_to_twip(sy))
-        self.rec.set_param(_to_twip(sx))
-        self.UpdateHeaderInfo()
-        self.WriteMetaRecord()
-        self.rec.release()
+        pass
+        #self.rec.set_record(ec.EMR_SELECTCLIPPATH, 4)
+        #self.rec.set_param(sx)
+        #self.rec.set_param(sy)
+        #self.rec.set_param(ex)
+        #self.rec.set_param(ey)
+        #self.UpdateHeaderInfo()
+        #self.WriteMetaRecord()
+        #self.rec.release()
         
     def DeleteClip(self, hrgn):
-        self.rec.set_record(ec.EMR_EXTSELECTCLIPRGN, 1)
-        self.rec.set_param(0)
-        self.UpdateHeaderInfo()
-        self.WriteMetaRecord()
-        self.rec.release()
+        pass
+        #self.rec.set_record(ec.EMR_EXCLUDECLIPRECT, 1)
+        #self.rec.set_param(0)
+        #self.UpdateHeaderInfo()
+        #self.WriteMetaRecord()
+        #self.rec.release()
         
 

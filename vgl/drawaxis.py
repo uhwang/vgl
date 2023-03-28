@@ -26,14 +26,7 @@ def draw_axis(dev):
     
     # draw x-axis
     if xaxis.show:
-        pos_y = ymin # default axis._POS_BOTTOM
-        pos_t = xaxis.pos_t
-        
-        if pos_t == axis._POS_TOP:
-            pos_y = ymax
-        elif pos_t == axis._POS_ZERO:
-            pos_y = 0
-        
+        pos_y = axis.get_xaxis_ypos(xaxis,yaxis)
         x1 = dev._x_viewport(xmin)
         x2 = dev._x_viewport(xmax)
         yy = dev._y_viewport(pos_y)
@@ -42,18 +35,10 @@ def draw_axis(dev):
     
     #draw y-axis
     if yaxis.show:
-        pos_x = xmin # default axis._POS_LEFT
-        pos_t = yaxis.pos_t
-        
-        if pos_t == axis._POS_RIGHT:
-            pos_x = xmax
-        elif pos_t == axis._POS_ZERO:
-            pos_x = 0
-        
+        pos_x = axis.get_yaxis_xpos(xaxis,yaxis)
         y1 = dev._y_viewport(ymin)
         y2 = dev._y_viewport(ymax)
         xx = dev._x_viewport(pos_x)
-        
         dev.lline(xx, y1, xx, y2, lcol=yaxis.lcol, 
                                  lthk=yaxis.lthk*dev.frm.hgt())
         
