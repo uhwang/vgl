@@ -146,9 +146,6 @@ class DeviceRaster(DeviceVector):
         xrange = frm.xaxis.get_range()
         yrange = frm.yaxis.get_range()
         
-        #self.sx_viewport_pixel = self.sx_viewport*self.dpi
-        #self.sy_viewport_pixel = self.sy_viewport*self.dpi
-        #self.ey_viewport_pixel = self.ey_viewport*self.dpi
         self.sx_viewport_pixel = (self.sx_viewport-self.gbbox.sx)*self.dpi
         self.sy_viewport_pixel = (self.sy_viewport-self.gbbox.sy)*self.dpi
         self.ey_viewport_pixel = (self.ey_viewport-self.gbbox.sy)*self.dpi
