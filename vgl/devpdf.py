@@ -23,7 +23,6 @@ from . import paper
 class DevicePDF(device.DeviceVector):
     def __init__(self, fname, gbox, p=(8.5,11.0)):
         super().__init__()
-        self.coordsys_t = device._COORDSYS_CARTESIAN
         self.gbox =gbox
         self.wid = p[0]        
         self.hgt = p[1]        
@@ -35,14 +34,6 @@ class DevicePDF(device.DeviceVector):
         self.frm = frm
         self.set_plot(frm,extend)
 
-    #def _y_viewport(self, y):
-    #    #return self.sy_viewport+(y-self.frm.data.ymin)*self.yscale_viewport\
-    #    #        +(self.hgt - self.gbox.hgt())
-    #    return self.sy_viewport+(y-self.frm.data.ymin)*self.yscale_viewport
-      
-    def _y_pdf(self, y):
-        return self.ey_viewport -y
-        
     def fill_white(self):
         return
         
@@ -53,16 +44,6 @@ class DevicePDF(device.DeviceVector):
     def delete_pen(self):
         self.dev.DeletePen()
         self.pen = False
-        
-    #def make_brush(self, fcol):
-    #    #self.dev.MakeBrush(fcol)
-    #    #self.brush.fcol = fcol
-    #    pass
-    #
-    #def delete_brush(self):
-    #    #self.dev.DeleteBrush()
-    #    #self.brush.fcol = None
-    #    pass
         
     def _line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, viewport=False):
         xx = [sx, ex]
@@ -177,11 +158,6 @@ class DevicePDF(device.DeviceVector):
         self.dev.Polygon(ppx, ppy, sym.lcol, sym.lthk*drvpdf._points_inch, sym.fcol)
     
     def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
-        #if lcol : self.dev.MakePen(lcol, lthk*self.dpi)
-        #else    : self.dev.MakePen(fcol, 0.01) # dummy line thickness 0.1
-        #if fcol : self.dev.MakeBrush(fcol)
-        #else    : self.dev.MakeNullBrush()
-
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
