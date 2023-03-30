@@ -140,7 +140,7 @@ class DevicePDF(device.DeviceVector):
             #self.make_pen(lcol, lthk)
             for p1 in pat_seg:
                 x2 = [p2[0]*drvpdf._points_inch for p2 in p1 ]
-                y2 = [-p2[1]*drvpdf._points_inch for p2 in p1 ]
+                y2 = [p2[1]*drvpdf._points_inch for p2 in p1 ]
                 self.dev.Polyline(x2, y2, lcol, _lthk, fcol=None, closed=False)
             #self.delete_pen()
             
@@ -161,7 +161,7 @@ class DevicePDF(device.DeviceVector):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
-        self.polygon(x1, y1, lcol, lthk*drvpdf._points_inch, fcol, lpat)
+        self.polygon(x1, y1, lcol, lthk, fcol, lpat)
         
     def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)

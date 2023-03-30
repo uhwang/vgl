@@ -73,8 +73,10 @@ class DeviceVector():
         self.frm = frm
         wid_viewport = frm.pdom.get_wid()
         hgt_viewport = frm.pdom.get_hgt()
-        xmax, xmin = frm.data.xmax, frm.data.xmin
-        ymax, ymin = frm.data.ymax, frm.data.ymin
+        #xmax, xmin = frm.data.xmax, frm.data.xmin
+        #ymax, ymin = frm.data.ymax, frm.data.ymin
+        xmin, xmax = frm.get_xaxis().get_minmax()
+        ymin, ymax = frm.get_yaxis().get_minmax()
         
         xrange_world = (xmax-xmin)
         yrange_world = (ymax-ymin)
@@ -85,6 +87,7 @@ class DeviceVector():
         self.sx_viewport = frm.bbox.sx+frm.pdom.sx
         self.sy_viewport = frm.bbox.sy+frm.pdom.sy
         self.ey_viewport = self.sy_viewport+frm.pdom.hgt
+        #self.ey_viewport = self.sy_viewport
         
         if extend!=_FIT_NONE:
             if extend==_FIT_DEPENDENT:
@@ -133,12 +136,12 @@ class DeviceRaster(DeviceVector):
         super().__init__()
         self.dpi  = dpi
         self.gbbox = gbox
-        self.gwid = int(gbox.wid()*dpi)
-        self.ghgt = int(gbox.hgt()*dpi)
+        self.gwid = gbox.wid()*dpi
+        self.ghgt = gbox.hgt()*dpi
         
         # logic coord -> pixel coord
-        self.lxscl = float(self.gwid/gbox.wid())
-        self.lyscl = float(self.ghgt/gbox.hgt())
+        self.lxscl = (self.gwid/gbox.wid())
+        self.lyscl = (self.ghgt/gbox.hgt())
         self.lscl = min(self.lxscl, self.lyscl)
         
     def set_plot(self, frm, extend=_FIT_NONE):
@@ -159,14 +162,14 @@ class DeviceRaster(DeviceVector):
     
     def get_xlt(self, x): return x*self.lxscl
     def get_ylt(self, y): return y*self.lyscl
-    def _x_pixel(self, x): return int(self.sx_viewport_pixel+\
+    def _x_pixel(self, x): return (self.sx_viewport_pixel+\
                                      (x-self.frm.data.xmin)*\
                                      self.xscale_pixel)    
-    def _y_pixel(self, y): return int(self.ey_viewport_pixel-\
+    def _y_pixel(self, y): return (self.ey_viewport_pixel-\
                                      (y-self.frm.data.ymin)*\
                                      self.yscale_pixel)
     def get_v (self, v): return v*self.scale_pixel
     def size  (self   ): return (self.gwid, self.ghgt)
-    def get_xp(self, x): return int(self.sx_viewport_pixel + x)
-    def get_yp(self, y): return int(self.sy_viewport_pixel + y)
+    def get_xp(self, x): return (self.sx_viewport_pixel + x)
+    def get_yp(self, y): return (self.sy_viewport_pixel + y)
  

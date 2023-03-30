@@ -31,7 +31,7 @@ class DeviceCairo(device.DeviceRaster):
         self.fcol  = color.WHITE
         self.fill_white()
         self.nlineto = 0
-        
+    
     def set_device(self, frm, extend=device._FIT_NONE):
         self.set_plot(frm, extend)
         
@@ -104,8 +104,8 @@ class DeviceCairo(device.DeviceRaster):
     def create_pnt_list(self, x, y, convx, convy):
         self.npnt = len(x)
         self.cntx.move_to(convx(x[0]), convy(y[0]))
-        for i in range(1,self.npnt):
-            self.cntx.line_to(convx(x[i]), convy(y[i]))
+        for x1, y1 in zip(x[1:], y[1:]):
+            self.cntx.line_to(convx(x1), convy(y1))
     
     def draw_geometry(self, lcol, lthk, fcol, lpat):
         if fcol or self.brush.fcol: 
@@ -179,7 +179,7 @@ class DeviceCairo(device.DeviceRaster):
                     self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
         else:
             self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
-                            
+
             if closed: 
                 self.cntx.close_path()
     

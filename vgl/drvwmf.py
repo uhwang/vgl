@@ -130,8 +130,8 @@ class WindowsMetaFile():
         self.nTh_GDI_Object = -1;
     
         self.WriteHeader()
-        self.SetWindowOrg(gbox.sx, gbox.sy)
-        self.SetWindowExt(gbox.wid(), gbox.hgt())
+        #self.SetWindowOrg(gbox.sx, gbox.sy)
+        #self.SetWindowExt(gbox.wid(), gbox.hgt())
     
     def UpdateHeaderInfo(self):
         if self.rec.Size > self.std_head.MaxRecordSize:

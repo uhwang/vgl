@@ -21,6 +21,12 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
         self.pen = gdiobj.Pen()
         self.brush = gdiobj.Brush()
 
+    def _x_pixel(self, x):
+        return int(super()._x_pixel(x))
+
+    def _y_pixel(self, y):
+        return int(super()._y_pixel(y))
+        
     def set_device(self, frm, extend=device._FIT_NONE):
         self.frm = frm
         self.set_plot(frm,extend)
@@ -88,7 +94,7 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
                 px = [int(self._x_pixel(xx)) for xx in x]
                 py = [int(self._y_pixel(yy)) for yy in y]
             if isinstance(lcol, color.Color) and lpat == linepat._PAT_SOLID:
-                self.dev.Polygon(px,py,lcol, int(self.get_xl(lthk)),fcol)
+                self.dev.Polygon(px,py,lcol, int(self.get_xlt(lthk)),fcol)
             elif fcol:
                 self.dev.Polygon(px,py,None, None, fcol)
     
@@ -124,24 +130,15 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
         cx = self._x_viewport(x)
         cy = self._y_viewport(y)
         px, py = sym.update_xy(cx,cy)
-        #if draw: self.begin_symbol(sym)
-        #self.dev.Symbol(px,py,draw)
-        #if draw: self.end_symbol()
         ppx = [int(self.get_xl(px1)) for px1 in px]
         ppy = [int(self.get_yl(py1)) for py1 in py]
-        #self.dev.Polygon(ppx, ppy, sym.lcol, int(sym.lthk*self.dpi), sym.fcol)
         self.dev.Symbol(ppx,ppy)
     
     def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
-        #if lcol : self.dev.MakePen(lcol, lthk*self.dpi)
-        #else    : self.dev.MakePen(fcol, 0.01) # dummy line thickness 0.1
-        #if fcol : self.dev.MakeBrush(fcol)
-        #else    : self.dev.MakeNullBrush()
-
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
-        self.polygon(x1, y1, lcol, int(lthk*self.dpi), fcol, lpat)
+        self.polygon(x1, y1, lcol, lthk, fcol, lpat)
         
     def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
         if lcol: self.dev.MakePen(lcol, int(self.get_xlt(lthk)))

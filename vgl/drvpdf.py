@@ -133,11 +133,11 @@ class PDFDriver():
         
         if lcol:
             buffer_2_list.append("%1.4f %1.4f %1.4f RG\n"%(lc.r, lc.g, lc.b))
+            buffer_2_list.append("%3.3f w\n"%lthk)
         
         if fcol:
             buffer_2_list.append("%1.4f %1.4f %1.4f rg\n"%(fc.r, fc.g, fc.b))
             
-        buffer_2_list.append("%3.3f w\n"%lthk)
         buffer_2_list.append("%3.3f %3.3f m\n"%(x[0],y[0]))
         
         for x1, y1 in zip(x[1:],y[1:]):

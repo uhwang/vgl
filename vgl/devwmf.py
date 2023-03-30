@@ -66,7 +66,7 @@ class DeviceWindowsMetafile(device.DeviceVector):
         return
         
     def moveto(self, x, y):
-        self.dev.MoveTo(self._x_viewport(x),self._y_pixel(y))
+        self.dev.MoveTo(self._x_viewport(x),self._y_viewport(y))
         
     def lineto(self, x, y):
         self.dev.LineTo(self._x_viewport(x),self._y_viewport(y))
@@ -176,8 +176,8 @@ class DeviceWindowsMetafile(device.DeviceVector):
                 y1 = [ p2[1] for p2 in p1 ]
                 self.dev.Polyline(x1, y1,closed=False)
         else:
-            px=[self._x_viewport(x[i]) for i in range(len(x))]
-            py=[self._y_viewport(y[i]) for i in range(len(y))]
+            px=[self._x_viewport(xx) for xx in x]
+            py=[self._y_viewport(yy) for yy in y]
             self.dev.Polyline(px,py,closed)
         if lcol: self.dev.DeletePen()
         

@@ -70,12 +70,7 @@ class Text(Font):
         self.y     = y
         self.text  = text
         self.rotation = 0
-        #self.moveto= moveto
-        #self.lineto= lineto
-        #self.polyline = polyline
-        #self.polygon  = polygon
-        #self.rotation = rotation
-        
+
     def set_text(self, x, y, text):
         self.x     = x
         self.y     = y
@@ -228,8 +223,8 @@ def write_text(dev, t, viewport=True):
     fhgt = fbox.hgt()*0.5
     if IS_RIGHT  (t.align): dx = -fbox.wid()
     if IS_HCENTER(t.align): dx = -fbox.wid()*0.5
-    if IS_TOP    (t.align): dy = -fhgt if dev.iscartesian() else fhgt
-    if IS_BOTTOM (t.align): dy =  fhgt if dev.iscartesian() else -fhgt
+    if IS_TOP    (t.align): dy =  fhgt
+    if IS_BOTTOM (t.align): dy = -fhgt
     
     fthk = t.lthk*dev.frm.hgt()
     bthk = t.box_lthk*dev.frm.hgt()
