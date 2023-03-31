@@ -21,20 +21,5 @@ dev = vgl.DeviceCairo("intro01-01.jpg", fmm.get_gbbox(), 200)
 dev.set_device(frm)
 plot(dev)
 dev.close()
-
-dev = vgl.DeviceWindowsMetafile("intro01-01.wmf", fmm.get_gbbox())
-dev.set_device(frm)
-plot(dev)
-dev.close()
-
-dev = vgl.DeviceEnhancedMetafile("intro01-01.emf", fmm.get_gbbox())
-dev.set_device(frm)
-plot(dev)
-dev.close()
-
-dev = vgl.DevicePDF("intro01-01.pdf", fmm.get_gbbox())
-dev.set_device(frm)
-plot(dev)
-dev.close()
 ```
 ![intro01-01](https://user-images.githubusercontent.com/43251090/229165118-929608e3-734f-4bb9-8b3f-4a4ea5d3cb30.jpg)
