@@ -120,7 +120,7 @@ class MetaRecord():
 
 class WindowsMetaFile():
     def __init__(self, fname, gbox):
-        self.gbox     = gbox
+        self.gbox     = gbox 
         self.std_head = StandardMetaHeader()
         self.ald_head = PlaceableMetaHeader(gbox)
         self.fp       = open(fname, 'wb')
@@ -130,8 +130,8 @@ class WindowsMetaFile():
         self.nTh_GDI_Object = -1;
     
         self.WriteHeader()
-        #self.SetWindowOrg(gbox.sx, gbox.sy)
-        #self.SetWindowExt(gbox.wid(), gbox.hgt())
+        self.SetWindowOrg(gbox.sx, gbox.sy)
+        self.SetWindowExt(gbox.wid(), gbox.hgt())
     
     def UpdateHeaderInfo(self):
         if self.rec.Size > self.std_head.MaxRecordSize:

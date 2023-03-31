@@ -226,6 +226,7 @@ class PDFDriver():
         self.fp.write(bytes("trailer<<Size %d/Root 1 0 R>>\n"%len(self.obj_list),'utf-8'))
         self.fp.write(bytes("startxref\n%d\n"%start_xref,'utf-8'))
         self.fp.write(bytes("%%EOF",'utf-8'))
+        self.fp.close()
         
     def CreateClip(self, sx, sy, ex, ey):
         #pass

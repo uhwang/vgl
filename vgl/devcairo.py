@@ -23,9 +23,9 @@ class DeviceCairo(device.DeviceRaster):
         self.prv_pen = gdiobj.Pen()
         self.brush = gdiobj.Brush()
         self.pos   = device.Position(0,0)
-        self.data  = np.ndarray(shape=(self.ghgt, self.gwid), dtype=np.uint32)
+        self.data  = np.ndarray(shape=(int(self.ghgt), int(self.gwid)), dtype=np.uint32)
         self.surf  = cairo.ImageSurface.create_for_data(self.data, 
-                     cairo.FORMAT_ARGB32, self.gwid, self.ghgt)
+                     cairo.FORMAT_ARGB32, int(self.gwid), int(self.ghgt))
         self.cntx  = cairo.Context(self.surf)
         self.lcol  = color.WHITE
         self.fcol  = color.WHITE

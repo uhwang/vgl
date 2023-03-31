@@ -73,8 +73,6 @@ class DeviceVector():
         self.frm = frm
         wid_viewport = frm.pdom.get_wid()
         hgt_viewport = frm.pdom.get_hgt()
-        #xmax, xmin = frm.data.xmax, frm.data.xmin
-        #ymax, ymin = frm.data.ymax, frm.data.ymin
         xmin, xmax = frm.get_xaxis().get_minmax()
         ymin, ymax = frm.get_yaxis().get_minmax()
         
@@ -87,7 +85,6 @@ class DeviceVector():
         self.sx_viewport = frm.bbox.sx+frm.pdom.sx
         self.sy_viewport = frm.bbox.sy+frm.pdom.sy
         self.ey_viewport = self.sy_viewport+frm.pdom.hgt
-        #self.ey_viewport = self.sy_viewport
         
         if extend!=_FIT_NONE:
             if extend==_FIT_DEPENDENT:

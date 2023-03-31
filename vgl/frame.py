@@ -45,20 +45,48 @@ default_plot_domain_ymargin = 0.09
 
 class FrameProperty():
     def __init__(self, col=color.RED):
-        self.header_show = True 
-        self.header_thk  = 0.03
-        self.header_col  = col
-        self.border_show = True
-        self.border_col  = color.BLACK
-        self.border_thk  = 0.001
-        self.bk_color    = color.WHITE
-        self.bk_show     = True
-        self.pdombk_show = True
-        self.pdombk_lshow= True
-        self.pdombk_lcol = color.BLACK
-        self.pdombk_fcol = color.WHITE
-        self.pdombk_lthk = 0.001
-		
+        self.header_show  = False 
+        self.header_thk   = 0.03
+        self.header_col   = col
+        self.border_show  = True
+        self.border_col   = color.BLACK
+        self.border_thk   = 0.001
+        self.bk_color     = color.WHITE
+        self.bk_show      = True
+        self.pdombk_show  = True
+        self.pdombk_border= True
+        self.pdombk_lcol  = color.BLACK
+        self.pdombk_fcol  = color.WHITE
+        self.pdombk_lthk  = 0.001
+        
+    def __str__(self):
+        return "Header Show         {}\n"\
+               "Header Thk          {}\n"\
+               "Header Color        {}\n"\
+               "Border Show         {}\n"\
+               "Border Color        {}\n"\
+               "Border Thk          {}\n"\
+               "Bk     Color        {}\n"\
+               "Bk     Show         {}\n"\
+               "Pdombk Show         {}\n"\
+               "Pdombk Border       {}\n"\
+               "Pdombk Border Color {}\n"\
+               "Pdombk Fill Color   {}\n"\
+               "Pdombk Border Thk   {}\n".format(
+                self.header_show,
+                self.header_thk ,
+                str(self.header_col),
+                self.border_show,
+                str(self.border_col),
+                self.border_thk ,
+                str(self.bk_color),
+                self.bk_show,
+                self.pdombk_show,
+                self.pdombk_border,
+                str(self.pdombk_lcol),
+                str(self.pdombk_fcol),
+                self.pdombk_lthk)
+                
 class Frame():
     def __init__(self, id, sx, sy, wid, hgt, data=None, fit_axis=False):
         self.id   = id

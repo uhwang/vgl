@@ -44,6 +44,11 @@ _paper_info = {
 "LETTER": ( 8.5   , 11.0    ,  215.8915,  279.389)
 }
 
-def get_letter_in():
-    return (_paper_info["LETTER"][0], _paper_info["LETTER"][1])
+def get_paper_letter():
+    return (_paper_info["LETTER"][0], 
+            _paper_info["LETTER"][1],
+            _paper_info["LETTER"][2],
+            _paper_info["LETTER"][3])
 
+def get_paper_letter_inch():
+    return _paper_info["LETTER"][0], _paper_info["LETTER"][1]

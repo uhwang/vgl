@@ -8,7 +8,7 @@
 # Email : uhwangtx@gmail.com
 #
 
-from . import color, frame
+from . import color
 
 def draw_frame(dev):
     frm = dev.frm
@@ -28,13 +28,13 @@ def draw_frame(dev):
     	dev.lpolyline(frm.get_frm_xs(), 
     	              frm.get_frm_ys(), 
     	              fp.border_col, 
-    	              fp.border_thk*frm.hgt(), True)
+    	              fp.border_thk*frm.hgt(), closed=True)
     	
     if fp.pdombk_show:
-    	if fp.pdombk_lshow:
+    	if fp.pdombk_border:
     		dev.lpolyline(frm.get_pdom_xs(), 
     		              frm.get_pdom_ys(), 
     					  fp.pdombk_lcol, 
-                          fp.pdombk_lthk*frm.hgt(), True)
+                          fp.pdombk_lthk*frm.hgt(), closed=True)
 	
 	

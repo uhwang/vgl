@@ -470,7 +470,6 @@ class EnhancedMetaFile():
         self.rec.set_param(bounds[0][1])
         self.rec.set_param(bounds[1][0])
         self.rec.set_param(bounds[1][1])
-        if closed: npoint += 1
         self.rec.set_param(npoint)
   
         bytes = bytearray(self.rec.Size)

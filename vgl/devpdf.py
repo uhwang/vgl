@@ -173,9 +173,15 @@ class DevicePDF(device.DeviceVector):
             if viewport:
                 px = [xx*drvpdf._points_inch for xx in x]
                 py = [yy*drvpdf._points_inch for yy in y]
+                if closed:
+                    px.append(x[0]*drvpdf._points_inch)
+                    py.append(y[0]*drvpdf._points_inch)
             else:
                 px = [self._x_viewport(xx)*drvpdf._points_inch for xx in x]
                 py = [self._y_viewport(yy)*drvpdf._points_inch for yy in y]
+                if closed:
+                    px.append(self._x_viewport(x[0])*drvpdf._points_inch)
+                    py.append(self._y_viewport(y[0])*drvpdf._points_inch)
             self.dev.Polyline(px,py,lcol,_lthk,fcol=None,closed=False)
     
         if lcol and pat_inst:
