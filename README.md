@@ -37,3 +37,4 @@ dev.set_device(frm)
 plot(dev)
 dev.close()
 ```
+![intro01-01](https://user-images.githubusercontent.com/43251090/229165118-929608e3-734f-4bb9-8b3f-4a4ea5d3cb30.jpg)
