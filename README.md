@@ -2,4 +2,6 @@
 Vector Graphic Library for Python
 
 Introduction
-![](image/Slide2.png)
+<p float="left">
+  <img src="/image/Slide2.png">
+</p>
