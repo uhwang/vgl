@@ -2,4 +2,4 @@
 Vector Graphic Library for Python
 
 Introduction
-![alt text](/imagie/slide2.png)
+![alt text](/imagie/Slide2.png)
