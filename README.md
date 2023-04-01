@@ -6,7 +6,7 @@ Vector Graphic Library for Python
 ![Slide2](https://user-images.githubusercontent.com/43251090/229162160-5899a185-4e94-4ea9-90c9-81a33428163b.PNG)
 
 ## Screenshot
-![screenshot](https://user-images.githubusercontent.com/43251090/229262896-74e7e29e-d644-4df0-9802-7ffccbdde409.jpg)
+![screenshot](https://user-images.githubusercontent.com/43251090/229310460-f6ff7567-4b2d-4e27-b041-45ad96263086.jpg)
 
 ```Python
 # Screenshot.py
@@ -15,12 +15,14 @@ import random
 import numpy as np
 import math
 import vgl
-
-xwid,xhgt=300,300
+f_wid, f_hgt = 3,3 # inch
+f_sx, f_sy = 0.5, 0.5
+skip = 0.1
+xwid = 300
 fmm = vgl.FrameManager()
-frm_00 = fmm.create(0,0,2,2, vgl.Data(0,xwid,0,xhgt))
-frm_01 = fmm.create(2.1,0,2,2, vgl.Data(-4,4,-4,4))
-frm_10 = fmm.create(0,2.1,2,2, vgl.Data(-3,3,-1,10))
+frm_00 = fmm.create(f_sx,f_sy,f_wid,f_hgt, vgl.Data(0,xwid,0,300))
+frm_01 = fmm.create(f_sx+skip+f_wid,f_sy,f_wid,f_hgt, vgl.Data(-4,4,-4,4))
+frm_10 = fmm.create(f_sx,f_sy+skip+f_hgt,f_wid, f_hgt, vgl.Data(-3,3,-1,10))
 
 # Draw Fractal Tree
 def fixed_tree(dev, order, length, angle):
@@ -80,7 +82,7 @@ def create_polygon_list():
     plist.append(vgl.geom.Polygon( 0, 0,3,1,vgl.color.BLACK, 0.007, vgl.color.CYAN))
     
 def draw_shape(dev):
-    vgl.drawaxis.draw_axis(dev)
+    vgl.draw_axis(dev)
     for p in plist:
         dev.polygon(p.get_xs(), p.get_ys(), 
                     p.lcol, p.lthk*dev.frm.hgt(), 
@@ -109,7 +111,7 @@ def plot_prop(dev):
     mb = vgl.mesh3d.MeshBBox(tec_geom.mesh)
     xmin, xmax, ymin, ymax, zmin, zmax = mb.get_bbox()
     data = vgl.Data(xmin, xmax, ymin, ymax, zmin, zmax)
-    frm_11 = fmm.create(2.1,2.1,2,2, data)
+    frm_11 = fmm.create(f_sx+skip+f_wid,f_sy+skip+f_hgt,f_wid,f_hgt, data)
     v3d = vgl.view3d.View3d(frm_11)
     
     v3d.xrotation(30)
@@ -134,26 +136,23 @@ fpy = lambda a,t : a*(1-math.cos(t))
 tt = np.arange(t1, t2, dt)
 xcy = np.array([fpx(r1, t) for t in tt])
 ycy = np.array([fpy(r1, t) for t in tt])
-
-frm_20 = fmm.create(1,2,1.6,0.7, vgl.Data(-1,20,-1,5)) 
-frm_20.set_bk_show(True)
-frm_20.set_pdom_bk_show(True)
-frm_20.show_xgrid()
-frm_20.show_ymajor_grid()
-frm_20.set_bk_color(vgl.color.CYAN)
+frm_20 = fmm.create(f_sx,f_sy+2*(skip+f_hgt),skip+f_wid*2,f_hgt/2, vgl.Data(-1,20,-1,5)) 
+frm_20.show_all_grid()
+frm_20.set_xlabel_size(0.06)
+frm_20.set_ylabel_size(0.06)
+frm_20.set_label_font(vgl.fontid.FONT_TIMESROMANBOLD)
 
 def plot_cycloid(dev):
     vgl.draw_frame(dev)
     vgl.draw_axis(dev)
     dev.polyline(xcy,ycy,vgl.color.MAGENTA, dev.frm.hgt()*0.02)
     
-def save_cairo(fname):
-    dev = vgl.DeviceCairo(fname, fmm.get_gbbox(), 300)
-    
+def save(dev):
     dev.set_plot(frm_00)
     run_fixed_tree(dev)
     
     create_polygon_list()
+    frm_01.show_all_major_grid()
     dev.set_plot(frm_01)
     draw_shape(dev)
     
@@ -167,5 +166,13 @@ def save_cairo(fname):
     
     dev.close()
 
-save_cairo("screenshot.jpg")
+dev_img = vgl.DeviceCairo("screenshot.jpg", fmm.get_gbbox(), 300)
+dev_pdf = vgl.DevicePDF("screenshot.pdf", fmm.get_gbbox())
+dev_wmf = vgl.DeviceWindowsMetafile("screenshot.wmf", fmm.get_gbbox())
+dev_emf = vgl.DeviceEnhancedMetafile("screenshot.emf", fmm.get_gbbox())
+    
+save(dev_img)
+save(dev_pdf)
+save(dev_wmf)
+save(dev_emf)
 ```
