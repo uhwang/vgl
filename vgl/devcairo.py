@@ -197,11 +197,10 @@ class DeviceCairo(device.DeviceRaster):
         return
     
     def begin_symbol(self, sym): 
-        self.make_pen(sym.lcol, sym.lthk)
-        self.make_brush(sym.fcol)
+        pass
         
     def end_symbol(self):  
-        return
+        pass
     
     def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
         if isinstance(lpat, linepat.LinePattern):
@@ -218,12 +217,7 @@ class DeviceCairo(device.DeviceRaster):
             
     def symbol(self, x,y, sym, draw=False):
         px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
-        self.create_pnt_list(px,py,self.get_xl, self.get_yl)
-        self.cntx.close_path()
-        self.make_brush(sym.fcol)
-        self.cntx.fill_preserve()
-        self.make_pen(sym.lcol, sym.lthk)
-        self.cntx.stroke()
+        self.polygon(px,py,sym.lcol,sym.lthk,sym.fcol,viewport=True)
         
     def lline(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         if lcol: self.make_pen(lcol, lthk)
