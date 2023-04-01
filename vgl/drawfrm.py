@@ -31,18 +31,18 @@ def draw_frame(dev):
         
     if fp.border_show:
         dev.lpolyline(frm.get_frm_xs(), 
-                    frm.get_frm_ys(), 
-                    fp.border_col, 
-                    fp.border_thk*frm.hgt(), closed=True)
+                      frm.get_frm_ys(), 
+                      fp.border_col, 
+                      fp.border_thk*frm.hgt(), closed=True)
         
     if fp.pdombk_show:
-        if fp.pdombk_border:
-            dev.lpolyline(frm.get_pdom_xs(), 
-                        frm.get_pdom_ys(), 
-                        fp.pdombk_lcol, 
-                        fp.pdombk_lthk*frm.hgt(), closed=True)
-                        
         if fp.pdombk_show:
             dev.lpolygon(frm.get_pdom_xs(), 
                         frm.get_pdom_ys(), 
                         lcol=None, lthk=None, fcol=fp.pdombk_fcol)
+                        
+        if fp.pdombk_border:
+            dev.lpolyline(frm.get_pdom_xs(), 
+                          frm.get_pdom_ys(), 
+                          fp.pdombk_lcol, 
+                          fp.pdombk_lthk*frm.hgt(), closed=True)
