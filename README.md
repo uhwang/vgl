@@ -6,7 +6,7 @@ Vector Graphic Library for Python
 ![Slide2](https://user-images.githubusercontent.com/43251090/229162160-5899a185-4e94-4ea9-90c9-81a33428163b.PNG)
 
 ## Screenshot
-![screenshot](https://user-images.githubusercontent.com/43251090/229262519-20975306-abd1-4048-93cf-4eb76aad2e43.jpg)
+![screenshot](https://user-images.githubusercontent.com/43251090/229262896-74e7e29e-d644-4df0-9802-7ffccbdde409.jpg)
 
 ```Python
 # Screenshot.py
@@ -128,9 +128,9 @@ t1 = 0
 t2 = 2*np.pi*max_freq
 dt = (t2-t1)/(dur*fps)
 
-tt = np.arange(t1, t2, dt)
 fpx = lambda a,t : a*(t-math.sin(t))
 fpy = lambda a,t : a*(1-math.cos(t))
+
 tt = np.arange(t1, t2, dt)
 xcy = np.array([fpx(r1, t) for t in tt])
 ycy = np.array([fpy(r1, t) for t in tt])
@@ -140,12 +140,12 @@ frm_20.set_bk_show(True)
 frm_20.set_pdom_bk_show(True)
 frm_20.show_xgrid()
 frm_20.show_ymajor_grid()
-frm_20.set_bk_color(vgl.color.Color(200, 180, 100))
+frm_20.set_bk_color(vgl.color.CYAN)
 
 def plot_cycloid(dev):
     vgl.draw_frame(dev)
     vgl.draw_axis(dev)
-    dev.polyline(xcy,ycy,vgl.color.BLUE, dev.frm.hgt()*0.009)
+    dev.polyline(xcy,ycy,vgl.color.MAGENTA, dev.frm.hgt()*0.02)
     
 def save_cairo(fname):
     dev = vgl.DeviceCairo(fname, fmm.get_gbbox(), 300)
