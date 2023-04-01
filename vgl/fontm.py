@@ -8,40 +8,76 @@
 # Email : uhwangtx@gmail.com
 #
 
-from font import romans           # FONT_ROMANSIMPLEX        = 0
-from font import romand           # FONT_ROMANDUPLEX         = 1
-from font import romant           # FONT_ROMANTRIPLEX        = 2
-from font import cursive          # FONT_CURSIVE             = 3
-from font import futural          # FONT_FUTURAL             = 4
-from font import futuram          # FONT_FUTURAM             = 5
-from font import timesr           # FONT_TIMESROMAN          = 6
-from font import timesrb          # FONT_TIMESROMANBOLD      = 7
-from font import timesg           # FONT_TIMESGREEK          = 8
-from font import timesi           # FONT_TIMESITALIAN        = 9
-from font import timesib          # FONT_TIMESITALIANBOLD    = 10
-from font import gothgbt          # FONT_GOTHENGTRIPLEX      = 11
-from font import gothgrt          # FONT_GOTHGERMANTRIPLEX   = 12
-from font import gothiceng        # FONT_GOTHENGLISH         = 13
-from font import gothicger        # FONT_GOTHGERMAN          = 14
-from font import gothicita        # FONT_GOTHITALIAN         = 15
-from font import gothitt          # FONT_GOTHITALIANTRIPLEX  = 16
-from font import greek            # FONT_GREEK               = 17
-from font import greekc           # FONT_GREEKCOMPLEX        = 18
-from font import greeks           # FONT_GREEKSIMPLEX        = 19
-from font import mathlow          # FONT_MATHLOW             = 20
-from font import mathupp          # FONT_MATHUPPER           = 31
-from font import mathsymbol       # FONT_MATHSYMBOL          = 32
-from font import scriptc          # FONT_SCRIPTCOMPLEX       = 33
-from font import scripts          # FONT_SCRIPTSIMPLEX       = 34
-from font import symbol           # FONT_SYMBOL              = 35
-from font import marker           # FONT_MARKER              = 36
-from font import astrology        # FONT_ASTROLOGY           = 37
-from font import cyillic          # FONT_CYILLIC             = 38
-from font import cyrilc1          # FONT_CYILLIC1            = 39
-from font import meteorology      # FONT_METEOROLOGY         = 30
-from font import music            # FONT_MUSIC               = 31
+from .font import romans           # FONT_ROMANSIMPLEX        = 0
+from .font import romand           # FONT_ROMANDUPLEX         = 1
+from .font import romant           # FONT_ROMANTRIPLEX        = 2
+from .font import cursive          # FONT_CURSIVE             = 3
+from .font import futural          # FONT_FUTURAL             = 4
+from .font import futuram          # FONT_FUTURAM             = 5
+from .font import timesr           # FONT_TIMESROMAN          = 6
+from .font import timesrb          # FONT_TIMESROMANBOLD      = 7
+from .font import timesg           # FONT_TIMESGREEK          = 8
+from .font import timesi           # FONT_TIMESITALIAN        = 9
+from .font import timesib          # FONT_TIMESITALIANBOLD    = 10
+from .font import gothgbt          # FONT_GOTHENGTRIPLEX      = 11
+from .font import gothgrt          # FONT_GOTHGERMANTRIPLEX   = 12
+from .font import gothiceng        # FONT_GOTHENGLISH         = 13
+from .font import gothicger        # FONT_GOTHGERMAN          = 14
+from .font import gothicita        # FONT_GOTHITALIAN         = 15
+from .font import gothitt          # FONT_GOTHITALIANTRIPLEX  = 16
+from .font import greek            # FONT_GREEK               = 17
+from .font import greekc           # FONT_GREEKCOMPLEX        = 18
+from .font import greeks           # FONT_GREEKSIMPLEX        = 19
+from .font import mathlow          # FONT_MATHLOW             = 20
+from .font import mathupp          # FONT_MATHUPPER           = 31
+from .font import mathsymbol       # FONT_MATHSYMBOL          = 32
+from .font import scriptc          # FONT_SCRIPTCOMPLEX       = 33
+from .font import scripts          # FONT_SCRIPTSIMPLEX       = 34
+from .font import symbol           # FONT_SYMBOL              = 35
+from .font import marker           # FONT_MARKER              = 36
+from .font import astrology        # FONT_ASTROLOGY           = 37
+from .font import cyillic          # FONT_CYILLIC             = 38
+from .font import cyrilc1          # FONT_CYILLIC1            = 39
+from .font import meteorology      # FONT_METEOROLOGY         = 30
+from .font import music            # FONT_MUSIC               = 31
 
-import vgl.fontid as ids
+from . import fontid as ids
+
+#from font import romans           # FONT_ROMANSIMPLEX        = 0
+#from font import romand           # FONT_ROMANDUPLEX         = 1
+#from font import romant           # FONT_ROMANTRIPLEX        = 2
+#from font import cursive          # FONT_CURSIVE             = 3
+#from font import futural          # FONT_FUTURAL             = 4
+#from font import futuram          # FONT_FUTURAM             = 5
+#from font import timesr           # FONT_TIMESROMAN          = 6
+#from font import timesrb          # FONT_TIMESROMANBOLD      = 7
+#from font import timesg           # FONT_TIMESGREEK          = 8
+#from font import timesi           # FONT_TIMESITALIAN        = 9
+#from font import timesib          # FONT_TIMESITALIANBOLD    = 10
+#from font import gothgbt          # FONT_GOTHENGTRIPLEX      = 11
+#from font import gothgrt          # FONT_GOTHGERMANTRIPLEX   = 12
+#from font import gothiceng        # FONT_GOTHENGLISH         = 13
+#from font import gothicger        # FONT_GOTHGERMAN          = 14
+#from font import gothicita        # FONT_GOTHITALIAN         = 15
+#from font import gothitt          # FONT_GOTHITALIANTRIPLEX  = 16
+#from font import greek            # FONT_GREEK               = 17
+#from font import greekc           # FONT_GREEKCOMPLEX        = 18
+#from font import greeks           # FONT_GREEKSIMPLEX        = 19
+#from font import mathlow          # FONT_MATHLOW             = 20
+#from font import mathupp          # FONT_MATHUPPER           = 31
+#from font import mathsymbol       # FONT_MATHSYMBOL          = 32
+#from font import scriptc          # FONT_SCRIPTCOMPLEX       = 33
+#from font import scripts          # FONT_SCRIPTSIMPLEX       = 34
+#from font import symbol           # FONT_SYMBOL              = 35
+#from font import marker           # FONT_MARKER              = 36
+#from font import astrology        # FONT_ASTROLOGY           = 37
+#from font import cyillic          # FONT_CYILLIC             = 38
+#from font import cyrilc1          # FONT_CYILLIC1            = 39
+#from font import meteorology      # FONT_METEOROLOGY         = 30
+#from font import music            # FONT_MUSIC               = 31
+#
+#import fontid as ids
+
 
 class FontManager():
 	def __init__(self):
@@ -92,11 +128,11 @@ class FontManager():
 
 font_manager = FontManager()
 #def test():
-
-def main():
-	fm = FontManager()
-	ff = fm.get_font(0)
-	print(ff[0])
-
-if __name__ == '__main__':
-	main()
+#
+#def main():
+#	fm = FontManager()
+#	ff = fm.get_font(0)
+#	print(ff[0])
+#
+#if __name__ == '__main__':
+#	main()

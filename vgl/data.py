@@ -43,13 +43,16 @@ class Data():
         self.zmin+=dz 
         self.zmax+=dz
         
-    def get_xrange(self): return self.xmax-self.xmin
-    def get_yrange(self): return self.ymax-self.ymin
+    def get_xrange(self): return self.xrange()
+    def get_yrange(self): return self.yrange()
     def get_zrange(self): return self.zmax-self.zmin
     def set_yrange(self, ymin, ymax): 
         self.ymin = ymin
         self.ymax = ymax
         
+    def xrange(self): return self.xmax-self.xmin
+    def yrange(self): return self.ymax-self.ymin
+    
     def xcenter(self): return self.xmin+(self.xmax-self.xmin)*0.5
     def ycenter(self): return self.ymin+(self.ymax-self.ymin)*0.5
    

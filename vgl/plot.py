@@ -8,10 +8,13 @@
 # Email : uhwangtx@gmail.com
 #
 
-from vgl import color, mesh3d, text
 import numpy as np
 from operator import itemgetter
 import math
+
+from . import color, mesh3d, text
+#import color, mesh3d, text
+
 
 def draw_surface_normal(dev, v3d, mesh, f, N):
 	c,d = mesh3d.compute_face_center(f, mesh.tnode)

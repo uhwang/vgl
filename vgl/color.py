@@ -116,3 +116,21 @@ def hsv(H, S, V):
 	B = int(B1 * 255)
 
 	return Color(R,G,B)
+    
+    
+    
+def create_color_table(H1, H2, S, V, order):
+	cbtl = [(0,0,0)]*order
+	dH, tempH=0,0
+	
+	if H1 > H2:
+		H1, H2 = H2, H1
+
+	dH = (H2 - H1)/order
+	tempH = H1
+
+	for i in range(order):
+		cbtl[i] = hsv(tempH, S, V)
+		tempH += dH;
+
+	return cbtl    

@@ -30,6 +30,7 @@ from . devpdf    import *
 from . drvemf    import *
 from . drvpdf    import *
 from . emfconst  import *
+from . paper     import *
 
 #from . import frame     
 #from . import data      

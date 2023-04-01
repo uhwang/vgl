@@ -52,8 +52,8 @@ class FrameProperty():
         self.border_col   = color.BLACK
         self.border_thk   = 0.001
         self.bk_color     = color.WHITE
-        self.bk_show      = True
-        self.pdombk_show  = True
+        self.bk_show      = False
+        self.pdombk_show  = False
         self.pdombk_border= True
         self.pdombk_lcol  = color.BLACK
         self.pdombk_fcol  = color.WHITE
@@ -173,6 +173,10 @@ class Frame():
     def get_yaxis   (self): return self.yaxis
     def get_pdom_wid(self): return self.pdom.wid
     def get_pdom_hgt(self): return self.pdom.hgt
+    def set_bk_show(self, show): self.fprt.bk_show=show
+    def set_bk_color(self,fcol): self.fprt.bk_color=fcol
+    def set_pdom_bk_show(self, show): self.fprt.pdombk_show=show
+    def set_pdom_bk_color(self, fcol): self.fprt.pdombk_fcol=fcol
     def update_pdom (self, xm=default_plot_domain_xmargin, 
                         ym=default_plot_domain_ymargin):
         wid = self.bbox.wid()

@@ -3,8 +3,11 @@
 import numpy as np
 import math
 import re
-from vgl.linetype import *
-from vgl import color
+
+from .linetype import *
+from . import color
+#from linetype import *
+#import color
 
 MESH_WIREFRAME  = 0x0001
 MESH_HIDDENLINE = 0x0002

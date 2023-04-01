@@ -9,8 +9,10 @@
 #
 
 import numpy as np
-import vgl.geom as geom
-from vgl.util import deg_to_rad, rad_to_deg
+
+from . import geom
+#import geom
+from .util import deg_to_rad, rad_to_deg
 
 class Rotation():
 	def __init__(self):

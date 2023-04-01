@@ -248,6 +248,7 @@ class Axis(LineLevelA):
     def get_major_tick(self): return self.major_tick	
     def get_minor_tick(self): return self.minor_tick
     def get_range(self): return (self.max-self.min)
+    def get_minmax(self): return self.min, self.max
     def get_label(self): return self.label
     #def get_ylabel(self): return self.ylabel
     
