@@ -128,15 +128,9 @@ t1 = 0
 t2 = 2*np.pi*max_freq
 dt = (t2-t1)/(dur*fps)
 
-fpx = lambda a,t : a*(t-math.sin(t))
-fpy = lambda a,t : a*(1-math.cos(t))
-
 tt = np.arange(t1, t2, dt)
-x = np.array([fpx(r1, t) for t in tt])
-y = np.array([fpy(r1, t) for t in tt])
 fpx = lambda a,t : a*(t-math.sin(t))
 fpy = lambda a,t : a*(1-math.cos(t))
-
 tt = np.arange(t1, t2, dt)
 xcy = np.array([fpx(r1, t) for t in tt])
 ycy = np.array([fpy(r1, t) for t in tt])
