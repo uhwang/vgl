@@ -57,10 +57,10 @@ class DevicePDF(device.DeviceVector):
             exp = ex*drvpdf._points_inch
             eyp = ey*drvpdf._points_inch
         else:
-            sxp = sx
-            syp = sy
-            exp = ex
-            eyp = ey
+            sxp = self._x_viewport(sx)*drvpdf._points_inch
+            syp = self._y_viewport(sy)*drvpdf._points_inch
+            exp = self._x_viewport(ex)*drvpdf._points_inch
+            eyp = self._y_viewport(ey)*drvpdf._points_inch
             
         if isinstance(lpat, linepat.LinePattern):
             self.polyline(xx,yy,lcol,lthk,lpat,viewport=True)
@@ -69,7 +69,7 @@ class DevicePDF(device.DeviceVector):
                 self.dev.MoveTo(sxp, syp)
                 self.dev.LineTo(exp, eyp)
             else:
-                self.polyline(xx,yy,lcol,lthk,linepat._PAT_SOLID,viewport=True)
+                self.polyline(xx,yy,lcol,lthk,linepat._PAT_SOLID,viewport=viewport)
         
     def _moveto(self, x, y, viewport=False):
         if viewport:
