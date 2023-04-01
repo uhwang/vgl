@@ -34,6 +34,8 @@ class DevicePDF(device.DeviceVector):
         self.frm = frm
         self.set_plot(frm,extend)
 
+    def stroke(self):
+        pass
     def fill_white(self):
         return
         
