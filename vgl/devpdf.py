@@ -6,12 +6,6 @@
     
 '''
 
-'''
-    devemf.py
-
-
-''' 
-
 import numpy as np
 from . import color
 from . import device
