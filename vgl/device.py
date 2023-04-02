@@ -92,17 +92,21 @@ class DeviceVector():
                 wid_viewport != hgt_viewport:
                     if hgt_viewport < wid_viewport:
                         xmax = xmin+wid_viewport/self.yscale_viewport
+                        self.xscale_viewport = self.yscale_viewport
                     else:
                         ymax = ymin+hgt_viewport/self.xscale_viewport
+                        self.yscale_viewport = self.xscale_viewport
                 else:
                     if xrange_world < yrange_world:
                         # vertically long and horizontally narrow mesh
                         # adjust x-axis maximum value
                         xmax = xmin+wid_viewport/self.yscale_viewport
+                        self.xscale_viewport = self.yscale_viewport
                     elif xrange_world > yrange_world:
                         # vertically short and horizontally wide mesh
                         # adjust y-axis maximum value
                         ymax = ymin+hgt_viewport/self.xscale_viewport
+                        self.yscale_viewport = self.xscale_viewport
             elif extend==_FIT_EXTEND_Y:
                 # long x range, long plot domain in x dir
                 # rectangular plot domain in x dir
