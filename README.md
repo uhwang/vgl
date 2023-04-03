@@ -166,13 +166,15 @@ def save(dev):
     
     dev.close()
 
-dev_img = vgl.DeviceCairo("screenshot.jpg", fmm.get_gbbox(), 300)
+dev_img = vgl.DeviceCairo("screenshot.jpg", fmm.get_gbbox(),300)
 dev_pdf = vgl.DevicePDF("screenshot.pdf", fmm.get_gbbox())
-dev_wmf = vgl.DeviceWindowsMetafile("screenshot.wmf", fmm.get_gbbox())
-dev_emf = vgl.DeviceEnhancedMetafile("screenshot.emf", fmm.get_gbbox())
+dev_wmf = vgl.DeviceWMF("screenshot.wmf", fmm.get_gbbox())
+dev_emf = vgl.DeviceEMF("screenshot.emf", fmm.get_gbbox())
+dev_svg = vgl.DeviceSVG("screenshot.svg", fmm.get_gbbox(),300)
     
 save(dev_img)
 save(dev_pdf)
 save(dev_wmf)
 save(dev_emf)
+save(dev_svg)
 ```
