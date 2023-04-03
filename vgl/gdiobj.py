@@ -23,3 +23,16 @@ class Brush():
     def set_brush(self, fcol):
         self.fcol = fcol
         
+class StreamPen(Pen):
+    def __init__(self):
+        self.buf = []
+        
+class PDFPen(StreamPen):
+    def __init__(self):
+        super().__init__()
+        self.obj_index = 0
+        
+    def set_pen(self, lcol, lthk, obj_index):
+        super().set_pen(lcol,lthk)
+        self.obj_index = obj_index
+               

@@ -12,7 +12,7 @@ from . import linepat
 from . import patline
 from . import gdiobj
 
-class DeviceWindowsMetafile(device.DeviceVector):
+class DeviceWMF(device.DeviceVector):
     def __init__(self, fname, gbox):
         super().__init__()
         self.gbox =gbox
@@ -244,3 +244,6 @@ class DeviceWindowsMetafile(device.DeviceVector):
     def close(self):
         self.dev.CloseMetafile()
 
+class DeviceWindowsMetafile(DeviceWMF):
+    def __init__(self, fname, gbox):
+        super().__init__(fname, gbox)

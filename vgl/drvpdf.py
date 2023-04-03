@@ -56,16 +56,6 @@ _pdf_header = "%PDF-1.7\n"
 _points_inch = 72
 _CTM = "1 0 0 -1 0 %3.4f cm\n"
 
-class pdf_pen(gdiobj.Pen):
-    def __init__(self):
-        super().__init__()
-        self.obj_index = 0
-        self.buf = []
-        
-    def set_pen(self, lcol, lthk, obj_index):
-        super().set_pen(lcol,lthk)
-        self.obj_index = obj_index
-        
 class PDFDriver():
     def __init__(self, fname, gbbox, wid, hgt):
         self.start_obj_index = 3
@@ -86,7 +76,7 @@ class PDFDriver():
     def MakePen(self, lcol, lthk):
         self.cur_obj_index += 1
         lc = color.normalize(lcol)
-        self.pen = pdf_pen()
+        self.pen = gdiobj.PDFPen()
         self.pen.set_pen(lc, lthk, self.cur_obj_index)
 
     def DeletePen(self):

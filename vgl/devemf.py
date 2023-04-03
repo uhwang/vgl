@@ -12,7 +12,7 @@ from . import linepat
 from . import patline
 from . import gdiobj
 
-class DeviceEnhancedMetafile(device.DeviceRaster):
+class DeviceEMF(device.DeviceRaster):
     def __init__(self, fname, gbox, dpi=300):
         super().__init__(gbox, dpi)
         self.gbox =gbox
@@ -220,3 +220,7 @@ class DeviceEnhancedMetafile(device.DeviceRaster):
     def close(self):
         self.dev.CloseMetafile()
 
+class DeviceEnhancedMetafile(DeviceEMF):
+    def __init__(self, fname, gbox, dpi=300):
+        super().__init__(fname, gbox, dpi)
+        

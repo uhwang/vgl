@@ -27,6 +27,7 @@ from . devwmf    import *
 from . devemf    import *
 from . devcairo  import *
 from . devpdf    import *
+from . devsvg    import *
 from . drvemf    import *
 from . drvpdf    import *
 from . emfconst  import *
