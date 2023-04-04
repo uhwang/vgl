@@ -146,8 +146,8 @@ class DeviceSVG(device.DeviceRaster):
                         self.get_yl(ey)))
             else:
                 if self.pen:
-                    self.lmoveto(sx,sy)
-                    self.llineto(ex,ey)
+                    self.moveto(sx,sy)
+                    self.lineto(ex,ey)
                 else:            
                     self.fp.write(_line_format_begin%(\
                         self._x_pixel(sx),
