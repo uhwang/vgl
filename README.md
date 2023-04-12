@@ -3,7 +3,7 @@ Vector Graphic Library for Python
 
 # Introduction
 ## Plotting Engine
-![Slide2](https://user-images.githubusercontent.com/43251090/229162160-5899a185-4e94-4ea9-90c9-81a33428163b.PNG)
+![VGL](https://user-images.githubusercontent.com/43251090/231316558-c2f53f7d-13c4-4ce3-bf0c-f23de6e36060.jpg)
 
 ## Screenshot
 ![screenshot](https://user-images.githubusercontent.com/43251090/229310460-f6ff7567-4b2d-4e27-b041-45ad96263086.jpg)
