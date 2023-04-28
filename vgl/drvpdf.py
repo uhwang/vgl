@@ -47,7 +47,7 @@
         W*: 
         ex) W n
 '''
-
+import zlib
 from . import size
 from . import color
 from . import gdiobj
@@ -57,7 +57,7 @@ _points_inch = 72
 _CTM = "1 0 0 -1 0 %3.4f cm\n"
 
 class PDFDriver():
-    def __init__(self, fname, gbbox, wid, hgt):
+    def __init__(self, fname, gbbox, wid, hgt, compression=False):
         self.start_obj_index = 3
         self.cur_obj_index = self.start_obj_index
         self.body=[]
@@ -69,6 +69,7 @@ class PDFDriver():
         self.pen = None
         self.clip_region = None
         self.gbbox = gbbox
+        self.compression = compression
         #self.prv_pen = bdiobj.Pen()
         self.fp = open(fname, "wb")
         #self.set_pdf(wid, hgt)
@@ -88,11 +89,22 @@ class PDFDriver():
         for p in self.pen.buf:
             buffer_2_list.append(p)
         buffer_2_list.append("S\nQ\n")
-        buffer_2 = ''.join(buffer_2_list)
+        
+        #buffer_2 = ''.join(buffer_2_list)
+        if self.compression:
+            buffer_2 = zlib.compress(bytes(''.join(buffer_2_list), 'utf-8'))
+        else:
+            buffer_2 = bytes(''.join(buffer_2_list), 'utf-8')
+
             
-        buffer_1 = "%d 0 obj\n<</Length %d>>\nstream\n"%(self.pen.obj_index,len(buffer_2))
+        buffer_1 = "%d 0 obj\n<<\n/Length %d\n%s\n>>\nstream\n"%(
+                    self.pen.obj_index,
+                    len(buffer_2),
+                    "/Filter [/FlateDecode]" if self.compression else "")
         buffer_3 = "endstream\nendobj\n"
-        self.obj_list[self.cur_obj_index] = bytes(buffer_1+buffer_2+buffer_3,'utf-8')
+        self.obj_list[self.cur_obj_index] = bytes(buffer_1,'utf-8')+\
+                                            buffer_2+\
+                                            bytes(buffer_3,'utf-8')
         self.pen = None
 
     def MoveTo(self, x, y):
@@ -143,12 +155,19 @@ class PDFDriver():
         else:
             buffer_2_list.append("S\nQ\n")     # stroke and restoreDC
             
-        buffer_2 = ''.join(buffer_2_list)
-        buffer_1 = "%d 0 obj\n<</Length %d>>\nstream\n"%(
+        if self.compression:
+            buffer_2 = zlib.compress(bytes(''.join(buffer_2_list), 'utf-8'))
+        else:
+            buffer_2 = bytes(''.join(buffer_2_list), 'utf-8')
+            
+        buffer_1 = "%d 0 obj\n<<\n/Length %d\n%s\n>>\nstream\n"%(
                     self.cur_obj_index,
-                    len(buffer_2))
+                    len(buffer_2),
+                    "/Filter [/FlateDecode]" if self.compression else "")
         buffer_3 = "endstream\nendobj\n"
-        self.obj_list[self.cur_obj_index] = bytes(buffer_1+buffer_2+buffer_3,'utf-8')
+        self.obj_list[self.cur_obj_index] = bytes(buffer_1,'utf-8')+\
+                                            buffer_2+\
+                                            bytes(buffer_3,'utf-8')
         
     def Polygon(self, x, y, lcol, lthk, fcol):
         self.Polyline(x,y,lcol,lthk,fcol,True)
@@ -160,14 +179,7 @@ class PDFDriver():
         obj2 = "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1>>\nendobj\n"
         obj3_list = ["3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n"\
                      "/MediaBox [%3.4f %3.4f %3.4f %3.4f]\n"\
-                     #"/CropBox[%3.4f %3.4f %3.4f %3.4f]\n"\
                      "/Contents [\n"%\
-                     #"/MediaBox [%3.4f %3.4f %3.4f %3.4f]\n/Contents [\n"%\
-                     #(self.gbbox.sx*_points_inch, 
-                     # self.gbbox.sy*_points_inch, 
-                     # self.gbbox.ex*_points_inch, 
-                     # self.gbbox.ey*_points_inch)]
-                     #(0, 0, ex, ey)]
                       (0, 0, ex, ey)]
         r_list = ""
         for i, k in enumerate(self.obj_list.keys()):
