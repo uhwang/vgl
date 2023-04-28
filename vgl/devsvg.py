@@ -19,7 +19,7 @@ from . import linepat
 from . import patline
 from . import gdiobj
 
-_line_format_begin = "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" "
+_line_format_begin = "<line x1=\"%3.3f\" y1=\"%3.3f\" x2=\"%3.3f\" y2=\"%3.3f\" "
 _line_format_end = " style=\"fill:none;stroke:rgb(%d,%d,%d);stroke-width:%d\" />\n"
 _polygon_format_end = "style=\"stroke:rgb(%d,%d,%d);stroke-width:%d;fill:rgb(%d,%d,%d);\"/>\n"
 _polygon_format_end_nostroke = "style=\"stroke:none;fill:rgb(%d,%d,%d);\"/>\n"
@@ -64,7 +64,7 @@ class DeviceSVG(device.DeviceRaster):
         
     def delete_pen(self):
         for i, item in enumerate(self.pen.buf):
-            self.fp.write("%s %d %d,"%(item[0], item[1], item[2]))
+            self.fp.write("%s %3.3f %3.3f,"%(item[0], item[1], item[2]))
             if (i+1)%_points_per_line == 0:
                 self.fp.write(_next_line)
         
@@ -93,21 +93,21 @@ class DeviceSVG(device.DeviceRaster):
             
     def _write_polypoints(self, x, y):
         for i, (x1, y1) in enumerate(zip(x,y)):
-            self.fp.write("%d %d,"%(x1,y1))
+            self.fp.write("%3.3f %3.3f,"%(x1,y1))
             if (i+1)%_points_per_line == 0:
                 self.fp.write(_next_line)
         #self.fp.write("\"\n")
         
     def _write_pathpoints(self, x, y):
-        self.fp.write("M %d %d "%(x[0],y[0]))
+        self.fp.write("M %3.3f %3.3f "%(x[0],y[0]))
         for i, (x1, y1) in enumerate(zip(x[1:],y[1:])):
-            self.fp.write("L %d %d "%(x1,y1))
+            self.fp.write("L %3.3f %3.3f "%(x1,y1))
             if (i+1)%_points_per_line == 0:
                 self.fp.write(_next_line)
         
     def create_pnt_list(self, x, y, convx, convy):
         for i, (x1, y1) in enumerate(zip(x, y)):
-            self.fp.write("%d %d, "%(int(convx(x1)), int(convy(y1))))
+            self.fp.write("%3.3f %3.3f, "%(convx(x1), convy(y1)))
             if (i+1)%_points_per_line == 0:
                 self.fp.write(_next_line)
         self.fp.write("\"\n")    
