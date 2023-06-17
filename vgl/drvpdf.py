@@ -55,6 +55,7 @@ from . import gdiobj
 _pdf_header = "%PDF-1.7\n"
 _points_inch = 72
 _CTM = "1 0 0 -1 0 %3.4f cm\n"
+_default_nobj = 3
 
 class PDFDriver():
     def __init__(self, fname, gbbox, wid, hgt, compression=False):
@@ -225,7 +226,9 @@ class PDFDriver():
         for v in obj_pos:
             self.fp.write(bytes("%010d 00000 n\n"%(v),'utf-8'))
             
-        self.fp.write(bytes("trailer<<Size %d/Root 1 0 R>>\n"%len(self.obj_list),'utf-8'))
+        total_obj = len(self.obj_list)+_default_nobj
+        self.fp.write(bytes("trailer<</Size %d/Root 1 0 R>>\n"%
+            total_obj,'utf-8'))
         self.fp.write(bytes("startxref\n%d\n"%start_xref,'utf-8'))
         self.fp.write(bytes("%%EOF",'utf-8'))
         self.fp.close()
