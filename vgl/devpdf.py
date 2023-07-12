@@ -15,12 +15,12 @@ from . import patline
 from . import paper
 
 class DevicePDF(device.DeviceVector):
-    def __init__(self, fname, gbox, p=(8.5,11.0)):
+    def __init__(self, fname, gbox, p=(8.5,11.0), compression=False):
         super().__init__()
         self.gbox =gbox
         self.wid = p[0]        
         self.hgt = p[1]        
-        self.dev = drvpdf.PDFDriver(fname, gbox, p[0], p[1])
+        self.dev = drvpdf.PDFDriver(fname, gbox, p[0], p[1], compression)
         self.pen = False
         self.brush = device.Brush()
 
@@ -57,7 +57,8 @@ class DevicePDF(device.DeviceVector):
             eyp = self._y_viewport(ey)*drvpdf._points_inch
             
         if isinstance(lpat, linepat.LinePattern):
-            self.polyline(xx,yy,lcol,lthk,lpat,viewport=True)
+            self.polyline(xx,yy,lcol,lthk,lpat,viewport)
+            #self.polyline(xx,yy,lcol,lthk,lpat,viewport=True)
         else:
             if self.pen:
                 self.dev.MoveTo(sxp, syp)
@@ -181,14 +182,18 @@ class DevicePDF(device.DeviceVector):
             self.dev.Polyline(px,py,lcol,_lthk,fcol=None,closed=False)
     
         if lcol and pat_inst:
-            if isinstance(x, np.ndarray):
-                xp = np.append(x, x[0])
-                yp = np.append(y, y[0])
-            elif isinstance(x, list):
-                xp = x.copy()
-                yp = y.copy()
-                xp.append(x[0])
-                yp.append(y[0])
+            if closed: 
+                if isinstance(x, np.ndarray):
+                    xp = np.append(x, x[0])
+                    yp = np.append(y, y[0])
+                elif isinstance(x, list):
+                    xp = x.copy()
+                    yp = y.copy()
+                    xp.append(x[0])
+                    yp.append(y[0])
+            else:
+                xp, yp = x, y
+                
             if viewport:
                 pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
             else:

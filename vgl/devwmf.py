@@ -46,6 +46,8 @@ class DeviceWMF(device.DeviceVector):
         self.brush.fcol = None
         
     def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+        if lcol:
+            self.dev.MakePen(lcol, lthk)
     
         if isinstance(lpat, linepat.LinePattern):
             xp = [sx, ex]
@@ -54,13 +56,16 @@ class DeviceWMF(device.DeviceVector):
             for p1 in pat_seg:
                 x1 = [ p2[0] for p2 in p1 ]
                 y1 = [ p2[1] for p2 in p1 ]
-                self.dev.Polyline(x1, y1) 
+                self.dev.Polyline(x1, y1, closed=False) 
         else:
             x1 = self._x_viewport(sx)
             y1 = self._y_viewport(sy)
             x2 = self._x_viewport(ex)
             y2 = self._y_viewport(ey)
             self.dev.Line(x1, y1, x2, y2, lcol, lthk)
+            
+        if lcol:
+            self.dev.DeletePen()
 
     def stroke(self):
         return
@@ -228,7 +233,7 @@ class DeviceWMF(device.DeviceVector):
             for p1 in pat_seg:
                 x1 = [ p2[0] for p2 in p1 ]
                 y1 = [ p2[1] for p2 in p1 ]
-                self.dev.Polyline(x1, y1)
+                self.dev.Polyline(x1, y1, closed)
         else:        
             self.dev.Polyline(x, y, closed)
         

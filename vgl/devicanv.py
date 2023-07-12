@@ -74,11 +74,7 @@ class DeviceIPycanvas(device.DeviceRaster):
         self.canvas
         
     def create_pnt_list(self, x, y, convx, convy):
-        #self.points = np.zeros((npnt, 2), dtype=np.uint16)
-        #for i, (x1, y1) in enumerate(zip(x, y)):
-        #    self.points[i][0] = convx(x1)
-        #    self.points[i][1] = convy(y1)
-        self.points= [[convx(x[j]), convy(y[j])] for j in range(len(y))]
+        self.points= [[convx(x1), convy(y1)] for x1, y1 in zip(x,y)]
             
     def draw_geometry(self, lcol, lthk, fcol):
 
@@ -145,13 +141,26 @@ class DeviceIPycanvas(device.DeviceRaster):
         #self.polygon(px, py, sym.lcol, sym.lthk, sym.fcol)
         self.draw_geometry(sym.lcol, sym.lthk, sym.fcol)
 
-    def line(self, sx, sy, ex, ey, lcol=None, lthk=None):
-        if lcol: self.make_pen(lcol, lthk)
-        
-        x1 = int(self._x_pixel(sx))
-        y1 = int(self._y_pixel(sy))
-        x2 = int(self._x_pixel(ex))
-        y2 = int(self._y_pixel(ey))
+    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+        if lcol: 
+            self.make_pen(lcol, lthk)
+            
+        if isinstance(lpat, linepat.LinePattern):
+            xp = [sx, ex]
+            yp = [sy, ey]
+            pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
+            for p1 in pat_seg:
+                x1 = [ p2[0] for p2 in p1 ]
+                y1 = [ p2[1] for p2 in p1 ]
+                self.cntx.move_to(self.get_xl(x1[0]),self.get_yl(y1[0]))
+                for x2, y2 in zip(x1, y1):
+                    self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
+                self.cntx.stroke()
+        else:        
+            x1 = int(self._x_pixel(sx))
+            y1 = int(self._y_pixel(sy))
+            x2 = int(self._x_pixel(ex))
+            y2 = int(self._y_pixel(ey))
         
         self.canvas.stroke_line(x1, y1, x2, y2)
         

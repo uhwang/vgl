@@ -53,23 +53,25 @@ class DeviceEMF(device.DeviceRaster):
         self.brush.fcol = None
         
     def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
-        self.make_pen(lcol, lthk)
+
         if isinstance(lpat, linepat.LinePattern):
+            if lcol: self.make_pen(lcol, lthk)
             xp = [sx, ex]
             yp = [sy, ey]
             pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
+            
             for p1 in pat_seg:
                 x1 = [int(self.get_xl(p2[0])) for p2 in p1 ]
                 y1 = [int(self.get_yl(p2[1])) for p2 in p1 ]
-                self.dev.Polyline(x1, y1) 
-            self.delete_pen()
+                self.dev.Polyline(x1, y1, closed=False) 
+                
+            if lcol: self.delete_pen()
         else:
             x1 = self._x_pixel(sx)
             y1 = self._y_pixel(sy)
             x2 = self._x_pixel(ex)
             y2 = self._y_pixel(ey)
             self.dev.Line(x1, y1, x2, y2, lcol, int(lthk*self.dpi))
-        self.delete_pen()
         
     def stroke(self):
         return

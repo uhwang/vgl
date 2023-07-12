@@ -6,6 +6,7 @@
 '''
 import numpy as np
 from . import shape
+from . import linepat
 from . import linetype
 from . import util
 from . import color
@@ -76,13 +77,14 @@ def draw_arrow_head(dev, sx, sy, arrow, lcol, lthk, viewport):
     
     sx = dev._x_viewport(sx)
     sy = dev._y_viewport(sy)
-    xs = [sx, sx+arrow.wing_up[0], sx+arrow.wing_down[0], sx]
-    ys = [sy, sy+arrow.wing_up[1], sy+arrow.wing_down[1], sy]
+    xs = [sx+arrow.wing_up[0], sx, sx+arrow.wing_down[0], sx+arrow.wing_up[0]]
+    ys = [sy+arrow.wing_up[1], sy, sy+arrow.wing_down[1], sy+arrow.wing_up[1]]
     
     # open
     if arrow.type_t == _ARROWTYPE_OPEN:
-        dev.lline(sx, sy, sx+arrow.wing_up  [0], sy+arrow.wing_up[1], lcol, lthk)
-        dev.lline(sx, sy, sx+arrow.wing_down[0], sy+arrow.wing_down[1], lcol, lthk)
+        #dev.lline(sx, sy, sx+arrow.wing_up  [0], sy+arrow.wing_up[1], lcol, lthk)
+        #dev.lline(sx, sy, sx+arrow.wing_down[0], sy+arrow.wing_down[1], lcol, lthk)
+        dev.lpolyline(xs[:3], ys[:3], lcol, lthk)
         
     elif arrow.type_t == _ARROWTYPE_CLOSED:
         dev.lpolygon(xs, ys, lcol, lthk, fcol=None)
@@ -101,13 +103,19 @@ class GenericLine(linetype.LineLevelC):
                  sy, 
                  ex, 
                  ey, 
+                 lcol      = color.BLACK,
+                 lthk      = 0.001,
+                 lpat      = linepat._PAT_SOLID,
+                 pat_len   = 0.04,
                  show      = False,
                  col       = color.BLACK,
                  type_t    = _ARROWTYPE_OPEN, 
                  angle     = _arrow_angle, 
                  length    = _arrow_length_1, 
                  viewport  = False):
-        super().__init__()
+                 
+        super().__init__(lcol=lcol, lthk=lthk, lpat=lpat, pat_len=pat_len)
+        
         self.sx = sx
         self.sy = sy
         self.ex = ex
@@ -117,12 +125,25 @@ class GenericLine(linetype.LineLevelC):
                                      show, col, _ARROWPOS_START, type_t, angle, length)
         self.end_arrow   = ArrowHead(frm, sx,sy,ex,ey, 
                                      show, col, _ARROWPOS_END, type_t, angle, length)
-        
+    def __str__(self):
+        return "Lcol : %s\nLthk : %f\nLpat : %s\nPat_len : %f\nShow : %s\n"\
+               "Col  : %s\nType : %s\nAngle: %f\nLength: %f\nViewport : %s"%(
+               str(self.lcol), 
+               self.lthk, 
+               self.lpat, 
+               self.pat_len, 
+               self.end_arrow.show,
+               str(self.end_arrow.col) , 
+               self.end_arrow.type_t, 
+               self.end_arrow.angle, 
+               self.end_arrow.length, 
+               self.viewport)
+    
     def draw(self, dev):
         if self.viewport == False:
-            dev.line(self.sx, self.sy, self.ex, self.ey, self.lcol, self.lthk*dev.frm.hgt())
+            dev.line(self.sx, self.sy, self.ex, self.ey, self.lcol, self.lthk*dev.frm.hgt(), lpat=self.get_line_pattern())
         else:
-            dev.lline(self.sx, self.sy, self.ex, self.ey, self.lcol, self.lthk*dev.frm.hgt())
+            dev.lline(self.sx, self.sy, self.ex, self.ey, self.lcol, self.lthk*dev.frm.hgt(), lpat=self.get_line_pattern())
 
         if self.begin_arrow.show:
             acol = self.lcol if self.begin_arrow.col == self.lcol\
@@ -143,15 +164,19 @@ class ArrowLine(GenericLine):
                  sy, 
                  ex, 
                  ey, 
-                 show    = True,
-                 col     = color.BLACK,
-                 type_t  = _ARROWTYPE_OPEN, 
-                 angle   = _arrow_angle, 
-                 length  = _arrow_length_1, 
-                 viewport= False):
+                 lcol     = color.BLACK,
+                 lthk     = 0.001,
+                 lpat     = linepat._PAT_SOLID,
+                 pat_len  = 0.04,                 
+                 show     = True,
+                 col      = color.BLACK,
+                 type_t   = _ARROWTYPE_OPEN, 
+                 angle    = _arrow_angle, 
+                 length   = _arrow_length_1, 
+                 viewport = False):
                  
-        super().__init__(frm, sx, sy, ex, ey, 
-                         show, col, type_t, angle, length, viewport)
+        super().__init__(frm, sx, sy, ex, ey, lcol=lcol, lthk=lthk, lpat=lpat, pat_len=pat_len,
+                         show=show, col=col, type_t=type_t, angle=angle, length=length, viewport=viewport)
         
 class BeginArrowLine(GenericLine):
     def __init__(self, 
@@ -160,15 +185,19 @@ class BeginArrowLine(GenericLine):
                  sy, 
                  ex, 
                  ey, 
-                 show   = True,
-                 col    = color.BLACK,
-                 type_t = _ARROWTYPE_OPEN, 
-                 angle  = _arrow_angle, 
-                 length = _arrow_length_1,
-                 viewport=False):
+                 lcol     = color.BLACK,
+                 lthk     = 0.001,
+                 lpat     = linepat._PAT_SOLID,
+                 pat_len  = 0.04,                 
+                 show     = True,
+                 col      = color.BLACK,
+                 type_t   = _ARROWTYPE_OPEN, 
+                 angle    = _arrow_angle, 
+                 length   = _arrow_length_1,
+                 viewport = False):
                  
-        super().__init__(frm, sx, sy, ex, ey, 
-                         show, col, type_t, angle, length, viewport)
+        super().__init__(frm, sx, sy, ex, ey, lcol=lcol, lthk=lthk, lpat=lpat, pat_len=pat_len,
+                         show=show, col=col, type_t=type_t, angle=angle, length=length, viewport=viewport)
         self.end_arrow.show = False
         
 class EndArrowLine(GenericLine):
@@ -178,15 +207,19 @@ class EndArrowLine(GenericLine):
                  sy, 
                  ex, 
                  ey, 
-                 show   = True,
-                 col    = color.BLACK,
-                 type_t = _ARROWTYPE_OPEN, 
-                 angle  = _arrow_angle, 
-                 length = _arrow_length_1,
-                 viewport=False):
+                 lcol     = color.BLACK,
+                 lthk     = 0.001,
+                 lpat     = linepat._PAT_SOLID,
+                 pat_len  = 0.04,                 
+                 show     = True,
+                 col      = color.BLACK,
+                 type_t   = _ARROWTYPE_OPEN, 
+                 angle    = _arrow_angle, 
+                 length   = _arrow_length_1,
+                 viewport = False):
                  
-        super().__init__(frm, sx, sy, ex, ey, 
-                         show, col, type_t, angle, length, viewport)
+        super().__init__(frm, sx, sy, ex, ey, lcol=lcol, lthk=lthk, lpat=lpat, pat_len=pat_len,
+                         show=show, col=col, type_t=type_t, angle=angle, length=length, viewport=viewport)
         self.begin_arrow.show = False
         
         

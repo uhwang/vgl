@@ -128,10 +128,11 @@ class DeviceSVG(device.DeviceRaster):
             for p1 in pat_seg:
                 x1 = [ self.get_xl(p2[0]) for p2 in p1 ]
                 y1 = [ self.get_yl(p2[1]) for p2 in p1 ]
-                if self.pen:
-                    self._write_pathpoints(x1,y1)
-                else:
-                    self._write_polypoints(x1,y1)
+                #if self.pen:
+                #    self._write_pathpoints(x1,y1)
+                #else:
+                #    self._write_polypoints(x1,y1)
+                self._write_pathpoints(x1,y1)
             self.fp.write("\"\n")
         else:
             if viewport:
@@ -164,9 +165,11 @@ class DeviceSVG(device.DeviceRaster):
          
     def lline(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         self._line(x1, y1, x2, y2, lcol, lthk, lpat, True)
+        #self.polyline([x1,x2], [y1,y2], lcol, lthk, lpat, closed=False, viewport=True)
         
     def line(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         self._line(x1, y1, x2, y2, lcol, lthk, lpat, False)
+        #self.polyline([x1,x2], [y1,y2], lcol, lthk, lpat, closed=False, viewport=False)
         
     def _moveto(self, x, y, viewport=False):
         if viewport:
