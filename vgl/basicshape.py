@@ -1,5 +1,7 @@
 '''
-    shapeline.py
+    basicshape.py
+    
+    7/11/2023 Added Arrowed Lines
     
 '''
 import numpy as np
@@ -18,9 +20,9 @@ _ARROWTYPE_DOT          = 0x0006
 _ARROWPOS_START         = 0x0007
 _ARROWPOS_END           = 0x0008
 
-_arrow_angle         = 20 # degree
-_arrow_length_0      = 0.01 # 1/8'
-_arrow_length_1      = 0.05 # 1/4'
+_arrow_angle         = 15 # degree
+_arrow_length_0      = 0.01 # 
+_arrow_length_1      = 0.05 # 
 #_arrowhead_start = "START"
 #_arrowhead_end = "END"
 
@@ -46,6 +48,13 @@ class ArrowHead():
         self.col    = col
         
         self.calculate_pos(frm, sx, sy, ex, ey)
+        
+    def set(self, col, type_t, angle, length):
+        self.type_t = type_t
+        self.angle  = angle # degree
+        self.length = length # length of arrow head
+        self.col    = col
+        
         
     def calculate_pos(self, frm, sx, sy, ex, ey):
     
@@ -74,24 +83,40 @@ def draw_arrow_head(dev, sx, sy, arrow, lcol, lthk, viewport):
     if arrow.type_t == _ARROWTYPE_OPEN:
         dev.lline(sx, sy, sx+arrow.wing_up  [0], sy+arrow.wing_up[1], lcol, lthk)
         dev.lline(sx, sy, sx+arrow.wing_down[0], sy+arrow.wing_down[1], lcol, lthk)
+        
     elif arrow.type_t == _ARROWTYPE_CLOSED:
         dev.lpolygon(xs, ys, lcol, lthk, fcol=None)
+        
     elif arrow.type_t == _ARROWTYPE_CLOSEDFILLED:
         dev.lpolygon(xs, ys, lcol, lthk, fcol=lcol)
+        
     elif arrow.type_t == _ARROWTYPE_CLOSEDBLANK:
         dev.lpolygon(xs, ys, lcol, lthk, fcol=color.WHITE)
 
 # lcol, lthk, len_pat, pat_t
 class GenericLine(linetype.LineLevelC):
-    def __init__(self, frm, sx, sy, ex, ey, viewport=False):
+    def __init__(self, 
+                 frm, 
+                 sx, 
+                 sy, 
+                 ex, 
+                 ey, 
+                 show      = False,
+                 col       = color.BLACK,
+                 type_t    = _ARROWTYPE_OPEN, 
+                 angle     = _arrow_angle, 
+                 length    = _arrow_length_1, 
+                 viewport  = False):
         super().__init__()
         self.sx = sx
         self.sy = sy
         self.ex = ex
         self.ey = ey
         self.viewport = viewport
-        self.begin_arrow = ArrowHead(frm, sx,sy,ex,ey, pos_t=_ARROWPOS_START)
-        self.end_arrow   = ArrowHead(frm, sx,sy,ex,ey, pos_t=_ARROWPOS_END)
+        self.begin_arrow = ArrowHead(frm, sx,sy,ex,ey, 
+                                     show, col, _ARROWPOS_START, type_t, angle, length)
+        self.end_arrow   = ArrowHead(frm, sx,sy,ex,ey, 
+                                     show, col, _ARROWPOS_END, type_t, angle, length)
         
     def draw(self, dev):
         if self.viewport == False:
@@ -112,16 +137,57 @@ class GenericLine(linetype.LineLevelC):
             acol, self.lthk*dev.frm.hgt(), True)
 
 class ArrowLine(GenericLine):
-    def __init__(self, dev, sx, sy, ex, ey, viewport=False):
-        super().__init__(dev, sx, sy, ex, ey, viewport)
+    def __init__(self, 
+                 frm, 
+                 sx, 
+                 sy, 
+                 ex, 
+                 ey, 
+                 show    = True,
+                 col     = color.BLACK,
+                 type_t  = _ARROWTYPE_OPEN, 
+                 angle   = _arrow_angle, 
+                 length  = _arrow_length_1, 
+                 viewport= False):
+                 
+        super().__init__(frm, sx, sy, ex, ey, 
+                         show, col, type_t, angle, length, viewport)
         
 class BeginArrowLine(GenericLine):
-    def __init__(self, dev, sx, sy, ex, ey, viewport=False):
-        super().__init__(dev, sx, sy, ex, ey, viewport)
+    def __init__(self, 
+                 frm, 
+                 sx, 
+                 sy, 
+                 ex, 
+                 ey, 
+                 show   = True,
+                 col    = color.BLACK,
+                 type_t = _ARROWTYPE_OPEN, 
+                 angle  = _arrow_angle, 
+                 length = _arrow_length_1,
+                 viewport=False):
+                 
+        super().__init__(frm, sx, sy, ex, ey, 
+                         show, col, type_t, angle, length, viewport)
         self.end_arrow.show = False
         
 class EndArrowLine(GenericLine):
-    def __init__(self, dev, sx, sy, ex, ey, viewport=False):
-        super().__init__(dev, sx, sy, ex, ey, viewport)
+    def __init__(self, 
+                 frm, 
+                 sx, 
+                 sy, 
+                 ex, 
+                 ey, 
+                 show   = True,
+                 col    = color.BLACK,
+                 type_t = _ARROWTYPE_OPEN, 
+                 angle  = _arrow_angle, 
+                 length = _arrow_length_1,
+                 viewport=False):
+                 
+        super().__init__(frm, sx, sy, ex, ey, 
+                         show, col, type_t, angle, length, viewport)
         self.begin_arrow.show = False
+        
+        
         
