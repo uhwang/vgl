@@ -8,21 +8,37 @@ data = vgl.Data(xmin,xmax,ymin,ymax)
 fmm = vgl.FrameManager()
 frm = fmm.create(1,1,4,4, data)
 frm.show_all_major_grid()
-nth = 20
+nth = 13
 r = 1
 th = np.linspace(0, np.pi*2, nth)
+ctbl = vgl.create_color_table(0,270, 0.8, 1, nth)
+
 arrows = [vgl.basicshape.EndArrowLine(frm, 
             0,0,
             r*np.cos(t),
-            r*np.sin(t)) for t in th]
+            r*np.sin(t),
+            lpat=vgl.linepat._PAT_DASH,
+            col = ctbl[i],
+            #type_t = vgl.basicshape._ARROWTYPE_OPEN) 
+            #type_t = vgl.basicshape._ARROWTYPE_CLOSED) 
+            type_t = vgl.basicshape._ARROWTYPE_CLOSEDFILLED) 
+            for i,t in enumerate(th)]
+
+del arrows[-1]
+
+arrow = vgl.basicshape.EndArrowLine(frm, 
+            0,0, 1, 1,
+            lpat=vgl.linepat._PAT_DASH,
+            col=vgl.color.RED,
+            type_t = vgl.basicshape._ARROWTYPE_CLOSEDFILLED) 
             
 def plot(dev):
-    #vgl.draw_frame(dev)
-    #vgl.draw_axis(dev)
+    vgl.draw_frame(dev)
+    vgl.draw_axis(dev)
+    
+    #arrow.draw(dev)
     
     for a in arrows:
-        a.end_arrow.col = vgl.color.RED
-        a.end_arrow.type_t=vgl.basicshape._ARROWTYPE_CLOSEDFILLED
         a.draw(dev)
         
     dev.close()
