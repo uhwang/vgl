@@ -5,7 +5,9 @@ from . import linepat
 class LineLevelA():
     #def __init__(self, lcol=color.BLACK, lthk=0.001):
     def __init__(self, lcol, lthk):
-        self.set(lcol, lthk)
+        #self.set(lcol, lthk)
+        self.lcol = lcol
+        self.lthk = lthk
     
     def set(self, lcol, lthk):
         self.lcol = lcol
@@ -31,15 +33,17 @@ class LineLevelB(LineLevelA):
         
 class LineLevelC(LineLevelA):
     def __init__(self, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, pat_len=0.04):
-        #super().__init__(lcol, lthk)
-        #self.lpat = lpat
-        #self.patlen = patlen
-        self.set(lcol, lthk, pat_len, lpat)
+        super().__init__(lcol, lthk)
+        self.lpat = lpat
+        self.pat_len = pat_len
+        #self.set(lcol, lthk, pat_len, lpat)
                 
     def set(self, lcol, lthk, pat_len, lpat):
-        super().set(lcol, lthk)
-        self.pat_len = pat_len
+        #super().set(lcol, lthk)
+        self.lcol = lcol
+        self.lthk = lthk
         self.lpat = lpat
+        self.pat_len = pat_len
         
     def get_line_pattern(self): 
         return self.lpat\

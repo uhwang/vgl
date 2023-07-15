@@ -196,7 +196,7 @@ class DeviceWMF(device.DeviceVector):
             for p1 in pat_seg:
                 x1 = [ p2[0] for p2 in p1 ]
                 y1 = [ p2[1] for p2 in p1 ]
-                self.dev.Polyline(x1, y1)
+                self.dev.Polyline(x1, y1, closed=False)
         else:
             self.dev.MoveTo(x1,y1)
             self.dev.LineTo(x2,y2)

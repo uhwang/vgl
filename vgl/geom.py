@@ -122,8 +122,8 @@ class Polygon(shape.Shape):
                           lcol, 
                           lthk, 
                           fcol, 
-                          pat_len, 
-                          lpat)
+                          lpat, 
+                          pat_len)
         step = 360.0/nvert
         for i in range(nvert):
             rad = rotation.deg_to_rad(i*step)

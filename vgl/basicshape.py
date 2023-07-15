@@ -64,7 +64,7 @@ class ArrowHead():
         # find arrow head wing pos in local coord
         wing = self.length*frm.hgt()
         wing_x = wing*np.cos(util.deg_to_rad(self.angle))
-        wing_y= wing*np.sin(util.deg_to_rad(self.angle))
+        wing_y = wing*np.sin(util.deg_to_rad(self.angle))
         
         if self.pos_t == _ARROWPOS_START:
             self.wing_up   = util.rad_rotation(wing_x,  wing_y, -theta)
@@ -75,15 +75,16 @@ class ArrowHead():
 
 def draw_arrow_head(dev, sx, sy, arrow, lcol, lthk, viewport):
     
-    sx = dev._x_viewport(sx)
-    sy = dev._y_viewport(sy)
+    sx = dev._x_viewport(sx) if viewport==False else sx
+    sy = dev._y_viewport(sy) if viewport==False else sy
     xs = [sx+arrow.wing_up[0], sx, sx+arrow.wing_down[0], sx+arrow.wing_up[0]]
-    ys = [sy+arrow.wing_up[1], sy, sy+arrow.wing_down[1], sy+arrow.wing_up[1]]
+    if viewport == False:
+        ys = [sy+arrow.wing_up[1], sy, sy+arrow.wing_down[1], sy+arrow.wing_up[1]]
+    else:
+        ys = [sy-arrow.wing_up[1], sy, sy-arrow.wing_down[1], sy-arrow.wing_up[1]]
     
     # open
     if arrow.type_t == _ARROWTYPE_OPEN:
-        #dev.lline(sx, sy, sx+arrow.wing_up  [0], sy+arrow.wing_up[1], lcol, lthk)
-        #dev.lline(sx, sy, sx+arrow.wing_down[0], sy+arrow.wing_down[1], lcol, lthk)
         dev.lpolyline(xs[:3], ys[:3], lcol, lthk)
         
     elif arrow.type_t == _ARROWTYPE_CLOSED:
@@ -149,13 +150,13 @@ class GenericLine(linetype.LineLevelC):
             acol = self.lcol if self.begin_arrow.col == self.lcol\
                              else self.begin_arrow.col
             draw_arrow_head(dev, self.sx, self.sy, self.begin_arrow, 
-            acol, self.lthk*dev.frm.hgt(), True)
+            acol, self.lthk*dev.frm.hgt(), self.viewport)
             
         if self.end_arrow.show:
             acol = self.lcol if   self.end_arrow.col == self.lcol\
                              else self.end_arrow.col
             draw_arrow_head(dev, self.ex, self.ey, self.end_arrow, 
-            acol, self.lthk*dev.frm.hgt(), True)
+            acol, self.lthk*dev.frm.hgt(), self.viewport)
 
 class ArrowLine(GenericLine):
     def __init__(self, 
@@ -221,6 +222,35 @@ class EndArrowLine(GenericLine):
         super().__init__(frm, sx, sy, ex, ey, lcol=lcol, lthk=lthk, lpat=lpat, pat_len=pat_len,
                          show=show, col=col, type_t=type_t, angle=angle, length=length, viewport=viewport)
         self.begin_arrow.show = False
+        
+class Box(shape.Shape):
+    def __init__(self, 
+                 sx, 
+                 sy, 
+                 wid      = 1,  # edge length
+                 hgt      = 1,  # edge length
+                 lcol     = color.BLACK,
+                 lthk     = 0.001,
+                 fcol     = None, 
+                 lpat     = linepat._PAT_SOLID,
+                 pat_len  = 0.04,  
+                 viewport=False):
+        
+        super().__init__(sx, sy, 4, wid, lcol=lcol, lthk=lthk, fcol=fcol, lpat=lpat, pat_len=pat_len)
+        self.wid= wid
+        self.hgt= hgt
+        self.viewport = viewport
+        sx1 = sx+wid
+        sy1 = sy+hgt
+        self.vertex.put([0,2,4,6], [sx, sx1, sx1, sx ])
+        self.vertex.put([1,3,5,7], [sy, sy , sy1, sy1])
+            
+    def draw(self, dev):
+        if self.viewport==True:
+            dev.lpolygon(self.get_xs(), self.get_ys(), self.lcol, self.lthk*dev.frm.hgt(), self.fcol, self.lpat)
+        else:
+            dev.polygon(self.get_xs(), self.get_ys(), self.lcol, self.lthk*dev.frm.hgt(), self.fcol, self.lpat)
+        
         
         
         
