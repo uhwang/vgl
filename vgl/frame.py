@@ -229,11 +229,25 @@ class Frame():
     def hide_yaxis(self):
         self.yaxis.show = False
         
+    def hide_all_label(self):
+        self.hide_xlabel()
+        self.hide_ylabel()
+        
+    def show_all_label(self):
+        self.show_xlabel()
+        self.show_ylabel()
+        
     def hide_xlabel(self):
         self.xaxis.label.show = False
         
     def hide_ylabel(self):
         self.yaxis.label.show = False
+
+    def show_xlabel(self):
+        self.xaxis.label.show = True
+        
+    def show_ylabel(self):
+        self.yaxis.label.show = True
         
     def show_all_tick(self):
         self.show_xtick()
@@ -280,12 +294,12 @@ class Frame():
         self.xaxis.minor_grid.show = show
         
     def hide_xtick(self):
-        self.hide_major_tick()
-        self.hide_minor_tick()
+        self.hide_xmajor_tick()
+        self.hide_xminor_tick()
 
     def show_xtick(self):
-        self.show_major_tick()
-        self.show_minor_tick()
+        self.show_xmajor_tick()
+        self.show_xminor_tick()
         
     def hide_xgrid(self):
         self.hide_xmajor_grid()

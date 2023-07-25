@@ -15,7 +15,7 @@ from . import linepat
 from . import patline
 from . import gdiobj
 
-class DeviceCairo(device.DeviceRaster):
+class DeviceIMG(device.DeviceRaster):
     def __init__(self, fname, gbox, dpi):
         super().__init__(gbox, dpi)
         self.fname = fname
@@ -127,7 +127,7 @@ class DeviceCairo(device.DeviceRaster):
         if lcol: self.delete_pen()
         if fcol: self.delete_brush()
         
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         if (lpat == linepat._PAT_SOLID and lcol) or fcol:
             if viewport:
                 self.create_pnt_list(x,y,self.get_xl,self.get_yl)
@@ -207,17 +207,17 @@ class DeviceCairo(device.DeviceRaster):
             rrad = np.linspace(0, np.pi*2, self._circle_point)
             x1 = x+rad*np.cos(rrad)
             y1 = y+rad*np.sin(rrad)
-            self.polygon(x1, y1, lcol, lthk, fcol, lpat)
+            self.polygon(x1, y1, lcol, lthk, lpat, fcol)
         else:
             cx = self._x_pixel(x)
             cy = self._y_pixel(y)
             rr = self.get_v(rad)
             self.cntx.arc(cx,cy,rr,0,np.pi*2)
-            self.draw_geometry(lcol, lthk, fcol, lpat)
+            self.draw_geometry(lcol, lthk, lpat, fcol)
             
     def symbol(self, x,y, sym, draw=False):
         px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
-        self.polygon(px,py,sym.lcol,sym.lthk,sym.fcol,viewport=True)
+        self.polygon(px,py,sym.lcol,sym.lthk,sym.fcol, lpat=linepat._PAT_SOLID, viewport=True)
         
     def lline(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         if lcol: self.make_pen(lcol, lthk)
@@ -248,7 +248,7 @@ class DeviceCairo(device.DeviceRaster):
         self.cntx.line_to(self.get_xl(x),self.get_yl(y))
     
     def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
-        self.polygon(x,y,lcol,lthk, fcol, lpat, viewport=True)
+        self.polygon(x,y,lcol,lthk, lpat, fcol, viewport=True)
 
     def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
     
@@ -316,7 +316,10 @@ class DeviceCairo(device.DeviceRaster):
         self.surf = None
         self.data = None
 
-
+class DeviceCairo(DeviceIMG):
+    def __init__(self, fname, gbox, dpi=300):
+        super().__init__(fname, gbox, dpi)
+        
 class DeviceCairoAnimation():
     def __init__(self, fname, dev_cairo, func, duration, fps=30, codec='h264'):
         self.fname    = fname

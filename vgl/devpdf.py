@@ -105,7 +105,7 @@ class DevicePDF(device.DeviceVector):
     # viewport(True) : lpolygon
     # viewport(False) : polygon
     
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
 
         if lthk: _lthk = lthk*drvpdf._points_inch
@@ -154,7 +154,7 @@ class DevicePDF(device.DeviceVector):
         ppy = [py1*drvpdf._points_inch for py1 in py]
         self.dev.Polygon(ppx, ppy, sym.lcol, sym.lthk*drvpdf._points_inch, sym.fcol)
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
@@ -205,7 +205,7 @@ class DevicePDF(device.DeviceVector):
                 self.dev.Polyline(x2, y2, lcol, _lthk, fcol=None, closed=False)
         
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
 
     def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):

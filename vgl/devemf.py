@@ -85,7 +85,7 @@ class DeviceEMF(device.DeviceRaster):
     # viewport(True) : lpolygon
     # viewport(False) : polygon
     
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
 
         if (pat_inst ==False and lcol) or fcol:
@@ -136,7 +136,7 @@ class DeviceEMF(device.DeviceRaster):
         ppy = [int(self.get_yl(py1)) for py1 in py]
         self.dev.Symbol(ppx,ppy)
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
@@ -180,7 +180,7 @@ class DeviceEMF(device.DeviceRaster):
     def llineto(self, x, y):
         self.dev.LineTo(int(self.get_xl(x)),int(self.get_yl(y)))
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
 
     def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
@@ -204,7 +204,7 @@ class DeviceEMF(device.DeviceRaster):
             for p1 in pat_seg:
                 x1 = [ int(self.get_xl(p2[0])) for p2 in p1 ]
                 y1 = [ int(self.get_yl(p2[1])) for p2 in p1 ]
-                self.dev.Polyline(x1, y1)
+                self.dev.Polyline(x1, y1, closed)
         else:
             x1 = [ int(self.get_xl(p2)) for p2 in x ]
             y1 = [ int(self.get_yl(p2)) for p2 in y ]   

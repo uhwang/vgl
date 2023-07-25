@@ -86,7 +86,7 @@ class DeviceSVG(device.DeviceRaster):
         
     def symbol(self, x,y, sym, draw=False):
         px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
-        self.polygon(px,py,sym.lcol,sym.lthk,sym.fcol,viewport=True)
+        self.polygon(px,py,sym.lcol,sym.lthk,linepat._PAT_SOLID, sym.fcol,viewport=True)
                 
     def end_symbol(self):  
         pass
@@ -202,7 +202,7 @@ class DeviceSVG(device.DeviceRaster):
     def llineto(self, x,y):
         self._lineto(x,y, True)
         
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         if lpat == linepat._PAT_SOLID or fcol:
             self.fp.write("<polygon points=\"")
             if viewport:
@@ -294,7 +294,7 @@ class DeviceSVG(device.DeviceRaster):
                         lcol.b,
                         self._svg_lthk(lthk)))
                       
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
 
     def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):

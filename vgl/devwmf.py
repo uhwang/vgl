@@ -76,7 +76,7 @@ class DeviceWMF(device.DeviceVector):
     def lineto(self, x, y):
         self.dev.LineTo(self._x_viewport(x),self._y_viewport(y))
         
-    def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
         
         if (pat_inst ==False and lcol) or fcol:
@@ -142,7 +142,7 @@ class DeviceWMF(device.DeviceVector):
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
         
-        self.polygon(x1, y1, lcol, lthk, fcol, lpat)
+        self.polygon(x1, y1, lcol, lthk, lpat, fcol)
         #if isinstance(lpat, linepat.LinePattern):
         #    pat_seg = patline.get_pattern_line(self, x1, y1, lpat.pat_len, lpat.pat_t)
         #    for p1 in pat_seg:
@@ -209,8 +209,8 @@ class DeviceWMF(device.DeviceVector):
     def llineto(self, x, y):
         self.dev.LineTo(x,y)
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
-        self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
+    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
+        self.polygon(x,y,lcol,lthk,lpat,fcol,viewport=True)
 
     def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
         if lcol: 
