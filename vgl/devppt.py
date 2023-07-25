@@ -167,8 +167,35 @@ class DevicePPT(device.DeviceVector):
         self.polyline(x,y,lcol,lthk,lpat,closed,viewport=True)
     
     def polygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
-        pass
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
+        
+        pat_inst = isinstance(lpat, linepat.LinePattern)
+
+        if lthk: _lthk = lthk*self.frm.hgt()
+        else: lthk = 0
+        
+        if pat_inst == False:
+            if viewport:
+                px, py = x, y
+            else:
+                px = [self._x_viewport(xx) for xx in x]
+                py = [self._y_viewport(yy) for yy in y]
+            Polyline(self.slide, px, py, lcol, lthk, lpat, fcol, closed=True)
+    
+        else:
+            xp, yp = x, y
+                
+            if viewport:
+                pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
+            else:
+                pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
+
+            for p1 in pat_seg:
+                x2 = [p2[0] for p2 in p1 ]
+                y2 = [p2[1] for p2 in p1 ]
+             
+            Polyline(self.slide, x2, y2, lcol, lthk, lpat, fcol, closed=)
+
+def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
         pass
         
     def begin_symbol(self, sym):
