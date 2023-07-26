@@ -95,7 +95,7 @@ def plot_tec_mesh(dev, v3d, geom, move=False):
 				cval = 1.0 if intensity > 1 else intensity
 				fcol = color.get_gray(cval)
 				#fcol = color.hsv(200*cval, 1,1)
-				dev.polygon(x, y, geom.mesh[f.imesh].lcol, geom.mesh[f.imesh].lthk*dev.frm.hgt(), fcol)
+				dev.polygon(x, y, geom.mesh[f.imesh].lcol, geom.mesh[f.imesh].lthk*dev.frm.hgt(), fcol=fcol)
 
 				# draw surface normal vector
 				#p4 = 0.02*N
@@ -124,7 +124,7 @@ def plot_tec_mesh(dev, v3d, geom, move=False):
 				
 				x = (mx[i0], mx[i1], mx[i2], mx[i3])
 				y = (my[i0], my[i1], my[i2], my[i3])
-				dev.polygon(x, y, geom.mesh[f.imesh].lcol, geom.mesh[f.imesh].lthk*dev.frm.hgt(), color.WHITE)
+				dev.polygon(x, y, geom.mesh[f.imesh].lcol, geom.mesh[f.imesh].lthk*dev.frm.hgt(), fcol=color.WHITE)
 				
 def plot_mesh(dev, v3d, mesh):
 	
