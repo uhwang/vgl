@@ -161,11 +161,15 @@ class DevicePPT(device.DeviceVector):
         if fcol and closed and pat_inst==linepat._PAT_SOLID:
             Polyline(self.slide, px, py, lcol, _lthk, lpat, fcol, closed)
             
-        # polyline and solid/patterened
+        # polyline/polygon and solid/patterened outline
         else:
             if pat_inst:
                 xp, yp = x, y
                 
+                if fcol and closed:
+                    lcol1 = fcol
+                    Polyline(self.slide, px, py, lcol1, _lthk, lpat, fcol, closed)
+                    
                 if viewport:
                     pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
                 else:
