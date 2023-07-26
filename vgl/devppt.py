@@ -38,12 +38,38 @@
     
     With these changes, the line will be drawn without any shadow effect in the resulting PowerPoint presentation.
     
+    
+    chat.openai.com
+    ===============
+    
+    insert shapes to a group shape
+    group_shape = slide.shapes.add_group_shape()
+    
+    shapes = [
+        slide.shapes.add_shape(
+            pptx.enum.shapes.MSO_SHAPE.RECTANGLE,
+            left=100,
+            top=100,
+            width=100,
+            height=50),
+        slide.shapes.add_shape(
+            pptx.enum.shapes.MSO_SHAPE.RECTANGLE,
+            left=200,
+            top=100,
+            width=100,
+            height=150)
+    ]
+    
+    for shape in shapes:
+        group_shape.shapes._spTree.insert_element_before(shape._element, 'p:extLst')
+    
 '''
 import collections 
 import collections.abc
 import pptx
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
+import numpy as np
 
 from . import color
 from . import device
@@ -164,12 +190,21 @@ class DevicePPT(device.DeviceVector):
         # polyline/polygon and solid/patterened outline
         else:
             if pat_inst:
-                xp, yp = x, y
-                
+                # fill the polygon
                 if fcol and closed:
                     lcol1 = fcol
                     Polyline(self.slide, px, py, lcol1, _lthk, lpat, fcol, closed)
                     
+                # polygon & outline (one more point to close)
+                if closed:
+                    if isinstance(x, np.ndarray):
+                        xp = np.append(x, x[0])
+                        yp = np.append(y, y[0])
+                    elif isinstance(x, list):
+                        xp = x.copy()
+                        yp = y.copy()
+                        xp.append(x[0])
+                        yp.append(y[0])
                 if viewport:
                     pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
                 else:
@@ -178,7 +213,7 @@ class DevicePPT(device.DeviceVector):
                 for p1 in pat_seg:
                     x2 = [p2[0] for p2 in p1 ]
                     y2 = [p2[1] for p2 in p1 ]
-                    Polyline(self.slide, x2, y2, lcol, _lthk, lpat, fcol, closed)
+                    Polyline(self.slide, x2, y2, lcol, _lthk, lpat, fcol, closed=False)
             else:
                 Polyline(self.slide, px, py, lcol, _lthk, lpat, fcol, closed)
          
