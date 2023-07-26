@@ -27,11 +27,13 @@ from . devwmf    import *
 from . devemf    import *
 from . devcairo  import *
 from . devpdf    import *
+from . devppt    import *
 from . devsvg    import *
 from . drvemf    import *
 from . drvpdf    import *
 from . emfconst  import *
 from . paper     import *
+from . basicshape import * 
 
 #from . import frame     
 #from . import data      
