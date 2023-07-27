@@ -17,7 +17,7 @@ setup(name='vgl',
 	packages=find_packages(),
 	
 	install_requires = ['pygame', 'aggdraw', 'numpy', 'pillow', 'pycairo', 
-	                    'moviepy', 'pyquaternion' ],
+	                    'moviepy', 'pyquaternion', 'python-pptx' ],
 	
 	classifiers      = ['Programming Language :: Python :: 3.7',
                         'Intended Audience :: Everybody'#,
