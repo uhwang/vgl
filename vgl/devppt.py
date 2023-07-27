@@ -238,7 +238,7 @@ class DevicePPT(device.DeviceVector):
     def symbol(self, x,y,sym,draw=False):
         px, py = sym.update_xy( self._x_viewport(x),
                                 self._y_viewport(y) )
-        self._polyline(px, py, sym.lcol, sym.lthk*self.frm.hgt(), 
+        self._polyline(px, py, sym.lcol, sym.lthk, 
         linepat._PAT_SOLID, sym.fcol, closed=True, viewport=True)
         
     def stroke(self):

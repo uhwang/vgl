@@ -217,7 +217,7 @@ class DeviceIMG(device.DeviceRaster):
             
     def symbol(self, x,y, sym, draw=False):
         px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
-        self.polygon(px,py,sym.lcol,sym.lthk,sym.fcol, lpat=linepat._PAT_SOLID, viewport=True)
+        self.polygon(px,py,sym.lcol,sym.lthk,linepat._PAT_SOLID, sym.fcol, viewport=True)
         
     def lline(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         if lcol: self.make_pen(lcol, lthk)
