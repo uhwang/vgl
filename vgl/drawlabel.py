@@ -12,7 +12,6 @@ from . import color
 from . import text
 from . import axis
 
-
 def draw_label(dev):
     frm = dev.frm
     xx = yy = mispc = oxx = wxx = wyy = mitlen = mjtlen = 0.0
@@ -33,7 +32,7 @@ def draw_label(dev):
         yy = axis.get_xaxis_ypos(xaxis,yaxis)
         yy = dev._y_viewport(yy)
     
-        while wxx <= xaxis.max:
+        while wxx <= xaxis.amax:
             wxxl = dev._x_viewport(wxx)
             ypos = yy + xlabel.pos * hgt
             xlabel.x = wxxl
@@ -51,7 +50,7 @@ def draw_label(dev):
         xx = dev._x_viewport(xx)
         ylabel.ev()
         ylabel.pos  = 0.01
-        while wyy <= yaxis.max:
+        while wyy <= yaxis.amax:
             wyyl = dev._y_viewport(wyy)
             xpos = xx - ylabel.pos * hgt
             ylabel.x = xpos

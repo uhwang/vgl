@@ -140,7 +140,7 @@ class DeviceEMF(device.DeviceRaster):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
-        self.polygon(x1, y1, lcol, lthk, fcol, lpat)
+        self.polygon(x1, y1, lcol, lthk, lpat, fcol)
         
     def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
         if lcol: self.dev.MakePen(lcol, int(self.get_xlt(lthk)))

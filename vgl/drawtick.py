@@ -60,7 +60,7 @@ def draw_tick(dev):
         vi = 1
         owxx = wxx
     
-        while wxx <= xaxis.max:
+        while wxx <= xaxis.amax:
             wxxl = dev._x_viewport(wxx)
             dev.lline(wxxl,yy+min_ty0,wxxl,yy+min_ty1)	
             if j == xaxis.nminor_tick:
@@ -78,7 +78,7 @@ def draw_tick(dev):
         vi = 1;
         wxx = xaxis.first_major_tick_pos
         dev.make_pen(maj_tick.lcol, maj_tick.lthk*hgt)
-        while wxx <= xaxis.max:
+        while wxx <= xaxis.amax:
             wxxl = dev._x_viewport(wxx)
             dev.lline(wxxl, yy+maj_ty0, wxxl, yy+maj_ty1)
             wxx = xaxis.first_major_tick_pos+xaxis.spacing*vi
@@ -114,7 +114,7 @@ def draw_tick(dev):
         vi = 1
         owyy = wyy
     
-        while wyy <= yaxis.max:
+        while wyy <= yaxis.amax:
             wyyl = dev._y_viewport(wyy)
             dev.lline(xx-min_tx0,wyyl,xx-min_tx1,wyyl)	
             if j == yaxis.nminor_tick:
@@ -132,7 +132,7 @@ def draw_tick(dev):
         vi = 1;
         wyy = yaxis.first_major_tick_pos
         dev.make_pen(maj_tick.lcol, maj_tick.lthk*hgt)
-        while wyy <= yaxis.max:
+        while wyy <= yaxis.amax:
             wyyl = dev._y_viewport(wyy)
             dev.lline(xx-maj_tx0, wyyl, xx-maj_tx1, wyyl)
             wyy = yaxis.first_major_tick_pos+yaxis.spacing*vi

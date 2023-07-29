@@ -34,6 +34,7 @@ from . drvpdf    import *
 from . emfconst  import *
 from . paper     import *
 from . basicshape import * 
+from . polarplot import *
 
 #from . import frame     
 #from . import data      

@@ -86,7 +86,17 @@ class FrameProperty():
                 str(self.pdombk_lcol),
                 str(self.pdombk_fcol),
                 self.pdombk_lthk)
-                
+
+#AxisCartesian
+#AxisPolar                
+
+#class AxisManager():
+#    def __init__(self):
+#        self.axis_xy
+#        self.axis_polar
+#        #self.axis_2d
+#        #self.axis_3d
+        
 class Frame():
     def __init__(self, id, sx, sy, wid, hgt, data=None, fit_axis=False):
         self.id   = id
@@ -98,6 +108,9 @@ class Frame():
         self.pdom = Rect()                    # plot domain size
         self.fprt = FrameProperty()           # frame properties (border, bk, ...)
         
+        self.axis_t = axis.AXIS_CARTESIAN
+        self.axis_polar = None
+        self.axis_cartesian = None
         # xy mode
         #self.xaxis1 = 
         #self.yaxis1 = 
@@ -122,6 +135,25 @@ class Frame():
         self.update_vertex()                  # compute frame vertex
    
     #def resize(self, wid, hgt):
+        
+    def create_polar_axis(self, rmin, rmax):
+        import decimal
+        context = decimal.getcontext()
+        context.rounding = decimal.ROUND_HALF_UP
+        _rmin, _rmax = float(round(decimal.Decimal(rmin), 1)),\
+                       float(round(decimal.Decimal(rmax), 1))
+        if self.axis_polar == None:
+            self.axis_polar = axis.PolarAxis(_rmin, _rmax)
+            
+    def to_polar(self, rmin, rmax):
+        self.axis_t = axis.AXIS_POLAR   
+        self.create_polar_axis(rmin, rmax)
+        
+    def set_rmax(self, rmax):
+        self.axis_polar.raxis.rmax = rmax
+        
+    def to_cartesian(self):
+        self.axis_t = axis.AXIS_CARTESIAN   
         
     def create_axis(self, xmin, xmax, ymin, ymax):
         self.xaxis = axis.AxisX(xmin, xmax)# x axis

@@ -107,7 +107,7 @@ class DeviceIMG(device.DeviceRaster):
         for x1, y1 in zip(x[1:], y[1:]):
             self.cntx.line_to(convx(x1), convy(y1))
     
-    def draw_geometry(self, lcol, lthk, fcol, lpat):
+    def draw_geometry(self, lcol, lthk, lpat, fcol):
         if fcol or self.brush.fcol: 
             if fcol: 
                 self.make_brush(fcol)
@@ -134,7 +134,7 @@ class DeviceIMG(device.DeviceRaster):
             else:
                 self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
             self.cntx.close_path()        
-            self.draw_geometry(lcol, lthk, fcol, lpat)
+            self.draw_geometry(lcol, lthk, lpat, fcol)
 
         if lcol and isinstance(lpat, linepat.LinePattern):
             if isinstance(x, np.ndarray):
@@ -202,7 +202,7 @@ class DeviceIMG(device.DeviceRaster):
     def end_symbol(self):  
         pass
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         if isinstance(lpat, linepat.LinePattern):
             rrad = np.linspace(0, np.pi*2, self._circle_point)
             x1 = x+rad*np.cos(rrad)

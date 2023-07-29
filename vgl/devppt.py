@@ -131,6 +131,7 @@ def Polyline(slide, x, y, lcol, lthk, lpat, fcol, closed):
     
 class DevicePPT(device.DeviceVector):
     def __init__(self, fname, gbox):
+        super().__init__()
         self.fname = fname
         self.ppt = pptx.Presentation()
         self.blank_slide_layout = self.ppt.slide_layouts[6]
@@ -152,6 +153,18 @@ class DevicePPT(device.DeviceVector):
     def delete_pen(self):
         self.pen.lcol = None
         self.pen.lthk = None
+        
+    def circle(self, x,y, rad, lcol, lthk, lpat=linepat._PAT_SOLID, fcol=None):
+        rrad = np.linspace(0, np.pi*2, self._circle_point)
+        x1 = x+rad*np.cos(rrad)
+        y1 = y+rad*np.sin(rrad)
+        self._polyline(x1,y1, lcol, lthk, lpat, fcol, closed=True, viewport=False)
+        
+    def lcircle(self, x,y, rad, lcol, lthk, lpat=linepat._PAT_SOLID, fcol=None):
+        rrad = np.linspace(0, np.pi*2, self._circle_point)
+        x1 = x+rad*np.cos(rrad)
+        y1 = y+rad*np.sin(rrad)
+        self._polyline(x,y, rad, lcol, lthk, lpat, fcol, closed=True, viewport=True)
         
     def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, viewport=False):
         if self.pen.lcol:

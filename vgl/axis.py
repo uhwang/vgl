@@ -11,16 +11,20 @@
 import math
 from . import color
 from . import text
-from .linetype import *
-#
-#import color
-#import text
-#from linetype import *
+from . linetype import *
 
+AXIS_CARTESIAN = 0x0001
+AXIS_POLAR     = 0x0002
 
-TICK_DIR_IN     = 0x01
-TICK_DIR_OUT    = 0x02
-TICK_DIR_CENTER = 0x03
+TICK_DIR_IN    = 0x0003
+TICK_DIR_OUT   = 0x0004
+TICK_DIR_CENTER= 0x0005
+
+_POS_LEFT      = 0x0006
+_POS_TOP       = 0x0007
+_POS_RIGHT     = 0x0008
+_POS_BOTTOM    = 0x0009
+_POS_ZERO      = 0x000A
 
 def get_mantissaexp(v):
 	ie = 0;
@@ -159,12 +163,12 @@ def compute_tick_position(vmin, vmax, mjspace, nMiTick):
     return startMjTick, startMiTick, firstNMiTick	
     
 class Label(text.Text):
-    def __init__(self, pos=0.02):
+    def __init__(self, size=0.015, pos=0.02):
         super().__init__()
         self.show = True
         self.color = color.BLACK
         self.pos = pos
-        self.size = 0.015 # the percentage of frame height: 1.5%
+        self.size = size # the percentage of frame height: 1.5%
         self.rotation = 0
 
 class Grid(LineLevelC):
@@ -181,64 +185,115 @@ class Tick(LineLevelB):
         self.show         = show
         self.auto_spacing = True
         self.dir          = TICK_DIR_IN
-   
-_POS_LEFT    = 0x0001
-_POS_TOP     = 0x0002
-_POS_RIGHT   = 0x0003
-_POS_BOTTOM  = 0x0004
-_POS_ZERO    = 0x0005
 
 _AXIS_NAME = ["Axis-X", "Axis-Y", "Axis-X"]
 def _get_xaxis_name(): return _AXIS_NAME[0]
 def _get_yaxis_name(): return _AXIS_NAME[1]
 def _get_zaxis_name(): return _AXIS_NAME[2]
 
-
 def get_xaxis_ypos(xaxis, yaxis):
-    pos_y = yaxis.min # default axis._POS_BOTTOM
+    pos_y = yaxis.amin # default axis._POS_BOTTOM
     pos_t = xaxis.pos_t
         
     if pos_t == _POS_TOP:
-        pos_y = yaxis.max
+        pos_y = yaxis.amax
     elif pos_t == _POS_ZERO:
         pos_y = 0
         
     return pos_y
 
 def get_yaxis_xpos(xaxis, yaxis):
-    pos_x = xaxis.min # default axis._POS_LEFT
+    pos_x = xaxis.amin # default axis._POS_LEFT
     pos_t = yaxis.pos_t
         
     if pos_t == _POS_RIGHT:
-        pos_x = xaxis.max
+        pos_x = xaxis.amax
     elif pos_t == _POS_ZERO:
         pos_x = 0
         
     return pos_x
-        
 
-class Axis(LineLevelA):
-    def __init__(self, min=0, max=1, lcol = color.BLACK, lthk=0.004):
-        super().__init__(lcol, lthk)
+class PolarTick(LineLevelC):
+    def __init__(self, show, lcol = color.BLACK, lthk=0.004, lpat=linepat._PAT_SOLID):
+        super().__init__(lcol, lthk, lpat)
+        self.show = show
+
+# Radial Axis        
+class RAxis(LineLevelC):
+    def __init__(self, rmin = 0, rmax=1, lcol = color.BLACK, lthk=0.004, lpat=linepat._PAT_SOLID):
+        super().__init__(lcol, lthk, lpat)
+        self.show = True
+        self.rmin = rmin
+        self.rmax = rmax # the max of radius
+        self.rtick_autospacing = True
+        self.dr  = 1
+        self.nminor_tick = 4
+        self.major_tick = PolarTick(True, color._gray(0.1), 0.002, linepat._PAT_SOLID)
+        self.minor_tick = PolarTick(False, color._gray(0.1), 0.002, linepat._PAT_SOLID)
+        self.label      = Label()
+        self.update_tick(self.rmin, self.rmax)
+        
+    def update_tick(self, rmin, rmax):
+        self.update_range(rmin, rmax)
+        self.spacing = compute_tick_spacing(rmin,rmax)
+        a,b,c=compute_tick_position(rmin,rmax,self.spacing,self.nminor_tick)
+        self.first_major_tick_pos = a
+        self.first_minor_tick_pos = b
+        self.first_nminor_tick    = c
+        #self.dr = (rmax-rmin)/self.nminor_tick
+        self.dr = self.spacing
+        
+    def update_range(self, min, max):
+        self.rmin = min
+        self.rmax = max
+    def get_label(self): return self.label
+    #def get_major_grid(self): return self.major_grid	
+    #def get_minor_grid(self): return self.minor_grid	
+    def get_major_tick(self): return self.major_tick	
+    def get_minor_tick(self): return self.minor_tick
+    def get_range(self): return (self.rmax-self.rmin)
+    def get_minmax(self): return self.rmin,self.rmax
+    
+# Theta Axis
+class TAxis(LineLevelC):
+    def __init__(self, lcol = color.BLACK, lthk=0.004, lpat=linepat._PAT_SOLID):
+        super().__init__(lcol, lthk, lpat)
+        self.show = True
+        self.dtheta = 30
+        self.nminor_tick = 2
+        self.major_tick = PolarTick(True, color._gray(0.1), 0.002, linepat._PAT_SOLID)
+        self.minor_tick = PolarTick(False, color._gray(0.1), 0.002, linepat._PAT_SOLID)
+        self.label   = Label(size=0.02, pos=0.08)
+
+    def get_label(self): return self.label
+    
+class PolarAxis():
+    def __init__(self, rmin=0, rmax=1):
+        self.raxis = RAxis(rmin, rmax)
+        self.taxis = TAxis()
+            
+class Axis(LineLevelC):
+    def __init__(self, amin=0, amax=1, lcol = color.BLACK, lthk=0.004, lpat=linepat._PAT_SOLID):
+        super().__init__(lcol, lthk, lpat)
         self.show                = True
-        self.min                 = min
-        self.max                 = max
+        self.amin                = amin
+        self.amax                = amax
         self.major_tick          = Tick(lthk=0.004, llen=0.018)
         self.minor_tick          = Tick(lthk=0.001, llen=0.01)
         self.major_grid          = Grid(show=False)
         self.minor_grid          = Grid(show=False)
         self.nminor_tick         = 4
-        self.update_tick(min, max)
+        self.update_tick(amin, amax)
         self.label               = Label()
 
-    def update_range(self, min, max):
-        self.min = min
-        self.max = max
+    def update_range(self, amin, amax):
+        self.amin = amin
+        self.amax = amax
         
-    def update_tick(self, min, max):
-        self.update_range(min, max)
-        self.spacing = compute_tick_spacing(min,max)
-        a,b,c=compute_tick_position(min,max,self.spacing,self.nminor_tick)
+    def update_tick(self, amin, amax):
+        self.update_range(amin, amax)
+        self.spacing = compute_tick_spacing(amin,amax)
+        a,b,c=compute_tick_position(amin,amax,self.spacing,self.nminor_tick)
         self.first_major_tick_pos = a
         self.first_minor_tick_pos = b
         self.first_nminor_tick    = c
@@ -247,8 +302,8 @@ class Axis(LineLevelA):
     def get_minor_grid(self): return self.minor_grid	
     def get_major_tick(self): return self.major_tick	
     def get_minor_tick(self): return self.minor_tick
-    def get_range(self): return (self.max-self.min)
-    def get_minmax(self): return self.min, self.max
+    def get_range(self): return (self.amax-self.amin)
+    def get_minmax(self): return self.amin,self.amax
     def get_label(self): return self.label
     #def get_ylabel(self): return self.ylabel
     
@@ -260,24 +315,21 @@ class Axis(LineLevelA):
                self.first_nminor_tick)
 
 class AxisX(Axis):
-    def __init__(self, min=0, max=1, lcol = color.BLACK, lthk=0.004,\
+    def __init__(self, amin=0, amax=1, lcol = color.BLACK, lthk=0.004,\
                  pos_t =_POS_BOTTOM):
-        super().__init__(min,max,lcol,lthk)
+        super().__init__(amin,amax,lcol,lthk)
         self.name = _get_xaxis_name()
         self.pos_t= pos_t
         #self.pos    = 
         
 class AxisY(Axis):
-    def __init__(self, min=0, max=1, lcol = color.BLACK, lthk=0.004,\
+    def __init__(self, amin=0, amax=1, lcol = color.BLACK, lthk=0.004,\
                  pos_t =_POS_LEFT):
-        super().__init__(min,max,lcol,lthk)
+        super().__init__(amin,amax,lcol,lthk)
         self.name = _get_yaxis_name()
         self.pos_t= pos_t
 
-def main():
-	x=Axis(-3,3)
-	a,b,c=compute_tick_position(-1,1,0.25,4)
-	print(a,b,c)
-	
-if __name__ == '__main__':
-	main()
+class CartesianAxis2D():
+    def __init__(self):
+        self.xaxis = AxisX()
+        self.yaxis = AxisY()

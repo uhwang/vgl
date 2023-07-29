@@ -29,12 +29,14 @@ def draw_frame(dev):
         #dev.lpolygon(xx, yy, lcol=fp.header_col, fcol=fp.header_col)
         dev.lpolygon(xx, yy, lcol=None, fcol=fp.header_col)
         
+    # Draw frame border
     if fp.border_show:
         dev.lpolyline(frm.get_frm_xs(), 
                       frm.get_frm_ys(), 
                       fp.border_col, 
                       fp.border_thk*frm.hgt(), closed=True)
-        
+    
+    # Plot domain background
     if fp.pdombk_show:
         if fp.pdombk_show:
             dev.lpolygon(frm.get_pdom_xs(), 

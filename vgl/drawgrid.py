@@ -49,7 +49,7 @@ def draw_grid(dev):
         vi = 1
         owxx = wxx
         
-        while wxx <= xaxis.max:
+        while wxx <= xaxis.amax:
             wxxl= dev._x_viewport(wxx)	
             dev.lline(wxxl,sy,wxxl,ey)
             if j == xaxis.nminor_tick:
@@ -67,7 +67,7 @@ def draw_grid(dev):
         vi = 1
         wxx = xaxis.first_major_tick_pos
         dev.make_pen(major_grid.lcol, major_grid.lthk*hgt)
-        while wxx <= xaxis.max:
+        while wxx <= xaxis.amax:
             wxxl = dev._x_viewport(wxx)
             dev.lline(wxxl, sy, wxxl, ey)
             wxx = xaxis.first_major_tick_pos+xaxis.spacing*vi
@@ -97,7 +97,7 @@ def draw_grid(dev):
         vi = 1
         owyy = wyy
     
-        while wyy <= yaxis.max:
+        while wyy <= yaxis.amax:
             wyyl = dev._y_viewport(wyy)
             dev.lline(sx,wyyl,ex,wyyl)	
             if j == yaxis.nminor_tick:
@@ -115,7 +115,7 @@ def draw_grid(dev):
         vi = 1;
         wyy = yaxis.first_major_tick_pos
         dev.make_pen(major_grid.lcol, major_grid.lthk*hgt)
-        while wyy <= yaxis.max:
+        while wyy <= yaxis.amax:
             wyyl = dev._y_viewport(wyy)
             dev.lline(sx, wyyl, ex, wyyl)
             wyy = yaxis.first_major_tick_pos+yaxis.spacing*vi

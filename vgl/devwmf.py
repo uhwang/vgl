@@ -127,7 +127,7 @@ class DeviceWMF(device.DeviceVector):
         self.dev.Symbol(px,py)
         if draw: self.end_symbol()
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         if lcol : self.dev.MakePen(lcol, lthk)
         else    : self.dev.MakePen(fcol, 0.01) # dummy line thickness 0.1
         if fcol : self.dev.MakeBrush(fcol)
@@ -156,8 +156,8 @@ class DeviceWMF(device.DeviceVector):
         #    self.polygon(x1,y1,lcol, lthk, fcol)
         #    
         #self.dev.DeleteBrush()
-        #if lcol: self.dev.DeletePen()
-        #if fcol: self.dev.DeleteBrush()
+        self.dev.DeletePen()
+        self.dev.DeleteBrush()
         
     def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
         if lcol: self.dev.MakePen(lcol, lthk)

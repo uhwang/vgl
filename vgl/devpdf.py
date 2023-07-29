@@ -158,7 +158,7 @@ class DevicePDF(device.DeviceVector):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
-        self.polygon(x1, y1, lcol, lthk, fcol, lpat)
+        self.polygon(x1, y1, lcol, lthk, lpat, fcol)
         
     def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
@@ -206,7 +206,7 @@ class DevicePDF(device.DeviceVector):
         
         
     def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
-        self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
+        self.polygon(x,y,lcol,lthk,lpat,fcol,viewport=True)
 
     def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
         self.polyline(x,y,lcol,lthk,lpat,closed,viewport=True)
