@@ -23,7 +23,9 @@ class Color():
         return self.r == c.r and self.g == c.g and self.b == c.b
         
     def __str__(self):
-        return "%03d, %03d, %03d"%(self.r, self.g, self.b)
+        format = "%3.3f, %03.3f, %03.3f" if isinstance(self.r, float) else\
+                 "%03d, %03d, %03d"
+        return format%(self.r, self.g, self.b)
         
     def get_tuple(self) : return (self.r, self.g, self.b)
         

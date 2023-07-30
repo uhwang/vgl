@@ -81,22 +81,18 @@ class DeviceSVG(device.DeviceRaster):
     def stroke(self):
         pass
         
-    def _circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
-        pass
-    #    if viewport:
-    #        cx, cy = self.get_xl(x), self.get_yl(y)
-    #        crad = self.get_yl(rad)
-    #    else:
-    #        cx, cy = self._x_pixel(x), self._y_pixel(y)
-    #        crad = self.
-    #        
-    #    self.fp.write("<circle cx=\"%3.3f\" cy=\"%3.3f\" r=\"3.3f\""\
-    #                  "stroke=\"rgb(%d %d %d)\" stroke-width=\"%d\" fill=\"rgb(%d %d %d)\" />\n"\
-    #                  )
-        
-    def circle(self, x,y, rad, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID, viewport=False):
-        pass
-        
+    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+        cx, cy = self._x_pixel(x), self._y_pixel(y)
+   
+        if isinstance(fcol, color.Color):
+            self.fp.write("<circle cx=\"%3.3f\" cy=\"%3.3f\" r=\"%3.3f\" "\
+                  "stroke=\"rgb(%d, %d, %d)\" stroke-width=\"%d\" fill=\"rgb(%d, %d, %d)\" />\n"%
+                  (cx, cy, self.get_v(rad), lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk), fcol.r, fcol.g, fcol.b))
+        else:
+            self.fp.write("<circle cx=\"%3.3f\" cy=\"%3.3f\" r=\"%3.3f\" "\
+                  "stroke=\"rgb(%d, %d, %d)\" stroke-width=\"%d\" fill=\"none\" />\n"%
+                  (cx, cy, self.get_v(rad), lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk)))
+
     def begin_symbol(self, sym): 
         pass
         

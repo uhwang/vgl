@@ -5,6 +5,8 @@
     03/10/2023  Separate device file
 '''
 import numpy as np
+from collections import deque
+
 from . import color
 from . import device
 from . import drvwmf as dw
@@ -19,6 +21,7 @@ class DeviceWMF(device.DeviceVector):
         self.dev = dw.WindowsMetaFile(fname, gbox)
         self.pen = gdiobj.Pen()
         self.brush = gdiobj.Brush()
+        self.stack_gidobj = deque()
 
     def set_device(self, frm, extend=device._FIT_NONE):
         self.frm = frm
@@ -126,6 +129,18 @@ class DeviceWMF(device.DeviceVector):
         if draw: self.begin_symbol(sym)
         self.dev.Symbol(px,py)
         if draw: self.end_symbol()
+    
+    def push(self):
+        self.stack_gidobj.append((copy.deepcopy(self.pen), copy.deepcopy(self.brush)))
+        
+    def pop(self):
+        try:
+            elem = self.stack_gidobj.pop()
+        except IndexError:
+            return None
+            
+        # reutnr pen, brush
+        return elem[0], elem[1]
     
     def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
         if lcol : self.dev.MakePen(lcol, lthk)

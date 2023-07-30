@@ -108,6 +108,7 @@ class DeviceIMG(device.DeviceRaster):
             self.cntx.line_to(convx(x1), convy(y1))
     
     def draw_geometry(self, lcol, lthk, lpat, fcol):
+        #print(lcol)
         if fcol or self.brush.fcol: 
             if fcol: 
                 self.make_brush(fcol)

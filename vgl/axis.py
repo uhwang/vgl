@@ -228,9 +228,9 @@ class RAxis(LineLevelC):
         self.rtick_autospacing = True
         self.dr  = 1
         self.nminor_tick = 4
-        self.major_tick = PolarTick(True, color._gray(0.1), 0.002, linepat._PAT_SOLID)
-        self.minor_tick = PolarTick(False, color._gray(0.1), 0.002, linepat._PAT_SOLID)
-        self.label      = Label()
+        self.major_tick = PolarTick(True, color._gray(0.8), 0.002, linepat._PAT_SOLID)
+        self.minor_tick = PolarTick(False, color._gray(0.8), 0.002, linepat._PAT_SOLID)
+        self.label      = Label(pos=0.01)
         self.update_tick(self.rmin, self.rmax)
         
     def update_tick(self, rmin, rmax):
@@ -261,8 +261,8 @@ class TAxis(LineLevelC):
         self.show = True
         self.dtheta = 30
         self.nminor_tick = 2
-        self.major_tick = PolarTick(True, color._gray(0.1), 0.002, linepat._PAT_SOLID)
-        self.minor_tick = PolarTick(False, color._gray(0.1), 0.002, linepat._PAT_SOLID)
+        self.major_tick = PolarTick(True, color._gray(0.8), 0.002, linepat._PAT_SOLID)
+        self.minor_tick = PolarTick(False, color._gray(0.8), 0.002, linepat._PAT_SOLID)
         self.label   = Label(size=0.02, pos=0.08)
 
     def get_label(self): return self.label

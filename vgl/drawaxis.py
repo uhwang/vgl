@@ -72,13 +72,14 @@ def draw_axis(dev):
                 yy = 0
                 yy = dev._y_viewport(yy)
                 hgt = dev.frm.hgt()
-                rlabel.hs()
+                rlabel.en()
+                shift =  rlabel.pos * hgt
                 
                 while wxx <= raxis.rmax:
                     wxxl = dev._x_viewport(wxx)
-                    ypos = yy + rlabel.pos * hgt
-                    rlabel.x = wxxl
-                    rlabel.y = ypos
+                    ypos = yy
+                    rlabel.x = wxxl - shift
+                    rlabel.y = ypos + shift
                     rlabel.text = "%1.2f"%wxx
                     text.write_text(dev, rlabel, True)
                     wxx = raxis.first_major_tick_pos+raxis.spacing*vi
@@ -100,13 +101,16 @@ def draw_axis(dev):
         
             if taxis.label.show:
                 tlabel = taxis.get_label()
-                tlabel.pos = 0.005*hgt
+                tlabel.pos = 0.01*hgt
                 tt = 0
                 while tt < 360.0:
                     rt = util.deg_to_rad(tt)
                     tlabel.x = dev._x_viewport(raxis.rmax*math.cos(rt))
                     tlabel.y = dev._y_viewport(raxis.rmax*math.sin(rt))
-                    if tt >= 0 and tt < 90: 
+                    if tt == 0:
+                        tlabel.wv()
+                        tlabel.x += tlabel.pos
+                    if tt > 0 and tt < 90: 
                         tlabel.ws()
                         tlabel.x += tlabel.pos
                     elif tt == 90: 

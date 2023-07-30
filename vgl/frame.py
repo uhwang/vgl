@@ -142,8 +142,7 @@ class Frame():
         context.rounding = decimal.ROUND_HALF_UP
         _rmin, _rmax = float(round(decimal.Decimal(rmin), 1)),\
                        float(round(decimal.Decimal(rmax), 1))
-        if self.axis_polar == None:
-            self.axis_polar = axis.PolarAxis(_rmin, _rmax)
+        self.axis_polar = axis.PolarAxis(_rmin, _rmax)
             
     def to_polar(self, rmin, rmax):
         self.axis_t = axis.AXIS_POLAR   
@@ -261,9 +260,21 @@ class Frame():
     def hide_yaxis(self):
         self.yaxis.show = False
         
+    def hide_rlabel(self):
+        if self.axis_polar:
+            self.axis_polar.raxis.label.show = False
+            self.axis_polar.raxis.label.show = False
+            
+    def hide_tlabel(self):
+        if self.axis_polar:
+            self.axis_polar.taxis.label.show = False
+            self.axis_polar.taxis.label.show = False
+    
     def hide_all_label(self):
         self.hide_xlabel()
         self.hide_ylabel()
+        self.hide_rlabel()
+        self.hide_tlabel()
         
     def show_all_label(self):
         self.show_xlabel()
