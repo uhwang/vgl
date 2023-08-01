@@ -116,8 +116,8 @@ class FontManager():
 			(music      .font_name, music      .font_map)
 		)
 	def get_font(self, fid):
-		#if fid < ids.FONT_ROMANSIMPLEX and fid > ids.FONT_MUSIC:
-		#	raise 
+		if fid < ids.FONT_ROMANSIMPLEX and fid > ids.FONT_MUSIC:
+			return None 
 		return self.font_pool[fid]
 
 	def get_font_map(self, fid):
@@ -127,6 +127,11 @@ class FontManager():
 		return self.font_pool[fid][0]
 
 font_manager = FontManager()
+
+
+def get_font_name(fid):
+    return font_manager.get_font_name(fid)
+
 #def test():
 #
 #def main():
