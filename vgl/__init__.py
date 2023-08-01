@@ -35,6 +35,8 @@ from . emfconst  import *
 from . paper     import *
 from . basicshape import * 
 from . polarplot import *
+from . fontutil import * 
+from . devutil import *
 
 #from . import frame     
 #from . import data      
