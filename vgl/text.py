@@ -60,6 +60,10 @@ class Font():
         self.box_fcol  = color.WHITE
         self.box_lthk  = 0.001
         
+    def set_font(self, fid):
+        self.font_name = fontm.font_manager.get_font_name(fid)
+        self.font_id   = fid
+        
     def set_size(self, size): self.size = sz
     #def set_halign_center(self): self.align = 
 
@@ -158,6 +162,7 @@ def write_text(dev, t, viewport=True):
     
     clist = []
     font_map = fontm.font_manager.get_font_map(t.font_id)
+    end_x = 0
     
     for ich in range(nstr):
         #glyp  = romans.font_map[ord(t.text[ich])-ord(' ')]
@@ -178,7 +183,8 @@ def write_text(dev, t, viewport=True):
             py = pp[1]
             
             if px==-1 and py==-1:
-                llist.append((xp,yp))
+                if xp and yp:
+                    llist.append((xp,yp))
                 xp = []
                 yp = []
                 continue
@@ -210,10 +216,11 @@ def write_text(dev, t, viewport=True):
         curx += delx
         cury += dely
     
-    el = clist[-1]
-    for l in el: ex = max(l[0])
+    #el = clist[-1]
+    #for l in el: ex = max(l[0])
     fbox.sx = 0
-    fbox.ex = ex
+    #fbox.ex = ex
+    fbox.ex = curx
     
     #fbox.expand(min(fbox.hgt(), fbox.wid())*0.05)
     dx = 0
@@ -251,17 +258,14 @@ def write_text(dev, t, viewport=True):
         if t.show_box:
             dev.lpolyline(fbox.get_xs(), fbox.get_ys(), t.box_lcol, bthk, True)
     
-    #dev.make_pen(t.lcol, fthk)
     for ll in clist:
         for ls in ll:
-            #xx = np.array(ls[0])
-            #yy = np.array(ls[1])
             if viewport:
                 xx = np.array(ls[0])
                 yy = np.array(ls[1])
             else:
-                xx = dev._x_viewport(np.array(ls[0]))
-                yy = dev._y_viewport(np.array(ls[1]))
+                xx = np.array([dev._x_viewport(x1) for x1 in ls[0]])
+                yy = np.array([dev._x_viewport(y1) for y1 in ls[1]])
             
             if t.rotation != 0:
                 for i in range(xx.size):
@@ -275,6 +279,4 @@ def write_text(dev, t, viewport=True):
             else:
                 xx += dx + dev._x_viewport(t.x)
                 yy += dy + dev._y_viewport(t.y)
-            #t.polyline(xx,yy)
             dev.lpolyline(xx,yy,t.lcol, fthk)
-    #dev.delete_pen()
