@@ -16,7 +16,6 @@ from . import fontid
 from . import fontm
 
 def print_hershey_font(font_id, dev_name):
-
  
     if fontid._valid_fid(font_id):
     
@@ -61,7 +60,7 @@ def print_hershey_font(font_id, dev_name):
                 tx.set_text(sx+dw*(i+1.5), sy+dh*1.5, "%0X"%i)
                 text.write_text(dev, tx, True)
                 
-            # write index in vertical (0, 1, 2, ... F)
+            # write index in vertical
             for i in range(ncv-3):
                 tx.set_text(sx+dw*0.5, sy+dh*(i+2.5), "%dx"%(i+2))
                 text.write_text(dev, tx, True)                
@@ -78,7 +77,7 @@ def print_hershey_font(font_id, dev_name):
                     try:
                         text.write_text(dev, tx, True)
                     except Exception as e:
-                        print("Error (%s): %d\n..... %s"%(fnt[0],idx,str(e)))
+                        print("Error (%s): %d\n..... %s"%(font_name,idx,str(e)))
                         pass
                     
             devutil.close_device()

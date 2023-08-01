@@ -132,6 +132,10 @@ font_manager = FontManager()
 def get_font_name(fid):
     return font_manager.get_font_name(fid)
 
+def get_glyp(fid, gid):
+    return font_manager.font_pool[fid][1][gid]
+
+    
 #def test():
 #
 #def main():

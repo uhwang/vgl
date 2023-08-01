@@ -16,9 +16,13 @@ from vgl.size import BBox
 import vgl.rotation
 import vgl.fontid as fontid
 import vgl.fontm as fontm
+import vgl.symtbl as sym_search
 
 to_rad = 3.1415926535/180
 #void TG_TextOut(TG_Device_Ptr dev, TG_StrPtr str, TG_Float x, TG_Float y, TG_UShort align, TG_Float lthk, TG_Color fc, TG_Color lc)
+
+
+ESCAPE = "\\"
 
 TEXT_ALIGN_VCENTER   = 0x0001
 TEXT_ALIGN_LEFT      = 0x0002
@@ -106,7 +110,14 @@ class Point():
     def __init__(self,x=0,y=0):
         self.x = x
         self.y = y
-        
+
+def get_next_token(txt, idx):
+    i_token = 0
+    for s in txt[idx:]:
+        if s.isspace() == True: break
+        i_token += 1
+    return txt[idx:idx+i_token], i_token
+    
 def write_text(dev, t, viewport=True):
     SHIFT_FACTOR = 1.2;
     ich=0 
@@ -163,10 +174,22 @@ def write_text(dev, t, viewport=True):
     clist = []
     font_map = fontm.font_manager.get_font_map(t.font_id)
     end_x = 0
+
+    non_escape = True
     
-    for ich in range(nstr):
-        #glyp  = romans.font_map[ord(t.text[ich])-ord(' ')]
-        glyp = font_map[ord(t.text[ich])-ord(' ')]
+    while ich < nstr:
+        if t.text[ich] == ESCAPE:
+            token, i_token = get_next_token(t.text, ich)
+            glyp = sym_search.get_symbol_glyp(token)
+            if glyp:
+                ich += i_token
+                non_escape = False
+            else:
+                non_escape = True
+        if non_escape:
+            glyp = font_map[ord(t.text[ich])-ord(' ')]
+            ich += 1
+            
         npnt  = glyp[0]
         prs   = glyp[1]
         bbox  = glyp[2] # ll(x,y), rt(x,y)
