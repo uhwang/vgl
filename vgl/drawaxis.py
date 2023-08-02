@@ -51,6 +51,7 @@ def draw_axis(dev):
     else:
         raxis = dev.frm.axis_polar.raxis
         taxis = dev.frm.axis_polar.taxis
+        hgt = dev.frm.hgt()
         
         # draw r axis
         if raxis.show:
@@ -63,28 +64,6 @@ def draw_axis(dev):
                                         raxis.major_tick.lpat)
                     rr += raxis.dr
             
-            if raxis.label.show:
-                rlabel = raxis.get_label()
-                maj_tick = raxis.get_major_tick()
-        
-                wxx = raxis.first_major_tick_pos
-                vi = 1
-                yy = 0
-                yy = dev._y_viewport(yy)
-                hgt = dev.frm.hgt()
-                rlabel.en()
-                shift =  rlabel.pos * hgt
-                
-                while wxx <= raxis.rmax:
-                    wxxl = dev._x_viewport(wxx)
-                    ypos = yy
-                    rlabel.x = wxxl - shift
-                    rlabel.y = ypos + shift
-                    rlabel.text = "%1.2f"%wxx
-                    text.write_text(dev, rlabel, True)
-                    wxx = raxis.first_major_tick_pos+raxis.spacing*vi
-                    vi+=1
-    
         # minor r-tick
         # draw theta axis
         if taxis.show:
@@ -141,6 +120,27 @@ def draw_axis(dev):
                         tlabel.wn()
                         tlabel.y += tlabel.pos
                         
-                    tlabel.text = "%1.0f"%tt
+                    tlabel.text = "%1.0f\\deg"%tt
                     text.write_text(dev, tlabel, True)
                     tt += taxis.dtheta
+                    
+        if raxis.show and raxis.label.show:
+            rlabel = raxis.get_label()
+            maj_tick = raxis.get_major_tick()
+        
+            wxx = raxis.first_major_tick_pos
+            vi = 1
+            yy = 0
+            yy = dev._y_viewport(yy)
+            rlabel.en()
+            shift =  rlabel.pos * hgt
+            
+            while wxx <= raxis.rmax:
+                wxxl = dev._x_viewport(wxx)
+                ypos = yy
+                rlabel.x = wxxl - shift
+                rlabel.y = ypos + shift
+                rlabel.text = "%1.2f"%wxx
+                text.write_text(dev, rlabel, True)
+                wxx = raxis.first_major_tick_pos+raxis.spacing*vi
+                vi+=1
