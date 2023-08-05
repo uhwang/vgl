@@ -81,7 +81,7 @@ class DeviceSVG(device.DeviceRaster):
     def stroke(self):
         pass
         
-    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+    def circle(self, x,y, rad, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         cx, cy = self._x_pixel(x), self._y_pixel(y)
    
         if isinstance(fcol, color.Color):
@@ -168,18 +168,18 @@ class DeviceSVG(device.DeviceRaster):
                         self._x_pixel(ex),
                         self._y_pixel(ey)))
         
-        if isinstance(lcol, color.Color):
+        if not self.pen and isinstance(lcol, color.Color):
             self.fp.write(_line_format_end%(\
                         lcol.r, 
                         lcol.g, 
                         lcol.b, 
                         self._svg_lthk(lthk)))
          
-    def lline(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+    def lline(self, x1, y1, x2, y2, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID):
         self._line(x1, y1, x2, y2, lcol, lthk, lpat, True)
         #self.polyline([x1,x2], [y1,y2], lcol, lthk, lpat, closed=False, viewport=True)
         
-    def line(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+    def line(self, x1, y1, x2, y2, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID):
         self._line(x1, y1, x2, y2, lcol, lthk, lpat, False)
         #self.polyline([x1,x2], [y1,y2], lcol, lthk, lpat, closed=False, viewport=False)
         
@@ -214,7 +214,7 @@ class DeviceSVG(device.DeviceRaster):
     def llineto(self, x,y):
         self._lineto(x,y, True)
         
-    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+    def polygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         if lpat == linepat._PAT_SOLID or fcol:
             self.fp.write("<polygon points=\"")
             if viewport:
@@ -257,7 +257,7 @@ class DeviceSVG(device.DeviceRaster):
             self.fp.write("\"\n"+_polygon_format_end_nofill%(\
                 lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk)))
             
-    def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False, viewport=False):
+    def polyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False, viewport=False):
         if closed:
             if isinstance(x, np.ndarray):
                 xp = np.append(x, x[0])
@@ -306,10 +306,10 @@ class DeviceSVG(device.DeviceRaster):
                         lcol.b,
                         self._svg_lthk(lthk)))
                       
-    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
+    def lpolygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
 
-    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
+    def lpolyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
         self.polyline(x,y,lcol,lthk,lpat,closed,viewport=True)
         
     def close(self):
