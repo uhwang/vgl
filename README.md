@@ -142,15 +142,15 @@ def plot_cycloid(dev):
     dev.polyline(xcy,ycy,vgl.color.MAGENTA, 0.02)
     
 def save(dev):
-    dev.set_plot(frm_00)
+    dev.set_device(frm_00)
     run_fixed_tree(dev)
     
     create_polygon_list()
     frm_01.show_all_major_grid()
-    dev.set_plot(frm_01)
+    dev.set_device(frm_01)
     draw_shape(dev)
     
-    dev.set_plot(frm_10)
+    dev.set_device(frm_10)
     plot_x2(dev)
     
     plot_prop(dev)
