@@ -27,7 +27,6 @@ ex  = 5
 dx = (ex-sx)/npnt
 px, py = sx, 0
 pxx, pyy = [], []
-tan_xgap = data.xrange()*0.1
 
 def draw(t):
     global dev, px, py, pxx, pyy
