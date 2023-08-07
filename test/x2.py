@@ -12,12 +12,10 @@ gbox = fmm.get_gbbox()
 
 def draw(dev):
     dev.set_device(frm)
-    vgl.drawaxis.draw_axis(dev)
+    vgl.draw_axis(dev)
     dev.polyline(x, y2, vgl.color.BLUE, 0.001)
     sym = vgl.symbol.Circle(0.008, dev.frm.hgt(), 0.002)
-
-    for i in range(0,x.size): 
-        dev.symbol(x[i],y2[i],sym)
+    for i in range(0,x.size): dev.symbol(x[i],y2[i],sym)
     dev.close()
 
 def save():
