@@ -54,10 +54,8 @@ class DeviceIMG(device.DeviceRaster):
         self.pen.lthk = lthk
         self.pen.lcol = lcol
         c = color.normalize(lcol)
-        #self.cntx.set_source_rgb(self.lcol.r,self.lcol.g,self.lcol.b)
-        #self.cntx.set_source_rgb(r,g,b)
         self.cntx.set_source_rgb(c.r,c.g,c.b)
-        self.cntx.set_line_width(self.get_xlt(lthk))
+        self.cntx.set_line_width(self.get_ylt(lthk))
         
     def make_brush(self, fcol):
         self.fcol = color.normalize(fcol)
@@ -73,7 +71,7 @@ class DeviceIMG(device.DeviceRaster):
         
     def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
         if lcol:
-            self.make_pen(lcol, lthk)
+            self.make_pen(lcol, lthk*self.frm.hgt())
             
         if isinstance(lpat, linepat.LinePattern):
             xp = [sx, ex]
@@ -108,7 +106,6 @@ class DeviceIMG(device.DeviceRaster):
             self.cntx.line_to(convx(x1), convy(y1))
     
     def draw_geometry(self, lcol, lthk, lpat, fcol):
-        #print(lcol)
         if fcol or self.brush.fcol: 
             if fcol: 
                 self.make_brush(fcol)
@@ -128,14 +125,14 @@ class DeviceIMG(device.DeviceRaster):
         if lcol: self.delete_pen()
         if fcol: self.delete_brush()
         
-    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+    def polygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         if (lpat == linepat._PAT_SOLID and lcol) or fcol:
             if viewport:
                 self.create_pnt_list(x,y,self.get_xl,self.get_yl)
             else:
                 self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
             self.cntx.close_path()        
-            self.draw_geometry(lcol, lthk, lpat, fcol)
+            self.draw_geometry(lcol, lthk*self.frm.hgt(), lpat, fcol)
 
         if lcol and isinstance(lpat, linepat.LinePattern):
             if isinstance(x, np.ndarray):
@@ -150,17 +147,18 @@ class DeviceIMG(device.DeviceRaster):
                 pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport = True)
             else:
                 pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
-            self.make_pen(lcol, lthk)
+            self.make_pen(lcol, lthk*self.frm.hgt())
             for p1 in pat_seg:
                 x1 = [ p2[0] for p2 in p1 ]
                 y1 = [ p2[1] for p2 in p1 ]
                 self.cntx.move_to(self.get_xl(x1[0]),self.get_yl(y1[0]))
                 for x2, y2 in zip(x1, y1):
                     self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
-            self.delete_pen()
             self.cntx.stroke()
+            self.delete_pen()
             
-    def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
+    def polyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
+    
         if isinstance(lpat, linepat.LinePattern):
             if closed:
                 if isinstance(x, np.ndarray):
@@ -178,14 +176,15 @@ class DeviceIMG(device.DeviceRaster):
                 self.cntx.move_to(self.get_xl(x1[0]),self.get_yl(y1[0]))
                 for x2, y2 in zip(x1[1:], y1[1:]):
                     self.cntx.line_to(self.get_xl(x2),self.get_yl(y2))
+            self.delete_pen()
         else:
             self.create_pnt_list(x,y,self._x_pixel,self._y_pixel)
 
             if closed: 
                 self.cntx.close_path()
     
-        if lcol: self.make_pen(lcol, lthk)
-        else   : self.make_pen(self.pen.lcol, self.pen.lthk)
+        if lcol: self.make_pen(lcol, lthk*self.frm.hgt())
+        #else   : self.make_pen(self.pen.lcol, self.pen.lthk*self.frm.hgt())
 
         self.cntx.stroke()
             
@@ -203,7 +202,7 @@ class DeviceIMG(device.DeviceRaster):
     def end_symbol(self):  
         pass
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
+    def circle(self, x,y, rad, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         if isinstance(lpat, linepat.LinePattern):
             rrad = np.linspace(0, np.pi*2, self._circle_point)
             x1 = x+rad*np.cos(rrad)
@@ -214,15 +213,15 @@ class DeviceIMG(device.DeviceRaster):
             cy = self._y_pixel(y)
             rr = self.get_v(rad)
             self.cntx.arc(cx,cy,rr,0,np.pi*2)
-            self.draw_geometry(lcol, lthk, lpat, fcol)
+            self.draw_geometry(lcol, lthk*self.frm.hgt(), lpat, fcol)
             
     def symbol(self, x,y, sym, draw=False):
         px, py = sym.update_xy(self._x_viewport(x),self._y_viewport(y))
         self.polygon(px,py,sym.lcol,sym.lthk,linepat._PAT_SOLID, sym.fcol, viewport=True)
         
     def lline(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
-        if lcol: self.make_pen(lcol, lthk)
-        else   : self.make_pen(self.pen.lcol, self.pen.lthk)
+        if lcol: self.make_pen(lcol, lthk*self.frm.hgt())
+        #else   : self.make_pen(self.pen.lcol, self.pen.lthk*self.frm.hgt())
         
         if isinstance(lpat, linepat.LinePattern):
             x = [sx, ex]
@@ -248,10 +247,10 @@ class DeviceIMG(device.DeviceRaster):
     def llineto(self, x,y):
         self.cntx.line_to(self.get_xl(x),self.get_yl(y))
     
-    def lpolygon(self, x, y, lcol=None, lthk=None, fcol=None, lpat=linepat._PAT_SOLID):
+    def lpolygon(self, x, y, lcol=color.BLACK, lthk=0.001, fcol=None, lpat=linepat._PAT_SOLID):
         self.polygon(x,y,lcol,lthk, lpat, fcol, viewport=True)
 
-    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
+    def lpolyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
     
         if isinstance(lpat, linepat.LinePattern):
             if closed:
@@ -278,8 +277,8 @@ class DeviceIMG(device.DeviceRaster):
             if closed: 
                 self.cntx.close_path()
             
-        if lcol: self.make_pen(lcol, lthk)    
-        else   : self.make_pen(self.pen.lcol, self.pen.lthk)
+        if lcol: self.make_pen(lcol, lthk*self.frm.hgt())    
+        else   : self.make_pen(self.pen.lcol, self.pen.lthk*self.frm.hgt())
         self.cntx.stroke()
         if lcol: self.delete_pen()
     

@@ -256,8 +256,8 @@ def write_text(dev, t, viewport=True):
     if IS_TOP    (t.align): dy =  fhgt
     if IS_BOTTOM (t.align): dy = -fhgt
     
-    fthk = t.lthk*dev.frm.hgt()
-    bthk = t.box_lthk*dev.frm.hgt()
+    fthk = t.lthk#*dev.frm.hgt()
+    bthk = t.box_lthk#*dev.frm.hgt()
     if t.show_box or t.fill_box:
         if t.rotation != 0:
             x1 = fbox.sx*ccos-fbox.sy*csin

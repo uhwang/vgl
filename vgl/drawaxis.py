@@ -34,8 +34,7 @@ def draw_axis(dev):
             x1 = dev._x_viewport(xmin)
             x2 = dev._x_viewport(xmax)
             yy = dev._y_viewport(pos_y)
-            dev.lline(x1, yy, x2, yy, lcol= xaxis.lcol, 
-                                    lthk=xaxis.lthk*dev.frm.hgt())
+            dev.lline(x1, yy, x2, yy, xaxis.lcol, xaxis.lthk)
         
         #draw y-axis
         if yaxis.show:
@@ -43,8 +42,7 @@ def draw_axis(dev):
             y1 = dev._y_viewport(ymin)
             y2 = dev._y_viewport(ymax)
             xx = dev._x_viewport(pos_x)
-            dev.lline(xx, y1, xx, y2, lcol=yaxis.lcol, 
-                                 lthk=yaxis.lthk*dev.frm.hgt())
+            dev.lline(xx, y1, xx, y2, yaxis.lcol, yaxis.lthk)
         drawtick.draw_tick(dev)
         drawgrid.draw_grid(dev)
         drawlabel.draw_label(dev)
@@ -60,7 +58,7 @@ def draw_axis(dev):
                 rr = raxis.dr
                 while rr <= raxis.rmax:
                     dev.circle(0,0, rr, raxis.major_tick.lcol, 
-                                        raxis.major_tick.lthk*dev.frm.hgt(), 
+                                        raxis.major_tick.lthk, 
                                         raxis.major_tick.lpat)
                     rr += raxis.dr
             
@@ -74,7 +72,7 @@ def draw_axis(dev):
                     dev.line(0,0,raxis.rmax*math.cos(rt), 
                                  raxis.rmax*math.sin(rt),
                                  taxis.major_tick.lcol, 
-                                 taxis.major_tick.lthk*dev.frm.hgt(), 
+                                 taxis.major_tick.lthk, 
                                  taxis.major_tick.lpat)
                     tt += taxis.dtheta
         

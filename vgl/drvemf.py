@@ -67,7 +67,7 @@ def unpack_header(format, buf):
         h[23],h[24],h[25],
         h[26],h[27])
 
-# from pyemf.py
+# start of pyemf.py
 colorref = lambda r,g,b: ((b<<16)|(g<<8)|r)        
 
 def _getBounds(points_x, points_y):
@@ -98,6 +98,7 @@ def _useShort(bounds):
         return True
     return False
 
+# enf of pyemf.py
     
 class MetaRecord():
     def __init__(self, func, nparam):

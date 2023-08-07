@@ -58,7 +58,6 @@ class DevicePDF(device.DeviceVector):
             
         if isinstance(lpat, linepat.LinePattern):
             self.polyline(xx,yy,lcol,lthk,lpat,viewport)
-            #self.polyline(xx,yy,lcol,lthk,lpat,viewport=True)
         else:
             if self.pen:
                 self.dev.MoveTo(sxp, syp)
@@ -96,19 +95,22 @@ class DevicePDF(device.DeviceVector):
     def llineto(self, x, y):
         self._lineto(x,y,True)
         
-    def lline(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+    def lline(self, x1, y1, x2, y2, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID):
         self._line(x1, y1, x2, y2, lcol, lthk, lpat, True)
         
-    def line(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+    def line(self, x1, y1, x2, y2, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID):
         self._line(x1, y1, x2, y2, lcol, lthk, lpat, False)
         
     # viewport(True) : lpolygon
     # viewport(False) : polygon
     
-    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+    def polygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
 
-        if lthk: _lthk = lthk*drvpdf._points_inch
+        #if lthk: 
+        if not self.pen:
+            _lthk = lthk*self.frm.hgt()*drvpdf._points_inch
+            
         if (pat_inst ==False and lcol) or fcol:
             if viewport:
                 px = [xx*drvpdf._points_inch for xx in x]
@@ -154,17 +156,20 @@ class DevicePDF(device.DeviceVector):
         ppy = [py1*drvpdf._points_inch for py1 in py]
         self.dev.Polygon(ppx, ppy, sym.lcol, sym.lthk*drvpdf._points_inch, sym.fcol)
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
+    def circle(self, x,y, rad, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
         self.polygon(x1, y1, lcol, lthk, lpat, fcol)
         
-    def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False, viewport=False):
+    def polyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
 
-        if lthk: _lthk = lthk*drvpdf._points_inch
-        else: lthk = 0
+        #if lthk: _lthk = lthk*drvpdf._points_inch
+        #else: lthk = 0
+        if not self.pen:
+            _lthk = lthk*self.frm.hgt()*drvpdf._points_inch
+            _lcol = lcol
         
         if pat_inst == False and lcol:
             if viewport:
@@ -179,9 +184,10 @@ class DevicePDF(device.DeviceVector):
                 if closed:
                     px.append(self._x_viewport(x[0])*drvpdf._points_inch)
                     py.append(self._y_viewport(y[0])*drvpdf._points_inch)
-            self.dev.Polyline(px,py,lcol,_lthk,fcol=None,closed=False)
+            self.dev.Polyline(px,py,_lcol,_lthk,fcol=None,closed=False)
     
-        if lcol and pat_inst:
+        #if lcol and pat_inst:
+        if not self.pen and lcol and pat_inst:
             if closed: 
                 if isinstance(x, np.ndarray):
                     xp = np.append(x, x[0])
@@ -202,13 +208,13 @@ class DevicePDF(device.DeviceVector):
             for p1 in pat_seg:
                 x2 = [p2[0]*drvpdf._points_inch for p2 in p1 ]
                 y2 = [p2[1]*drvpdf._points_inch for p2 in p1 ]
-                self.dev.Polyline(x2, y2, lcol, _lthk, fcol=None, closed=False)
+                self.dev.Polyline(x2, y2, _lcol, _lthk, fcol=None, closed=False)
         
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
+    def lpolygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         self.polygon(x,y,lcol,lthk,lpat,fcol,viewport=True)
 
-    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
+    def lpolyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
         self.polyline(x,y,lcol,lthk,lpat,closed,viewport=True)
         
     def create_clip(self, sx, sy, ex, ey):

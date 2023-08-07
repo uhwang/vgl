@@ -49,8 +49,9 @@ class DeviceSVG(device.DeviceRaster):
                       " style=\"fill:rgb(255,255,255)\"/>")
 
     def _svg_lthk(self, lthk):
-        lthk_ = int(self.get_xlt(lthk))
-        return 1 if lthk_ == 0 else lthk_
+        #lthk_ = int(self.get_xlt(lthk))
+        lthk_ = self.get_ylt(lthk)
+        return 1 if lthk_ < 1 else lthk_
         
     def make_pen(self, lcol, lthk):
         self.pen = gdiobj.StreamPen()
@@ -82,16 +83,19 @@ class DeviceSVG(device.DeviceRaster):
         pass
         
     def circle(self, x,y, rad, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+        if lthk:
+            _lthk = lthk*self.frm.hgt()
+            
         cx, cy = self._x_pixel(x), self._y_pixel(y)
    
         if isinstance(fcol, color.Color):
             self.fp.write("<circle cx=\"%3.3f\" cy=\"%3.3f\" r=\"%3.3f\" "\
                   "stroke=\"rgb(%d, %d, %d)\" stroke-width=\"%d\" fill=\"rgb(%d, %d, %d)\" />\n"%
-                  (cx, cy, self.get_v(rad), lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk), fcol.r, fcol.g, fcol.b))
+                  (cx, cy, self.get_v(rad), lcol.r, lcol.g, lcol.b, self._svg_lthk(_lthk), fcol.r, fcol.g, fcol.b))
         else:
             self.fp.write("<circle cx=\"%3.3f\" cy=\"%3.3f\" r=\"%3.3f\" "\
                   "stroke=\"rgb(%d, %d, %d)\" stroke-width=\"%d\" fill=\"none\" />\n"%
-                  (cx, cy, self.get_v(rad), lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk)))
+                  (cx, cy, self.get_v(rad), lcol.r, lcol.g, lcol.b, self._svg_lthk(_lthk)))
 
     def begin_symbol(self, sym): 
         pass
@@ -173,7 +177,7 @@ class DeviceSVG(device.DeviceRaster):
                         lcol.r, 
                         lcol.g, 
                         lcol.b, 
-                        self._svg_lthk(lthk)))
+                        self._svg_lthk(lthk*self.frm.hgt())))
          
     def lline(self, x1, y1, x2, y2, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID):
         self._line(x1, y1, x2, y2, lcol, lthk, lpat, True)
@@ -215,6 +219,9 @@ class DeviceSVG(device.DeviceRaster):
         self._lineto(x,y, True)
         
     def polygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+        if lthk:
+            _lthk = lthk*self.frm.hgt()
+            
         if lpat == linepat._PAT_SOLID or fcol:
             self.fp.write("<polygon points=\"")
             if viewport:
@@ -225,13 +232,13 @@ class DeviceSVG(device.DeviceRaster):
             if lcol and fcol:
                 if lpat == linepat._PAT_SOLID:
                     self.fp.write(_polygon_format_end%(\
-                        lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk),
+                        lcol.r, lcol.g, lcol.b, self._svg_lthk(_lthk),
                         fcol.r, fcol.g, fcol.b))
                 else:
                     self.fp.write(_polygon_format_end_nostroke%(fcol.r, fcol.g, fcol.b))
             elif lcol and not isinstance(fcol,color.Color):
                 self.fp.write(_polygon_format_end_nofill%(\
-                    lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk)))
+                    lcol.r, lcol.g, lcol.b, self._svg_lthk(_lthk)))
             else:
                 self.fp.write(_polygon_format_end_nostroke%(fcol.r, fcol.g, fcol.b))
 
@@ -255,9 +262,12 @@ class DeviceSVG(device.DeviceRaster):
                 y1 = [ self.get_yl(p2[1]) for p2 in p1 ]
                 self._write_pathpoints(x1,y1)
             self.fp.write("\"\n"+_polygon_format_end_nofill%(\
-                lcol.r, lcol.g, lcol.b, self._svg_lthk(lthk)))
+                lcol.r, lcol.g, lcol.b, self._svg_lthk(_lthk)))
             
     def polyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False, viewport=False):
+        if lthk:
+            _lthk = lthk*self.frm.hgt()
+            
         if closed:
             if isinstance(x, np.ndarray):
                 xp = np.append(x, x[0])
@@ -298,13 +308,14 @@ class DeviceSVG(device.DeviceRaster):
                         self.pen.lcol.r, 
                         self.pen.lcol.g, 
                         self.pen.lcol.b,
+                        #self._svg_lthk(self.pen.lthk)))
                         self.pen.lthk))
         else:
             self.fp.write(_line_format_end%(\
                         lcol.r, 
                         lcol.g, 
                         lcol.b,
-                        self._svg_lthk(lthk)))
+                        self._svg_lthk(_lthk)))
                       
     def lpolygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)

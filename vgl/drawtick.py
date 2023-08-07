@@ -41,7 +41,6 @@ def draw_tick(dev):
     min_ty0, min_ty1 = tick_pos_dir(min_tick, mitlen)
     
     # draw first minor ticks
-    #yy = frm.bbox.sy+frm.pdom.get_ey()
     yy = axis.get_xaxis_ypos(xaxis,yaxis)
     yy = dev._y_viewport(yy)
     
@@ -92,7 +91,6 @@ def draw_tick(dev):
     mjtlen = maj_tick.llen*hgt
     mispc = yaxis.spacing/(yaxis.nminor_tick+1)
     
-    #xx = frm.bbox.sx+frm.pdom.get_sx()#frm.pdom.get_sx()
     xx = axis.get_yaxis_xpos(xaxis,yaxis)
     xx = dev._x_viewport(xx)
     

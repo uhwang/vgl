@@ -37,7 +37,7 @@ class DeviceEMF(device.DeviceRaster):
     def make_pen(self, color, thk):
         self.pen.lcol = color
         self.pen.lthk = thk
-        self.dev.MakePen(color, int(self.get_xlt(thk)))
+        self.dev.MakePen(color, int(self.get_ylt(thk)))
     
     def delete_pen(self):
         self.dev.DeletePen()
@@ -52,10 +52,11 @@ class DeviceEMF(device.DeviceRaster):
         self.dev.DeleteBrush()
         self.brush.fcol = None
         
-    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+    def line(self, sx, sy, ex, ey, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID):
 
         if isinstance(lpat, linepat.LinePattern):
-            if lcol: self.make_pen(lcol, lthk)
+            if not isinstance(self.pen.lcol, color.Color) and lcol: 
+                self.make_pen(lcol, lthk*self.frm.hgt())
             xp = [sx, ex]
             yp = [sy, ey]
             pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
@@ -65,13 +66,14 @@ class DeviceEMF(device.DeviceRaster):
                 y1 = [int(self.get_yl(p2[1])) for p2 in p1 ]
                 self.dev.Polyline(x1, y1, closed=False) 
                 
-            if lcol: self.delete_pen()
+            if not isinstance(self.pen.lcol, color.Color) and lcol: 
+                self.delete_pen()
         else:
             x1 = self._x_pixel(sx)
             y1 = self._y_pixel(sy)
             x2 = self._x_pixel(ex)
             y2 = self._y_pixel(ey)
-            self.dev.Line(x1, y1, x2, y2, lcol, int(lthk*self.dpi))
+            self.dev.Line(x1, y1, x2, y2, lcol, int(self.get_ylt(lthk*self.frm.hgt())))
         
     def stroke(self):
         return
@@ -85,7 +87,7 @@ class DeviceEMF(device.DeviceRaster):
     # viewport(True) : lpolygon
     # viewport(False) : polygon
     
-    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
+    def polygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None, viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
 
         if (pat_inst ==False and lcol) or fcol:
@@ -96,7 +98,8 @@ class DeviceEMF(device.DeviceRaster):
                 px = [int(self._x_pixel(xx)) for xx in x]
                 py = [int(self._y_pixel(yy)) for yy in y]
             if isinstance(lcol, color.Color) and lpat == linepat._PAT_SOLID:
-                self.dev.Polygon(px,py,lcol, int(self.get_xlt(lthk)),fcol)
+                self.dev.Polygon(px,py,lcol, 
+                                 int(self.get_ylt(lthk*self.frm.hgt())),fcol)
             elif fcol:
                 self.dev.Polygon(px,py,None, None, fcol)
     
@@ -113,7 +116,8 @@ class DeviceEMF(device.DeviceRaster):
                 pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
             else:
                 pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
-            self.make_pen(lcol, lthk)
+
+            self.make_pen(lcol, lthk*self.frm.hgt())
             for p1 in pat_seg:
                 x2 = [int(self.get_xl(p2[0])) for p2 in p1 ]
                 y2 = [int(self.get_xl(p2[1])) for p2 in p1 ]
@@ -121,12 +125,13 @@ class DeviceEMF(device.DeviceRaster):
             self.delete_pen()
             
     def begin_symbol(self, sym):
-        self.make_pen(sym.lcol, sym.lthk)
-        self.make_brush(sym.fcol)
-        
+        #self.make_pen(sym.lcol, sym.lthk)
+        #self.make_brush(sym.fcol)
+        pass
     def end_symbol(self):
-        self.delete_pen()
-        self.delete_brush()
+        #self.delete_pen()
+        #self.delete_brush()
+        pass
         
     def symbol(self, x,y,sym,draw=False):
         cx = self._x_viewport(x)
@@ -134,16 +139,20 @@ class DeviceEMF(device.DeviceRaster):
         px, py = sym.update_xy(cx,cy)
         ppx = [int(self.get_xl(px1)) for px1 in px]
         ppy = [int(self.get_yl(py1)) for py1 in py]
-        self.dev.Symbol(ppx,ppy)
+        #self.dev.Symbol(ppx,ppy)
+        self.dev.Polygon(ppx,ppy, sym.lcol, 
+        int(self.get_ylt(sym.lthk*self.frm.hgt())), sym.fcol)
     
-    def circle(self, x,y, rad, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
+    def circle(self, x,y, rad, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
         self.polygon(x1, y1, lcol, lthk, lpat, fcol)
         
-    def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
-        if lcol: self.dev.MakePen(lcol, int(self.get_xlt(lthk)))
+    def polyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
+        #if lcol: 
+        if not isinstance(self.pen.lcol, color.Color) and lcol:
+            self.dev.MakePen(lcol, int(self.get_xlt(lthk*self.frm.hgt())))
         
         if isinstance(lpat, linepat.LinePattern):
             if closed:
@@ -167,9 +176,14 @@ class DeviceEMF(device.DeviceRaster):
             px=[int(self._x_pixel(x1)) for x1 in x]
             py=[int(self._y_pixel(y1)) for y1 in y]
             self.dev.Polyline(px,py,closed)
-        if lcol: self.dev.DeletePen()
+            
+        #if lcol: 
+        #if not isinstance(self.pen.lcol, color.Color):
+        if not isinstance(self.pen.lcol, color.Color) and lcol:
+            self.dev.MakePen(lcol, int(self.get_xlt(lthk*self.frm.hgt())))        
+            self.dev.DeletePen()
         
-    def lline(self, x1, y1, x2, y2, lcol=None, lthk=None, lpat=linepat._PAT_SOLID):
+    def lline(self, x1, y1, x2, y2, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID):
         x = [x1, x2]
         y = [y1, y2]
         self.lpolyline(x,y,lcol,lthk,lpat)
@@ -180,13 +194,16 @@ class DeviceEMF(device.DeviceRaster):
     def llineto(self, x, y):
         self.dev.LineTo(int(self.get_xl(x)),int(self.get_yl(y)))
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
+    def lpolygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         self.polygon(x,y,lcol,lthk,fcol,lpat,viewport=True)
 
-    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
-        if lcol: 
-            self.make_pen(lcol, lthk)
-
+    def lpolyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
+        #if lcol: 
+        #if not isinstance(self.pen.lcol, color.Color):
+        #    self.make_pen(lcol, lthk*self.frm.hgt())
+        if not isinstance(self.pen.lcol, color.Color):
+            self.dev.MakePen(lcol, int(self.get_xlt(lthk*self.frm.hgt())))
+            
         if isinstance(lpat, linepat.LinePattern):
             if closed:
                 if isinstance(x, np.ndarray):
@@ -210,7 +227,10 @@ class DeviceEMF(device.DeviceRaster):
             y1 = [ int(self.get_yl(p2)) for p2 in y ]   
             self.dev.Polyline(x1, y1, closed)
         
-        if lcol: 
+        #if lcol: 
+        #if not isinstance(self.pen.lcol, color.Color):
+        if not isinstance(self.pen.lcol, color.Color) and lcol:
+            self.dev.MakePen(lcol, int(self.get_xlt(lthk*self.frm.hgt())))        
             self.delete_pen()
         
     def create_clip(self, sx, sy, ex, ey):

@@ -320,7 +320,9 @@ class AxisX(Axis):
         super().__init__(amin,amax,lcol,lthk)
         self.name = _get_xaxis_name()
         self.pos_t= pos_t
-        #self.pos    = 
+
+    def set_pos_center(self):
+        self.pos_t = _POS_ZERO
         
 class AxisY(Axis):
     def __init__(self, amin=0, amax=1, lcol = color.BLACK, lthk=0.004,\
@@ -328,7 +330,10 @@ class AxisY(Axis):
         super().__init__(amin,amax,lcol,lthk)
         self.name = _get_yaxis_name()
         self.pos_t= pos_t
-
+        
+    def set_pos_center(self):
+        self.pos_t = _POS_ZERO
+        
 class CartesianAxis2D():
     def __init__(self):
         self.xaxis = AxisX()

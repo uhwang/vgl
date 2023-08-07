@@ -136,6 +136,11 @@ class Frame():
    
     #def resize(self, wid, hgt):
         
+    def set_axispos_center(self):
+        #self.axis_cartesian
+        self.xaxis.set_pos_center()
+        self.yaxis.set_pos_center()
+        
     def create_polar_axis(self, rmin, rmax):
         import decimal
         context = decimal.getcontext()
@@ -260,6 +265,18 @@ class Frame():
     def hide_yaxis(self):
         self.yaxis.show = False
         
+    def hide_all_xaxis(self):
+        self.hide_xaxis()
+        self.hide_xtick()
+        self.hide_xgrid()
+        self.hide_xlabel()
+        
+    def hide_all_yaxis(self):
+        self.hide_yaxis()
+        self.hide_ytick()
+        self.hide_ygrid()
+        self.hide_ylabel()
+                
     def hide_rlabel(self):
         if self.axis_polar:
             self.axis_polar.raxis.label.show = False

@@ -78,8 +78,6 @@ from . import linepat
 from . import patline
 from . import gdiobj
 
-_PPT_PT_INCH = 10
-
 def Polyline(slide, x, y, lcol, lthk, lpat, fcol, closed):
 
     free_form = slide.shapes.build_freeform(Inches(x[0]), Inches(y[0]))
@@ -102,15 +100,14 @@ def Polyline(slide, x, y, lcol, lthk, lpat, fcol, closed):
     if lcol:
         if fcol and lcol == fcol:
             line_shape.line.color.rgb = RGBColor(fcol.r, fcol.g, fcol.b)
-            line_shape.line.width = Pt(lthk*_PPT_PT_INCH)
+            line_shape.line.width = Inches(lthk)
         else:
             line_shape.line.color.rgb = RGBColor(lcol.r, lcol.g, lcol.b)
-            line_shape.line.width = Pt(lthk*_PPT_PT_INCH)
+            line_shape.line.width = Inches(lthk)
         
     line_shape.shadow.inherit     = False
     line_shape.shadow.blur_radius = 0
     line_shape.shadow.distance    = 0
-
     
 # Not working. 
 
@@ -154,29 +151,36 @@ class DevicePPT(device.DeviceVector):
         self.pen.lcol = None
         self.pen.lthk = None
         
-    def circle(self, x,y, rad, lcol, lthk, lpat=linepat._PAT_SOLID, fcol=None):
+    def circle(self, x,y, rad, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
-        self._polyline(x1,y1, lcol, lthk, lpat, fcol, closed=True, viewport=False)
+        self._polyline(x1,y1, lcol, lthk*self.frm.hgt(), lpat, fcol, closed=True, viewport=False)
         
-    def lcircle(self, x,y, rad, lcol, lthk, lpat=linepat._PAT_SOLID, fcol=None):
+    def lcircle(self, x,y, rad, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
         rrad = np.linspace(0, np.pi*2, self._circle_point)
         x1 = x+rad*np.cos(rrad)
         y1 = y+rad*np.sin(rrad)
-        self._polyline(x,y, rad, lcol, lthk, lpat, fcol, closed=True, viewport=True)
+        self._polyline(x,y, rad, lcol, lthk*self.frm.hgt(), lpat, fcol, closed=True, viewport=True)
         
-    def line(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, viewport=False):
+    def line(self, sx, sy, ex, ey, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, viewport=False):
         if self.pen.lcol:
-            lcol = self.pen.lcol
-            lthk = self.pen.lthk
-        self._polyline((sx,ex), (sy,ey), lcol, lthk, lpat, None, False, viewport=False)
+            _lcol = self.pen.lcol
+            _lthk = self.pen.lthk
+        else:
+            _lcol = lcol
+            _lthk = lthk*self.frm.hgt()
+        self._polyline((sx,ex), (sy,ey), _lcol, _lthk, lpat, None, False, viewport=False)
         
-    def lline(self, sx, sy, ex, ey, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, viewport=True):
+    def lline(self, sx, sy, ex, ey, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, viewport=True):
         if self.pen.lcol:
-            lcol = self.pen.lcol
-            lthk = self.pen.lthk
-        self._polyline((sx,ex), (sy,ey), lcol, lthk, lpat, None, False, viewport=True)
+            _lcol = self.pen.lcol
+            _lthk = self.pen.lthk
+        else:
+            _lcol = lcol
+            _lthk = lthk*self.frm.hgt()
+        #print(_lthk)
+        self._polyline((sx,ex), (sy,ey), _lcol, _lthk, lpat, None, False, viewport=True)
         
     def _polyline(self, x, y, 
                         lcol=None, 
@@ -187,8 +191,8 @@ class DevicePPT(device.DeviceVector):
                         viewport=False):
         pat_inst = isinstance(lpat, linepat.LinePattern)
 
-        if lthk: _lthk = lthk*self.frm.hgt()
-        else: _lthk = 0
+        #if lthk: _lthk = lthk*self.frm.hgt()
+        #else: _lthk = 0
 
         if viewport:
             px, py = x, y
@@ -198,7 +202,7 @@ class DevicePPT(device.DeviceVector):
 
         # polygon and solid outline
         if fcol and closed and pat_inst==linepat._PAT_SOLID:
-            Polyline(self.slide, px, py, lcol, _lthk, lpat, fcol, closed)
+            Polyline(self.slide, px, py, lcol, lthk, lpat, fcol, closed)
             
         # polyline/polygon and solid/patterened outline
         else:
@@ -206,7 +210,7 @@ class DevicePPT(device.DeviceVector):
                 # fill the polygon
                 if fcol and closed:
                     lcol1 = fcol
-                    Polyline(self.slide, px, py, lcol1, _lthk, lpat, fcol, closed)
+                    Polyline(self.slide, px, py, lcol1, lthk, lpat, fcol, closed)
                     
                 # polygon & outline (one more point to close)
                 if closed:
@@ -226,21 +230,45 @@ class DevicePPT(device.DeviceVector):
                 for p1 in pat_seg:
                     x2 = [p2[0] for p2 in p1 ]
                     y2 = [p2[1] for p2 in p1 ]
-                    Polyline(self.slide, x2, y2, lcol, _lthk, lpat, fcol, closed=False)
+                    Polyline(self.slide, x2, y2, lcol, lthk, lpat, fcol, closed=False)
             else:
-                Polyline(self.slide, px, py, lcol, _lthk, lpat, fcol, closed)
+                Polyline(self.slide, px, py, lcol, lthk, lpat, fcol, closed)
          
-    def polyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
+    def polyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
+        if self.pen.lcol:
+            _lcol = self.pen.lcol
+            _lthk = self.pen.lthk
+        else:
+            _lcol = lcol
+            _lthk = lthk*self.frm.hgt()
         self._polyline(x, y, lcol, lthk, lpat, None, closed, False)
         
-    def lpolyline(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, closed=False):
+    def lpolyline(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, closed=False):
+        if self.pen.lcol:
+            _lcol = self.pen.lcol
+            _lthk = self.pen.lthk
+        else:
+            _lcol = lcol
+            _lthk = lthk*self.frm.hgt()
         self._polyline(x, y, lcol, lthk, lpat, None, closed, True)
     
-    def polygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
-        self._polyline(x, y, lcol=lcol, lthk=lthk, lpat=lpat, fcol=fcol, closed=True, viewport=False)
+    def polygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
+        if self.pen.lcol:
+            _lcol = self.pen.lcol
+            _lthk = self.pen.lthk
+        else:
+            _lcol = lcol
+            _lthk = lthk*self.frm.hgt()    
+        self._polyline(x, y, _lcol, _lthk, lpat, fcol, True, viewport=False)
         
-    def lpolygon(self, x, y, lcol=None, lthk=None, lpat=linepat._PAT_SOLID, fcol=None):
-        self._polyline(x, y, lcol=lcol, lthk=lthk, lpat=lpat, fcol=fcol, closed=True, viewport=True)
+    def lpolygon(self, x, y, lcol=color.BLACK, lthk=0.001, lpat=linepat._PAT_SOLID, fcol=None):
+        if self.pen.lcol:
+            _lcol = self.pen.lcol
+            _lthk = self.pen.lthk
+        else:
+            _lcol = lcol
+            _lthk = lthk*self.frm.hgt()    
+        self._polyline(x, y, _lcol, _lthk, lpat, fcol, True, viewport=True)
         
     def begin_symbol(self, sym):
         pass
@@ -251,7 +279,7 @@ class DevicePPT(device.DeviceVector):
     def symbol(self, x,y,sym,draw=False):
         px, py = sym.update_xy( self._x_viewport(x),
                                 self._y_viewport(y) )
-        self._polyline(px, py, sym.lcol, sym.lthk, 
+        self._polyline(px, py, sym.lcol, sym.lthk*self.frm.hgt(), 
         linepat._PAT_SOLID, sym.fcol, closed=True, viewport=True)
         
     def stroke(self):

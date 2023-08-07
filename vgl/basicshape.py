@@ -144,22 +144,22 @@ class GenericLine(linetype.LineLevelC):
     def draw(self, dev):
         if self.viewport == False:
             dev.line(self.sx, self.sy, self.ex, self.ey, 
-                     self.lcol, self.lthk*dev.frm.hgt(), lpat=self.get_line_pattern())
+                     self.lcol, self.lthk, lpat=self.get_line_pattern())
         else:
             dev.lline(self.sx, self.sy, self.ex, self.ey, 
-                      self.lcol, self.lthk*dev.frm.hgt(), lpat=self.get_line_pattern())
+                      self.lcol, self.lthk, lpat=self.get_line_pattern())
 
         if self.begin_arrow.show:
             acol = self.lcol if self.begin_arrow.col == self.lcol\
                              else self.begin_arrow.col
             draw_arrow_head(dev, self.sx, self.sy, self.begin_arrow, 
-            acol, self.lthk*dev.frm.hgt(), self.viewport)
+            acol, self.lthk, self.viewport)
             
         if self.end_arrow.show:
             acol = self.lcol if   self.end_arrow.col == self.lcol\
                              else self.end_arrow.col
             draw_arrow_head(dev, self.ex, self.ey, self.end_arrow, 
-            acol, self.lthk*dev.frm.hgt(), self.viewport)
+            acol, self.lthk, self.viewport)
 
 class ArrowLine(GenericLine):
     def __init__(self, 

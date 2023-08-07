@@ -113,9 +113,10 @@ class Polygon(shape.Shape):
                 edge, 
                 lcol=color.BLACK, 
                 lthk=0.001,
-                fcol=None, 
+                lpat=linepat._PAT_SOLID,
                 pat_len=0.04, 
-                lpat = linepat._PAT_SOLID):
+                fcol=None 
+        ):
         super().__init__( xc,yc, 
                           nvert, 
                           edge, 
