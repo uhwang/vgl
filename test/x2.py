@@ -3,7 +3,7 @@ import numpy as np
 import vgl
 
 x = np.arange(-3,3.2,0.2)
-y2 = x**2
+y = x**2
 
 data = vgl.Data(-3,3,-1,10)
 fmm = vgl.FrameManager()
@@ -13,9 +13,9 @@ gbox = fmm.get_gbbox()
 def draw(dev):
     dev.set_device(frm)
     vgl.draw_axis(dev)
-    dev.polyline(x, y2, vgl.color.BLUE, 0.001)
+    dev.polyline(x, y, vgl.color.BLUE, 0.001)
     sym = vgl.symbol.Circle(0.008, dev.frm.hgt(), 0.002)
-    for i in range(0,x.size): dev.symbol(x[i],y2[i],sym)
+    for x1, y1 in zip(x,y): dev.symbol(x1,y1,sym)
     dev.close()
 
 def save():
