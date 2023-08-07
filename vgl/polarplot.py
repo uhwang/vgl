@@ -21,6 +21,6 @@ def polarplot(dev, theta, rho, lcol=color.cornflowerblue, lthk=0.004, lpat=linep
         y[i] = r*np.sin(t)
         
     if isinstance(fcol, color.Color):
-        dev.polygon(x,y, lcol, lthk*dev.frm.hgt(), lpat, fcol)
+        dev.polygon(x,y, lcol, lthk, lpat, fcol)
     else:
-        dev.polyline(x,y, lcol, lthk*dev.frm.hgt(), lpat)
+        dev.polyline(x,y, lcol, lthk, lpat)
