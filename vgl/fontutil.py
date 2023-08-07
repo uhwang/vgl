@@ -15,12 +15,13 @@ from . import color
 from . import fontid
 from . import fontm
 
-def print_hershey_font(font_id, dev_name):
+def print_hershey_font(font_id, dev_name, path=None):
  
     if fontid._valid_fid(font_id):
     
         font_name = fontm.get_font_name(font_id)
-        fname = "%s-table"%font_name
+        fname = "%s/%s-table"%(path,font_name) if path else "%s-table"%font_name 
+        
         dev = devutil.open_device(dev_name, fname)
         
         if dev:
@@ -48,11 +49,11 @@ def print_hershey_font(font_id, dev_name):
             # draw horiz lines
             for i in range(nch+1):
                 xx = sx + i*dw
-                dev.lline(xx, sy+dh, xx, ey, color.BLACK, 0.001*fh, linepat._PAT_SOLID)
+                dev.lline(xx, sy+dh, xx, ey, color.BLACK, 0.001, linepat._PAT_SOLID)
             
             for i in range(ncv-1):
                 yy = sy + (i+1)*dh
-                dev.lline(sx, yy, ex, yy, color.BLACK, 0.001*fh, linepat._PAT_SOLID)
+                dev.lline(sx, yy, ex, yy, color.BLACK, 0.001, linepat._PAT_SOLID)
             
             # write index in horizontal (0, 1, 2, ... F)
             tx.hv()
