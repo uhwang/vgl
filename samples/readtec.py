@@ -1,2 +1,0 @@
-# readtec.py
-
