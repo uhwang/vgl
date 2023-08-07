@@ -43,9 +43,7 @@ def fixed_tree(dev, order, length, angle):
         col = vgl.color.hsv(0, scale, 1)
         fruit = vgl.symbol.Circle(scale*0.01, dev.frm.hgt(), 0.001)
         fruit.set_color(col,col)
-        dev.begin_symbol(fruit)
         dev.symbol(posx, posy, fruit)
-        dev.end_symbol()
     
     if order > 0:
         fixed_tree(dev, order - 1, length*0.8, angle + 0.5)
@@ -85,8 +83,10 @@ def draw_shape(dev):
     vgl.draw_axis(dev)
     for p in plist:
         dev.polygon(p.get_xs(), p.get_ys(), 
-                    p.lcol, p.lthk*dev.frm.hgt(), 
-                    p.fcol, lpat=p.get_line_pattern())   
+                    lcol=p.lcol,
+                    lthk=p.lthk,
+                    lpat=p.get_line_pattern(),
+                    fcol=p.fcol)   
 
 # Plot X^2 curve                    
 x2 = np.arange(-3,3.2,0.2)
@@ -94,14 +94,8 @@ y2 = x2**2
 def plot_x2(dev):
     vgl.drawaxis.draw_axis(dev)
     dev.polyline(x2, y2, vgl.color.BLUE, 0.005*dev.frm.hgt())
-    #sym = vgl.symbol.Circle(0.008, dev.frm.hgt(), 0.002)
-    #sym = vgl.symbol.RightTriangle(0.02, dev.frm.hgt(), 0.005)
-    #sym = vgl.symbol.LeftTriangle(0.02, dev.frm.hgt(), 0.005)
-    sym = vgl.symbol.Diamond(0.03, dev.frm.hgt(), 0.005)
-    #sym = vgl.symbol.Square(0.02, dev.frm.hgt(), 0.005)
-    dev.begin_symbol(sym)
+    sym = vgl.symbol.Circle(0.008, dev.frm.hgt(), 0.002)
     for x2p, y2p in zip(x2,y2): dev.symbol(x2p,y2p,sym)
-    dev.end_symbol()
 
 # Plot Marine Propeller w/ Tecplot data format    
 def plot_prop(dev):
@@ -145,7 +139,7 @@ frm_20.set_label_font(vgl.fontid.FONT_TIMESROMANBOLD)
 def plot_cycloid(dev):
     vgl.draw_frame(dev)
     vgl.draw_axis(dev)
-    dev.polyline(xcy,ycy,vgl.color.MAGENTA, dev.frm.hgt()*0.02)
+    dev.polyline(xcy,ycy,vgl.color.MAGENTA, 0.02)
     
 def save(dev):
     dev.set_plot(frm_00)
