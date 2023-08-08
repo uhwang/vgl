@@ -17,7 +17,8 @@ def plot(dev):
 def save():
     import chkfld
     
-    chkfld.create_folder("./cardioid")
+    if not chkfld.create_folder("./cardioid"):
+        return
             
     dev_img = vgl.DeviceIMG("./cardioid/cardioid.jpg", fmm.get_gbbox(), 300)
     dev_pdf = vgl.DevicePDF("./cardioid/cardioid.pdf", fmm.get_gbbox())

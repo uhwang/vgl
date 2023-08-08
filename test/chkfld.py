@@ -4,9 +4,10 @@ def create_folder(path):
     p = Path(path)
     if p.exists() == False:
         try:
-            Path.mkdir(path)
+            p.mkdir()
         except Exception as e:
-            print("... Error: can't create %s"%path)
+            print("... Error: %s\n... Fail to create %s"%
+                 (e,path))
             return False
             
     return True

@@ -55,7 +55,8 @@ def save():
     import chkfld
     global dev
     
-    chkfld.create_folder("./parabola-mov")
+    if not chkfld.create_folder("./parabola-mov"):
+        return
         
     dev = vgl.DeviceCairo("", gbox, 250)
     dev.set_plot(frm)

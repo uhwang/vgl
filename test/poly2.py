@@ -39,7 +39,8 @@ create_polygon_list()
 def save():
     import chkfld
     
-    chkfld.create_folder("./poly2")
+    if not chkfld.create_folder("./poly2"):
+        return
     
     dev_wmf = vgl.DeviceWMF("./poly2/poly2.wmf", gbox)
     dev_emf = vgl.DeviceEMF("./poly2/poly2.emf", gbox)

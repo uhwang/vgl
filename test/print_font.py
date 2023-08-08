@@ -6,7 +6,8 @@ def save():
     import chkfld
     
     path = "./vgl-fonts"
-    chkfld.create_folder(path)
+    if not chkfld.create_folder(path):
+        return
     
     for fid in vgl.fontid._FONT_LIST:
         vgl.print_hershey_font(fid, vgl.devutil._dev_img, path)    

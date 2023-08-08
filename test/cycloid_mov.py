@@ -71,7 +71,8 @@ def save():
     import chkfld
     global dev
     
-    chkfld.create_folder("./cycloid-mov")   
+    if not chkfld.create_folder("./cycloid-mov"):
+        return
 
     dev = vgl.DeviceCairo("", fmm.get_gbbox(), 200)
     dev.set_device(frm, extend=vgl.device._FIT_EXTEND_X)

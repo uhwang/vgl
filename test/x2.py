@@ -21,7 +21,8 @@ def draw(dev):
 def save():
     import chkfld
     
-    chkfld.create_folder("./x2")
+    if not chkfld.create_folder("./x2"):
+        return
     
     dev_wmf = vgl.DeviceWMF("./x2/x2.wmf", gbox)
     dev_emf = vgl.DeviceEMF("./x2/x2.emf", gbox)

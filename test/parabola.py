@@ -40,7 +40,8 @@ def draw(dev):
 def save():
     import chkfld
     
-    chkfld.create_folder("./parabola")
+    if not chkfld.create_folder("./parabola"):
+        return
     
     dev_wmf = vgl.DeviceWMF("./parabola/parabola.wmf", gbox)
     dev_emf = vgl.DeviceEMF("./parabola/parabola.emf", gbox)

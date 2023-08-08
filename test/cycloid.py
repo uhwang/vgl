@@ -59,7 +59,8 @@ frm.yaxis.label.size *= 2
 def save():
     import chkfld
     
-    chkfld.create_folder("./cycloid")
+    if not chkfld.create_folder("./cycloid"):
+        return
         
     dev_img = vgl.DeviceIMG("./cycloid/cycloid.jpg", fmm.get_gbbox(), 300)
     dev_wmf = vgl.DeviceWMF("./cycloid/cycloid.wmf", fmm.get_gbbox())

@@ -63,7 +63,8 @@ gbox = fmm.get_gbbox()
 def save():
     import chkfld
     
-    chkfld.create_folder("./epicycloid")
+    if not chkfld.create_folder("./epicycloid"):
+        return
     
     dev_wmf = vgl.DeviceWMF("./epicycloid/epicycloid.wmf", gbox)
     dev_emf = vgl.DeviceEMF("./epicycloid/epicycloid.emf", gbox)

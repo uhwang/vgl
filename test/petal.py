@@ -18,7 +18,8 @@ def draw(dev):
 def save():
     import chkfld
     
-    chkfld.create_folder("./petal")
+    if not chkfld.create_folder("./petal"):
+        return
             
     dev_img = vgl.DeviceIMG("./petal/petal.jpg", fmm.get_gbbox(), 300)
     dev_pdf = vgl.DevicePDF("./petal/petal.pdf", fmm.get_gbbox())
