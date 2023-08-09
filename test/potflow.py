@@ -75,15 +75,15 @@ def vuv(U, alpha, x0,  y0,  x1,  y1):
 
 def usk(U, alpha, x0,  y0,  x1,  y1):
 
-	return U*np.cos(alpha)+\
-           RK*R2PI*((x1+RKM)/(y1**2+(x1+RKM)**2)-\
+    return U*np.cos(alpha)+\
+        RK*R2PI*((x1+RKM)/(y1**2+(x1+RKM)**2)-\
                     (x1-RKM)/(y1**2+(x1-RKM)**2))
 
 
 def vsk(U, alpha, x0,  y0,  x1,  y1):
 
-	return U*np.sin(alpha) - \
-           RK*R2PI*(y1/(y1**2+(x1-RKM)**2)-\
+    return U*np.sin(alpha) - \
+        RK*R2PI*(y1/(y1**2+(x1-RKM)**2)-\
                     y1/(y1**2+(x1+RKM)**2))
 
 uu = [uus, uuv, uud, usk ]
