@@ -149,9 +149,10 @@ class Frame():
                        float(round(decimal.Decimal(rmax), 1))
         self.axis_polar = axis.PolarAxis(_rmin, _rmax)
             
-    def to_polar(self, rmin, rmax):
+    #def to_polar(self, rmin, rmax):
+    def to_polar(self):
         self.axis_t = axis.AXIS_POLAR   
-        self.create_polar_axis(rmin, rmax)
+        #self.create_polar_axis(rmin, rmax)
         
     def set_rmax(self, rmax):
         self.axis_polar.raxis.rmax = rmax
