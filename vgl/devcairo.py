@@ -169,6 +169,8 @@ class DeviceIMG(device.DeviceRaster):
                     yp = y.copy()
                     xp.append(x[0])
                     yp.append(y[0])
+            else:
+                xp, yp = x, y
             pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t)
             for p1 in pat_seg:
                 x1 = [ p2[0] for p2 in p1 ]

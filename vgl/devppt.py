@@ -222,6 +222,9 @@ class DevicePPT(device.DeviceVector):
                         yp = y.copy()
                         xp.append(x[0])
                         yp.append(y[0])
+                else:
+                    xp, yp = x, y
+                    
                 if viewport:
                     pat_seg = patline.get_pattern_line(self, xp, yp, lpat.pat_len, lpat.pat_t, viewport=True)
                 else:
