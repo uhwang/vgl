@@ -14,8 +14,7 @@ def draw(dev):
     dev.set_device(frm)
     vgl.draw_axis(dev)
     dev.polyline(x, y, vgl.color.BLUE, 0.001)
-    sym = vgl.symbol.Circle(0.008, dev.frm.hgt(), 0.002)
-    for x1, y1 in zip(x,y): dev.symbol(x1,y1,sym)
+    vgl.plot_circle_symbol(dev,x,y)
     dev.close()
 
 def save():
