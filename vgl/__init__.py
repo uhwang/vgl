@@ -1,5 +1,4 @@
-# __init__.py
-__version__ = '0.1'
+__version__ = '0.4'
 __VERSION__ = __version__
 
 from . frame     import *
@@ -37,28 +36,4 @@ from . basicshape import *
 from . polarplot import *
 from . fontutil import * 
 from . devutil import *
-
-#from . import frame     
-#from . import data      
-#from . import device    
-#from . import device    
-#from . import color     
-#from . import size      
-#from . import symbol    
-#from . import text      
-#from . import geom      
-#from . import drawtick  
-#from . import drawaxis  
-#from . import drawlabel 
-#from . import patline   
-#from . import rotation  
-#from . import mesh3d    
-#from . import view3d    
-#from . import plot      
-#from . import linetype  
-#from . import util      
-#from . import drawfrm   
-#from . import drawgrid  
-#from . import devwmf    
-#from . import devcairo  
-
+from . plotsym import * 
