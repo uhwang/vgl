@@ -12,23 +12,16 @@ from numpy import pi, sin, cos
 from . import color
 from . import vertex
 from .rotation import deg_to_rad
-#import color
-#import vertex
-#from rotation import deg_to_rad
 
 class Symbol(vertex.Vertex):
-	def __init__(self, nvert, show, type, lcol, fill, fcol, size, lthk, skip):
+	def __init__(self, name, nvert, size, lcol, lthk, fill, fcol):
 		super().__init__(nvert)
-		self.show     = show
-		self.type     = type
+		self.name     = name
 		self.lcol     = lcol
 		self.fill     = fill
 		self.fcol     = fcol
 		self.size     = size
 		self.lthk     = lthk
-		self.skip     = skip
-		self.skip_indx= 0
-		self.skip_dist= 0
 		#self.pat      = SVC_SOLID;
 		#self.len      = 0.0
 
@@ -47,8 +40,16 @@ class Symbol(vertex.Vertex):
 	
 
 class Circle(Symbol):
-	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(12,True,'circle',color.BLACK,True,color.RED,size,lthk,0)
+	def __init__(
+                 self, 
+                 size, 
+                 hgt, 
+                 lcol=color.BLACK,
+                 lthk=0.001,
+                 fill=True,
+                 fcol=color.RED
+                ):
+		super().__init__('circle',12,size,lcol,lthk,True,fcol)
 		self.hgt = hgt
 		self.update(0,0)
 			
@@ -62,8 +63,16 @@ class Circle(Symbol):
 			self.vertex[i*2+1]=y+len*sin(rad)
 			
 class Gradient(Symbol):
-	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(3,True,'gradient',color.BLACK,True,color.RED,size,lthk,0)
+	def __init__(
+                 self, 
+                 size, 
+                 hgt, 
+                 lcol=color.BLACK,
+                 lthk=0.001,
+                 fill=True,
+                 fcol=color.RED
+                ):
+		super().__init__('gradient',3,size,lcol,lthk,True,fcol)
 		self.hgt = hgt
 		self.update(0,0)
 			
@@ -82,8 +91,16 @@ class Gradient(Symbol):
 		
 		
 class RightTriangle(Symbol):
-	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(3,True,'right triangle',color.BLACK,True,color.RED,size,lthk,0)
+	def __init__(
+                 self, 
+                 size, 
+                 hgt, 
+                 lcol=color.BLACK,
+                 lthk=0.001,
+                 fill=True,
+                 fcol=color.RED
+                ):
+		super().__init__('rtriangle',3,size,lcol,lthk,True,fcol)
 		self.hgt = hgt
 		self.update(0,0)
 
@@ -101,8 +118,16 @@ class RightTriangle(Symbol):
 		self.vertex[5]=y
 		
 class LeftTriangle(Symbol):
-	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(3,True,'left triangle',color.BLACK,True,color.RED,size,lthk,0)
+	def __init__(
+                 self, 
+                 size, 
+                 hgt, 
+                 lcol=color.BLACK,
+                 lthk=0.001,
+                 fill=True,
+                 fcol=color.RED
+                ):
+		super().__init__('ltriangle',3,size,lcol,lthk,True,fcol)
 		self.hgt = hgt
 		self.update(0,0)
 		
@@ -120,8 +145,16 @@ class LeftTriangle(Symbol):
 		self.vertex[5]=y+hs
 
 class Diamond(Symbol):
-	def __init__(self, size, hgt, lthk=0.001):
-		super().__init__(4,True,'diamond',color.BLACK,True,color.RED,size,lthk,0)
+	def __init__(
+                 self, 
+                 size, 
+                 hgt, 
+                 lcol=color.BLACK,
+                 lthk=0.001,
+                 fill=True,
+                 fcol=color.RED
+                ):
+		super().__init__('diamond',4,size,lcol,lthk,True,fcol)
 		self.hgt = hgt
 		self.update(0,0)
 		
@@ -139,8 +172,16 @@ class Diamond(Symbol):
 		self.vertex[7]=y
 		
 class Square(Symbol):
-	def __init__(self, size, hgt,lthk=0.001):
-		super().__init__(4,True,'square',color.BLACK,True,color.RED,size,lthk,0)
+	def __init__(
+                 self, 
+                 size, 
+                 hgt, 
+                 lcol=color.BLACK,
+                 lthk=0.001,
+                 fill=True,
+                 fcol=color.RED
+                ):
+		super().__init__('square',4,size,lcol,lthk,True,fcol)
 		self.hgt = hgt
 		self.update(0,0)
 		
