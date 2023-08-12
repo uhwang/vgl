@@ -142,3 +142,8 @@ def draw_axis(dev):
                 text.write_text(dev, rlabel, True)
                 wxx = raxis.first_major_tick_pos+raxis.spacing*vi
                 vi+=1
+
+def draw_center_axis(dev):
+    dev.frm.set_axispos_center()
+    dev.frm.to_cartesian()
+    draw_axis(dev)
