@@ -95,9 +95,12 @@ class Text(Font):
                  fill_box = False,
                  box_lcol = color.BLACK,
                  box_lthk = 0.001,
-                 box_fcol = color.WHITE
+                 box_fcol = color.WHITE,
+                 fid      = fontid.FONT_ROMANSIMPLEX
                 ):
-        super().__init__( size     = size,
+        super().__init__( 
+                          fid      = fid,
+                          size     = size,
                           lcol     = lcol,
                           lthk     = lthk,
                           align    = align,
