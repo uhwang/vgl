@@ -21,10 +21,6 @@ import vgl.symtbl as sym_search
 from . import util
 from . import vertex
 
-to_rad = 3.1415926535/180
-#void TG_TextOut(TG_Device_Ptr dev, TG_StrPtr str, TG_Float x, TG_Float y, TG_UShort align, TG_Float lthk, TG_Color fc, TG_Color lc)
-
-
 ESCAPE = "\\"
 
 TEXT_ALIGN_VCENTER   = 0x0001
@@ -41,8 +37,8 @@ STD_FONT_TOP_OFFSET    = 12
 STD_FONT_BOTTOM_OFFSET =  9
 TEXT_DROP              =  2 
 
-IS_BOX       = lambda a: (a)&TEXT_BOX
-IS_FILLEDBOX = lambda a: (a)&TEXT_FILLEDBOX
+#IS_BOX       = lambda a: (a)&TEXT_BOX
+#IS_FILLEDBOX = lambda a: (a)&TEXT_FILLEDBOX
 
 IS_LEFT      = lambda a: (a)&TEXT_ALIGN_LEFT   
 IS_RIGHT     = lambda a: (a)&TEXT_ALIGN_RIGHT   
@@ -290,17 +286,18 @@ def write_text(dev, t, viewport=True):
     
     fthk = t.lthk
     bthk = t.box_lthk
+    gap  = fhgt*0.15
     
     bvtx = vertex.Vertex(5)
-    bvtx.set_vertex(0, fbox.sx, fbox.sy)
-    bvtx.set_vertex(1, fbox.sx, fbox.ey)
-    bvtx.set_vertex(2, fbox.ex, fbox.ey)
-    bvtx.set_vertex(3, fbox.ex, fbox.sy)
-    bvtx.set_vertex(4, fbox.sx, fbox.sy)
+    bvtx.set_vertex(0, fbox.sx-gap, fbox.sy-gap)
+    bvtx.set_vertex(1, fbox.sx-gap, fbox.ey+gap)
+    bvtx.set_vertex(2, fbox.ex+gap, fbox.ey+gap)
+    bvtx.set_vertex(3, fbox.ex+gap, fbox.sy-gap)
+    bvtx.set_vertex(4, fbox.sx-gap, fbox.sy-gap)
     
     if t.show_box or t.fill_box:
         if t.deg != 0:
-            bvtx.rotate(t.deg)
+            bvtx.rotate(-t.deg)
         bvtx.trans(dx,dy)
         if viewport:
             curx = t.x
@@ -318,7 +315,7 @@ def write_text(dev, t, viewport=True):
     if t.deg != 0:
         for ll in clist:
             for ls in ll:
-                r = util.deg_rotation(ls[0], ls[1], t.deg)
+                r = util.deg_rotation(ls[0], ls[1], -t.deg)
                 ls[0], ls[1] = r[0], r[1]
 
     for ll in clist:
