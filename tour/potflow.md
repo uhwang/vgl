@@ -1,4 +1,4 @@
-![potflow](https://github.com/uhwang/vgl/assets/43251090/733c55d1-3955-40b3-9340-f1dac2b782c3)
+![potflow](https://github.com/uhwang/vgl/assets/43251090/26083a0a-54a5-47e5-8ea3-5eccc440dcf0)
 
 ```python
 # potflow.py
@@ -183,6 +183,7 @@ def uniform_source(dev):
 
     vgl.draw_frame(dev)
     vgl.draw_center_axis(dev)
+    vgl.print_top_center(dev, "Unifor+Source")
     
 def uniform_vortex(dev):
 
@@ -202,6 +203,7 @@ def uniform_vortex(dev):
 
     vgl.draw_frame(dev)
     vgl.draw_center_axis(dev)
+    vgl.print_top_center(dev, "Uniform+Vortex")
     
 def uniform_dipole(dev):
 
@@ -221,6 +223,7 @@ def uniform_dipole(dev):
 
     vgl.draw_frame(dev)
     vgl.draw_center_axis(dev)
+    vgl.print_top_center(dev, "Uniform+Dipole")
     
 def uniform_rankin(dev):
 
@@ -240,6 +243,7 @@ def uniform_rankin(dev):
 
     vgl.draw_frame(dev)
     vgl.draw_center_axis(dev)
+    vgl.print_top_center(dev, "Rankine Oval")
     
 fmm  = vgl.FrameManager()
 frm1 = fmm.create(0.0, 0.0, 3,3, vgl.Data(-1, 1, -1, 1))
@@ -289,3 +293,5 @@ def save():
     
 if __name__ == "__main__":
     save()
+        
+    
