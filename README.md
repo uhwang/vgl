@@ -94,8 +94,7 @@ y2 = x2**2
 def plot_x2(dev):
     vgl.drawaxis.draw_axis(dev)
     dev.polyline(x2, y2, vgl.color.BLUE, 0.005*dev.frm.hgt())
-    sym = vgl.symbol.Circle(0.008, dev.frm.hgt(), 0.002)
-    for x2p, y2p in zip(x2,y2): dev.symbol(x2p,y2p,sym)
+    vgl.plot_diamond_symbol(dev, x2, y2)
 
 # Plot Marine Propeller w/ Tecplot data format    
 def plot_prop(dev):
