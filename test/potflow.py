@@ -176,8 +176,11 @@ def uniform_source(dev):
         xx = [l[0] for l in line]
         yy = [l[1] for l in line]
             
-        dev.polyline(xx, yy)
+        dev.polyline(xx, yy, vgl.color.BLUE)
 
+    vgl.draw_frame(dev)
+    vgl.draw_center_axis(dev)
+    
 def uniform_vortex(dev):
 
     minx=-1.0
@@ -192,8 +195,11 @@ def uniform_vortex(dev):
         xx = [l[0] for l in line]
         yy = [l[1] for l in line]
             
-        dev.polyline(xx, yy)
+        dev.polyline(xx, yy, vgl.color.BLUE)
 
+    vgl.draw_frame(dev)
+    vgl.draw_center_axis(dev)
+    
 def uniform_dipole(dev):
 
     minx=-1.0
@@ -208,8 +214,11 @@ def uniform_dipole(dev):
         xx = [l[0] for l in line]
         yy = [l[1] for l in line]
             
-        dev.polyline(xx, yy)
-        
+        dev.polyline(xx, yy, vgl.color.BLUE)
+
+    vgl.draw_frame(dev)
+    vgl.draw_center_axis(dev)
+    
 def uniform_rankin(dev):
 
     minx=-1.0
@@ -224,13 +233,16 @@ def uniform_rankin(dev):
         xx = [l[0] for l in line]
         yy = [l[1] for l in line]
             
-        dev.polyline(xx, yy)
-        
+        dev.polyline(xx, yy, vgl.color.BLUE)
+
+    vgl.draw_frame(dev)
+    vgl.draw_center_axis(dev)
+    
 fmm  = vgl.FrameManager()
-frm1 = fmm.create(0,0,3,3, vgl.Data(-1, 1, -1, 1))
-frm2 = fmm.create(3,0,3,3, vgl.Data(-1, 1, -1, 1))
-frm3 = fmm.create(0,3,3,3, vgl.Data(-1, 1, -1, 1))
-frm4 = fmm.create(3,3,3,3, vgl.Data(-1, 1, -1, 1))
+frm1 = fmm.create(0.0, 0.0, 3,3, vgl.Data(-1, 1, -1, 1))
+frm2 = fmm.create(3.1, 0.0, 3,3, vgl.Data(-1, 1, -1, 1))
+frm3 = fmm.create(0.0, 3.1, 3,3, vgl.Data(-1, 1, -1, 1))
+frm4 = fmm.create(3.1, 3.1, 3,3, vgl.Data(-1, 1, -1, 1))
 
 def plot(dev):
     
