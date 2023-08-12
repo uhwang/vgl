@@ -37,3 +37,4 @@ from . polarplot import *
 from . fontutil import * 
 from . devutil import *
 from . plotsym import * 
+from . printtext import *
