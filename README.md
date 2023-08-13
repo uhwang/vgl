@@ -37,7 +37,7 @@ def fixed_tree(dev, order, length, angle):
     posx -= dx
     posy += dy
     
-    dev.line(prv_posx, prv_posy, posx, posy, ctbl[int(length-1)], length*dlength*0.04*dev.frm.hgt())
+    dev.line(prv_posx, prv_posy, posx, posy, ctbl[int(length-1)], length*dlength*0.04)
     
     if length <= 10:
         col = vgl.color.hsv(0, scale, 1)
@@ -93,7 +93,7 @@ x2 = np.arange(-3,3.2,0.2)
 y2 = x2**2
 def plot_x2(dev):
     vgl.drawaxis.draw_axis(dev)
-    dev.polyline(x2, y2, vgl.color.BLUE, 0.005*dev.frm.hgt())
+    dev.polyline(x2, y2, vgl.color.BLUE, 0.005)
     vgl.plot_diamond_symbol(dev, x2, y2)
 
 # Plot Marine Propeller w/ Tecplot data format    
