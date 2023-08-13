@@ -44,6 +44,10 @@ _paper_info = {
 "LETTER": ( 8.5   , 11.0    ,  215.8915,  279.389)
 }
 
+
+def get_paper_size(pn):
+    return _paper_info[pn] if pn in _paper_info else None
+    
 def get_paper_letter():
     return (_paper_info["LETTER"][0], 
             _paper_info["LETTER"][1],
@@ -52,3 +56,11 @@ def get_paper_letter():
 
 def get_paper_letter_inch():
     return _paper_info["LETTER"][0], _paper_info["LETTER"][1]
+    
+def get_letter_size_inch():
+    return get_paper_letter_inch()
+    
+def get_a4_size_inch():
+    return _paper_info["A4"][0], _paper_info["LETTER"][1]
+
+    
